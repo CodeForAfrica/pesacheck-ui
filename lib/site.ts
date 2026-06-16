@@ -3,8 +3,45 @@
  * Header, Footer). Page-specific content lives in `lib/<page>-content.ts`.
  */
 
-export const NAV_LINKS = [
-  { label: "About Us", href: "/about" },
+export type NavMenuItem = { label: string; href: string; icon: string };
+
+export type NavLink = {
+  label: string;
+  href: string;
+  /** When present, the link reveals a mega-menu (desktop hover / mobile accordion). */
+  menu?: { description: string; items: NavMenuItem[] };
+};
+
+/**
+ * "About Us" mega-menu. Items are listed in column-major order — the panel lays
+ * them out as 4 columns of 3, so indices 0–2 are column 1, 3–5 column 2, etc.
+ * (mirrors the Figma "Group 34738225" dropdown, node 2866:4472).
+ */
+export const ABOUT_MENU_ITEMS: NavMenuItem[] = [
+  { label: "About Us", href: "/about", icon: "about-grid" },
+  { label: "Who We Are", href: "/about/who-we-are", icon: "about-users" },
+  { label: "Our Partners", href: "/about/our-partners", icon: "about-hand" },
+  { label: "Funding", href: "/about/funding", icon: "about-coins-hand" },
+  { label: "Our Impact", href: "/about/our-impact", icon: "about-globe" },
+  { label: "FAQs", href: "/about/faqs", icon: "about-faq" },
+  { label: "Methodology", href: "/about/methodology", icon: "about-refresh" },
+  { label: "Contact Us", href: "/about/contact-us", icon: "about-phone" },
+  { label: "Our Ecosystem", href: "/about/our-ecosystem", icon: "about-server" },
+  { label: "Principles", href: "/about/principles", icon: "about-scales" },
+  { label: "Our Staff + Expertise", href: "/about/staff-expertise", icon: "about-users" },
+  { label: "Media Centre", href: "/about/media-centre", icon: "about-announcement" },
+];
+
+export const NAV_LINKS: NavLink[] = [
+  {
+    label: "About Us",
+    href: "/about",
+    menu: {
+      description:
+        "PesaCheck verifies public statements and viral claims across Africa. Learn who we are and how we work.",
+      items: ABOUT_MENU_ITEMS,
+    },
+  },
   { label: "Fact-Checks", href: "#fact-checks" },
   { label: "Knowledge", href: "/knowledge" },
   { label: "Tools", href: "/tools" },
