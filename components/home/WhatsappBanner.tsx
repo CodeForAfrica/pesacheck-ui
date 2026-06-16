@@ -3,22 +3,17 @@ import { Container } from "@/components/ui/SectionHeading";
 import { Icon } from "@/components/ui/Icon";
 import { WHATSAPP_BANNER, WHATSAPP_COLUMNS, type WhatsappColumn } from "@/lib/home-content";
 
-/** WhatsApp brand glyph, composited from the four exported SVG layers. */
-/* eslint-disable @next/next/no-img-element -- decorative layered SVG fragments */
-function WhatsappGlyph() {
-  return (
-    <div className="relative size-10">
-      <img src="/icons/whatsapp-border.svg" alt="" className="absolute inset-[9.38%_6.25%_3.13%_6.25%]" aria-hidden />
-      <img src="/icons/whatsapp-bg.svg" alt="" className="absolute inset-[12.5%]" aria-hidden />
-      <img src="/icons/whatsapp-border2.svg" alt="" className="absolute inset-[6.25%]" aria-hidden />
-      <img src="/icons/whatsapp-phone.svg" alt="" className="absolute inset-[27.78%_26.82%_30.22%_27.44%]" aria-hidden />
-    </div>
-  );
-}
-/* eslint-enable @next/next/no-img-element */
-
 function ColumnGraphic({ graphic }: { graphic: WhatsappColumn["graphic"] }) {
-  if (graphic === "whatsapp") return <WhatsappGlyph />;
+  if (graphic === "whatsapp")
+    return (
+      <Image
+        src="/images/whatsapp-icon.svg"
+        alt="WhatsApp"
+        width={40}
+        height={40}
+        className="size-18"
+      />
+    );
   if (graphic === "qr")
     return (
       <Image
