@@ -7,7 +7,7 @@ export const NAV_LINKS = [
   { label: "About Us", href: "#about" },
   { label: "Fact-Checks", href: "#fact-checks" },
   { label: "Knowledge", href: "/knowledge" },
-  { label: "Tools", href: "#tools" },
+  { label: "Tools", href: "/tools" },
 ];
 
 // "An initiative of…" blurb — appears in the footer ally/partner columns and
@@ -27,7 +27,7 @@ export const FOOTER_NAV = [
   "Contact Us",
 ];
 
-export const LEGAL = ["Copyright 2025 PesaCheck", "Imprint", "Privacy policy"];
+export const LEGAL = ["Copyright 2026 PesaCheck", "Imprint", "Privacy policy"];
 
 export type Logo = { src: string; alt: string; width: number; height: number };
 
