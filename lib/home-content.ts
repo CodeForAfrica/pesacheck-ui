@@ -104,17 +104,6 @@ export const TRENDING: Story[] = [
   { image: "/images/spotlight/long-format3-1.png", alt: "Trending story", verdict: "Partly False", title: PLACEHOLDER_TITLE },
 ];
 
-// Left-to-right order as in the Figma row.
-export const CONTENT_DESKS = [
-  { name: "Climate Change", image: "/images/content-desks/content2.png" },
-  { name: "Gender", image: "/images/content-desks/gender.png" },
-  { name: "Elections", image: "/images/content-desks/elections.png" },
-  { name: "Public Finances", image: "/images/content-desks/public-finance.png" },
-  { name: "Scams", image: "/images/content-desks/scams.png" },
-  { name: "Health", image: "/images/content-desks/content3.png" },
-  { name: "Migration", image: "/images/content-desks/content4.png" },
-];
-
 export const LATEST_FEATURE: Story = {
   image: "/images/hero-preview-cards/story-large.png",
   alt: "Latest feature story",

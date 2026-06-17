@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { FactChecksHero } from "@/components/fact-checks/FactChecksHero";
 import { FactChecksExplorer } from "@/components/fact-checks/FactChecksExplorer";
 import { FactChecksContentDesks } from "@/components/fact-checks/FactChecksContentDesks";
 
@@ -12,7 +11,6 @@ export const metadata: Metadata = {
 export default function FactChecksPage() {
   return (
     <>
-      <FactChecksHero />
       <FactChecksExplorer />
       <FactChecksContentDesks />
     </>

@@ -92,14 +92,3 @@ export const STORIES: Story[] = [
   { image: "/images/spotlight/long-format3-1.png", alt: "Fact-check", verdict: "Partly False", title: PLACEHOLDER_TITLE, topic: "Climate Change", region: "Uganda", language: "English" },
   { image: "/images/spotlight/long-format4-2.png", alt: "Fact-check", verdict: "Partly False", title: PLACEHOLDER_TITLE, topic: "Public Finances", region: "South Africa", language: "Portuguese" },
 ];
-
-// ── Content desks ────────────────────────────────────────────────────────--
-// Left-to-right order matching the Figma row; reuses the shared desk imagery.
-
-export const CONTENT_DESKS = [
-  { name: "Climate Change", image: "/images/content-desks/content2.png" },
-  { name: "Gender", image: "/images/content-desks/gender.png" },
-  { name: "Elections", image: "/images/content-desks/elections.png" },
-  { name: "Public Finances", image: "/images/content-desks/public-finance.png" },
-  { name: "Scams", image: "/images/content-desks/scams.png" },
-];

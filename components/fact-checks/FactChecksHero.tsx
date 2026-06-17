@@ -25,7 +25,7 @@ function PreviewCard({ story }: { story: Story }) {
   );
 }
 
-export function FactChecksHero() {
+export function FactChecksHero({ topic = HERO.topic }: { topic?: string }) {
   return (
     <section className="relative overflow-hidden bg-pesacheck-black">
       <Image
@@ -42,7 +42,7 @@ export function FactChecksHero() {
         <div>
           <span className="mb-5 block h-[3px] w-[190px] rounded bg-white/80" />
           <h1 className="text-[34px] font-extrabold leading-[1.18] text-white sm:text-[44px] lg:text-[52px]">
-            {HERO.topic}
+            {topic}
           </h1>
         </div>
 
