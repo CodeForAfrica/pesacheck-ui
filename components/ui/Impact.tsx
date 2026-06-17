@@ -1,9 +1,9 @@
 import Image from "next/image";
 import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import { Icon } from "@/components/ui/Icon";
-import { ABOUT_IMPACT_STATS } from "@/lib/about-content";
+import { IMPACT_STATS } from "@/lib/site";
 
-export function AboutImpact() {
+export function Impact() {
   return (
     <section className="bg-neutral-50 py-14 lg:py-20">
       <Container>
@@ -22,7 +22,7 @@ export function AboutImpact() {
 
           {/* 2x2 stat cards */}
           <div className="grid gap-5 sm:grid-cols-2">
-            {ABOUT_IMPACT_STATS.map((stat) => (
+            {IMPACT_STATS.map((stat) => (
               <div
                 key={stat.value}
                 className="rounded-xl border border-neutral-100 bg-pesacheck-white p-7"

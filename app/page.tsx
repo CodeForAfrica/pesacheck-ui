@@ -1,5 +1,5 @@
 import { Hero } from "@/components/home/Hero";
-import { Impact } from "@/components/home/Impact";
+import { Impact } from "@/components/ui/Impact";
 import { Spotlight } from "@/components/home/Spotlight";
 import { WhatsappBanner } from "@/components/home/WhatsappBanner";
 import { TrendingStories } from "@/components/home/TrendingStories";

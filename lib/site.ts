@@ -89,3 +89,19 @@ export const SOCIAL_ICONS = [
   { name: "social-icon2", label: "LinkedIn" },
   { name: "social-layer13", label: "YouTube" },
 ];
+
+const STAT_BLURB = "Pesacheck has lorem ipsum dolor sit amet consectetur adipiscing";
+
+export type ImpactStat = {
+  icon: string;
+  value: string;
+  label: string;
+};
+
+// Row-major order matching the 2x2 Figma grid.
+export const IMPACT_STATS: ImpactStat[] = [
+  { icon: "translate", value: "6 Publishing Languages", label: STAT_BLURB },
+  { icon: "search-refraction", value: "10,000+ Fact-checks", label: STAT_BLURB },
+  { icon: "calendar-impact", value: "8+ Years in operation", label: STAT_BLURB },
+  { icon: "globe", value: "18+ Countries we operate in", label: STAT_BLURB },
+];

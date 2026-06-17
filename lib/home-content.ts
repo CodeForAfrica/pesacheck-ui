@@ -40,12 +40,6 @@ export const HERO_PREVIEW: Story[] = [
   { image: "/images/hero-preview-cards/story1.png", alt: "Featured story", title: PLACEHOLDER_TITLE },
 ];
 
-export const IMPACT_STATS = [
-  { value: "9 Fact-Checking Languages", label: "We publish fact-checks in nine languages across the continent." },
-  { value: "10,000+ Fact-Checks", label: "Misleading claims debunked since we began in 2016." },
-  { value: "15+ Countries Covered", label: "Newsroom partners and audiences spanning Africa." },
-];
-
 // Spotlight: one feature story + a grid of smaller ones.
 export const SPOTLIGHT_FEATURE: Story = {
   image: "/images/spotlight/long-format6-5.png",

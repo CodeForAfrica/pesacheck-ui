@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { AboutHero } from "@/components/about/AboutHero";
 import { AboutIntro } from "@/components/about/AboutIntro";
-import { AboutImpact } from "@/components/about/AboutImpact";
+import { Impact } from "@/components/ui/Impact";
 import { AboutTeam } from "@/components/about/AboutTeam";
 
 export const metadata: Metadata = {
@@ -15,7 +15,7 @@ export default function AboutPage() {
     <>
       <AboutHero />
       <AboutIntro />
-      <AboutImpact />
+      <Impact />
       <AboutTeam />
     </>
   );
