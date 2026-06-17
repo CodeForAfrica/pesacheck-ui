@@ -6,7 +6,7 @@ import { PRINCIPLES_HERO } from "@/lib/principles-content";
 // edge; a left-to-right wash keeps the heading legible over the busy image.
 // Mirrors the shared About hero treatment.
 const HERO_GRADIENT =
-  "linear-gradient(90deg, #021d33 0%, rgba(2, 29, 51, 0.85) 45%, rgba(2, 29, 51, 0.15) 100%)";
+  "linear-gradient(95deg, rgba(4, 26, 109, 0.92) 30%, rgba(4, 26, 109, 0.55) 70%, rgba(11, 42, 234, 0.25) 100%)";
 
 export function PrinciplesHero() {
   return (

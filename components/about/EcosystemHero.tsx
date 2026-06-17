@@ -6,7 +6,7 @@ import { ECOSYSTEM_HERO } from "@/lib/ecosystem-content";
 // edge; a left-to-right wash keeps the heading legible over the illustration.
 // Mirrors the shared About hero treatment (see PrinciplesHero).
 const HERO_GRADIENT =
-  "linear-gradient(90deg, #021d33 0%, rgba(2, 29, 51, 0.85) 45%, rgba(2, 29, 51, 0.1) 100%)";
+  "linear-gradient(95deg, rgba(4, 26, 109, 0.92) 30%, rgba(4, 26, 109, 0.55) 70%, rgba(11, 42, 234, 0.25) 100%)";
 
 export function EcosystemHero() {
   return (
