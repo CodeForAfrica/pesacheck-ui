@@ -9,7 +9,12 @@ export type NavLink = {
   label: string;
   href: string;
   /** When present, the link reveals a mega-menu (desktop hover / mobile accordion). */
-  menu?: { description: string; items: NavMenuItem[] };
+  menu?: {
+    description: string;
+    items: NavMenuItem[];
+    /** Number of rows the desktop grid lays items into (column-major). Default 3. */
+    rows?: 2 | 3;
+  };
 };
 
 /**
@@ -32,6 +37,20 @@ export const ABOUT_MENU_ITEMS: NavMenuItem[] = [
   { label: "Media Centre", href: "/about/media-centre", icon: "about-announcement" },
 ];
 
+/**
+ * "Fact-Checks" mega-menu. Items are listed in column-major order — the panel
+ * lays them out as 3 columns of 2, so indices 0–1 are column 1, 2–3 column 2,
+ * 4–5 column 3 (mirrors the Figma "Fact Checks" dropdown, node 2866:7355).
+ */
+export const FACT_CHECKS_MENU_ITEMS: NavMenuItem[] = [
+  { label: "All fact-checks", href: "/fact-checks", icon: "about-grid" },
+  { label: "By Language", href: "/fact-checks/by-language", icon: "factcheck-language" },
+  { label: "By Topic", href: "/fact-checks/by-topic", icon: "factcheck-topic" },
+  { label: "Quick Reads", href: "/fact-checks/quick-reads", icon: "factcheck-reads" },
+  { label: "Explainers", href: "/fact-checks/explainers", icon: "factcheck-play" },
+  { label: "By Country", href: "/fact-checks/by-country", icon: "about-globe" },
+];
+
 export const NAV_LINKS: NavLink[] = [
   {
     label: "About Us",
@@ -42,7 +61,16 @@ export const NAV_LINKS: NavLink[] = [
       items: ABOUT_MENU_ITEMS,
     },
   },
-  { label: "Fact-Checks", href: "#fact-checks" },
+  {
+    label: "Fact-Checks",
+    href: "/fact-checks",
+    menu: {
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet.",
+      items: FACT_CHECKS_MENU_ITEMS,
+      rows: 2,
+    },
+  },
   { label: "Knowledge", href: "/knowledge" },
   { label: "Tools", href: "/tools" },
 ];

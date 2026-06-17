@@ -8,21 +8,22 @@ import { NAV_LINKS } from "@/lib/site";
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [aboutOpen, setAboutOpen] = useState(false);
-  const [aboutMobileOpen, setAboutMobileOpen] = useState(false);
-  const aboutRef = useRef<HTMLDivElement | null>(null);
+  // Which mega-menu is open, keyed by nav label (null = none).
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [openMobile, setOpenMobile] = useState<string | null>(null);
+  const navRef = useRef<HTMLElement | null>(null);
 
-  // Close the click-opened mega-menu when clicking anywhere outside it.
+  // Close the click-opened mega-menu when clicking anywhere outside the nav.
   useEffect(() => {
-    if (!aboutOpen) return;
+    if (!openMenu) return;
     const onDocClick = (e: MouseEvent) => {
-      if (aboutRef.current && !aboutRef.current.contains(e.target as Node)) {
-        setAboutOpen(false);
+      if (navRef.current && !navRef.current.contains(e.target as Node)) {
+        setOpenMenu(null);
       }
     };
     document.addEventListener("mousedown", onDocClick);
     return () => document.removeEventListener("mousedown", onDocClick);
-  }, [aboutOpen]);
+  }, [openMenu]);
 
   return (
     <header className="sticky top-0 z-50 h-[90px] w-full border-b border-white/40 bg-white/80 backdrop-blur-md">
@@ -54,21 +55,23 @@ export function Header() {
         </form>
 
         {/* Desktop nav */}
-        <nav className="hidden shrink-0 items-center gap-5 text-sm font-semibold text-neutral-900 lg:flex">
+        <nav
+          ref={navRef}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") setOpenMenu(null);
+          }}
+          className="hidden shrink-0 items-center gap-5 text-sm font-semibold text-neutral-900 lg:flex"
+        >
           {NAV_LINKS.map((l) =>
             l.menu ? (
-              <div
-                key={l.label}
-                ref={aboutRef}
-                onKeyDown={(e) => {
-                  if (e.key === "Escape") setAboutOpen(false);
-                }}
-              >
+              <div key={l.label}>
                 <button
                   type="button"
                   aria-haspopup="true"
-                  aria-expanded={aboutOpen}
-                  onClick={() => setAboutOpen((v) => !v)}
+                  aria-expanded={openMenu === l.label}
+                  onClick={() =>
+                    setOpenMenu((v) => (v === l.label ? null : l.label))
+                  }
                   className="flex items-center gap-1 font-semibold transition-colors hover:text-pesacheck-blue"
                 >
                   {l.label}
@@ -78,7 +81,7 @@ export function Header() {
                     viewBox="0 0 24 24"
                     fill="none"
                     aria-hidden
-                    className={`transition-transform duration-200 ${aboutOpen ? "rotate-180" : ""}`}
+                    className={`transition-transform duration-200 ${openMenu === l.label ? "rotate-180" : ""}`}
                   >
                     <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
@@ -88,7 +91,7 @@ export function Header() {
                 <div
                   role="menu"
                   aria-label={l.label}
-                  className={`absolute left-0 top-full w-full border-b border-neutral-100 bg-white shadow-[0px_10px_10px_0px_rgba(0,0,0,0.08)] transition-opacity duration-150 ${aboutOpen ? "visible opacity-100" : "pointer-events-none invisible opacity-0"
+                  className={`absolute left-0 top-full w-full border-b border-neutral-100 bg-white shadow-[0px_10px_10px_0px_rgba(0,0,0,0.08)] transition-opacity duration-150 ${openMenu === l.label ? "visible opacity-100" : "pointer-events-none invisible opacity-0"
                     }`}
                 >
                   <div className="mx-auto flex max-w-[1440px] gap-10 px-5 py-[30px] sm:px-8 lg:px-[100px]">
@@ -98,13 +101,15 @@ export function Header() {
                         {l.menu.description}
                       </p>
                     </div>
-                    <ul className="grid grow auto-cols-fr grid-flow-col grid-rows-3 gap-x-6 gap-y-[15px]">
+                    <ul
+                      className={`grid grow auto-cols-fr grid-flow-col gap-x-6 gap-y-[15px] ${l.menu.rows === 2 ? "grid-rows-2" : "grid-rows-3"}`}
+                    >
                       {l.menu.items.map((item) => (
                         <li key={`${item.label}-${item.href}`}>
                           <Link
                             href={item.href}
                             role="menuitem"
-                            onClick={() => setAboutOpen(false)}
+                            onClick={() => setOpenMenu(null)}
                             className="flex items-center gap-2 text-sm font-medium text-neutral-900 transition-colors hover:text-pesacheck-blue"
                           >
                             <Icon name={item.icon} size={20} className="shrink-0" />
@@ -155,8 +160,10 @@ export function Header() {
                 <div key={l.label}>
                   <button
                     type="button"
-                    aria-expanded={aboutMobileOpen}
-                    onClick={() => setAboutMobileOpen((v) => !v)}
+                    aria-expanded={openMobile === l.label}
+                    onClick={() =>
+                      setOpenMobile((v) => (v === l.label ? null : l.label))
+                    }
                     className="flex w-full items-center justify-between py-1"
                   >
                     <span>{l.label}</span>
@@ -166,12 +173,12 @@ export function Header() {
                       viewBox="0 0 24 24"
                       fill="none"
                       aria-hidden
-                      className={`transition-transform duration-200 ${aboutMobileOpen ? "rotate-180" : ""}`}
+                      className={`transition-transform duration-200 ${openMobile === l.label ? "rotate-180" : ""}`}
                     >
                       <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </button>
-                  {aboutMobileOpen && (
+                  {openMobile === l.label && (
                     <ul className="mt-2 mb-1 flex flex-col gap-3 border-l border-neutral-100 pl-4">
                       {l.menu.items.map((item) => (
                         <li key={`${item.label}-${item.href}`}>
