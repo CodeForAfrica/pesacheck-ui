@@ -22,6 +22,8 @@ export type Story = {
 const PLACEHOLDER_TITLE =
   "Subtitle - different from title in the image - 20 words Max 3 lines";
 
+const ARTICLE_HREF = "/fact-checks/south-africas-manufacturing-surge";
+
 const EXCERPT =
   "Through strategic investments in technology, innovation, and workforce development, the nation is revitalizing its industrial base, creating jobs, and enhancing export opportunities in an...";
 
@@ -47,6 +49,7 @@ export const SPOTLIGHT_FEATURE: Story = {
   verdict: "Partly False",
   title: PLACEHOLDER_TITLE,
   excerpt: EXCERPT,
+  href: ARTICLE_HREF,
 };
 
 export const SPOTLIGHT_SECONDARY: Story = {
@@ -54,13 +57,14 @@ export const SPOTLIGHT_SECONDARY: Story = {
   alt: "Spotlight story",
   verdict: "Partly False",
   title: PLACEHOLDER_TITLE,
+  href: ARTICLE_HREF,
 };
 
 export const SPOTLIGHT_GRID: Story[] = [
-  { image: "/images/spotlight/long-format4-2.png", alt: "Spotlight story", verdict: "Partly False", title: PLACEHOLDER_TITLE },
-  { image: "/images/spotlight/long-format3-2.png", alt: "Spotlight story", verdict: "Partly False", title: PLACEHOLDER_TITLE },
-  { image: "/images/spotlight/long-format1-1.png", alt: "Spotlight story", verdict: "Partly False", title: PLACEHOLDER_TITLE },
-  { image: "/images/spotlight/long-format4-1.png", alt: "Spotlight story", verdict: "Partly False", title: PLACEHOLDER_TITLE },
+  { image: "/images/spotlight/long-format4-2.png", alt: "Spotlight story", verdict: "Partly False", title: PLACEHOLDER_TITLE, href: ARTICLE_HREF },
+  { image: "/images/spotlight/long-format3-2.png", alt: "Spotlight story", verdict: "Partly False", title: PLACEHOLDER_TITLE, href: ARTICLE_HREF },
+  { image: "/images/spotlight/long-format1-1.png", alt: "Spotlight story", verdict: "Partly False", title: PLACEHOLDER_TITLE, href: ARTICLE_HREF },
+  { image: "/images/spotlight/long-format4-1.png", alt: "Spotlight story", verdict: "Partly False", title: PLACEHOLDER_TITLE, href: ARTICLE_HREF },
 ];
 
 export const WHATSAPP_BANNER = "/images/whatsapp-banner/banner3.png";
@@ -97,11 +101,11 @@ export const WHATSAPP_COLUMNS: WhatsappColumn[] = [
 ];
 
 export const TRENDING: Story[] = [
-  { image: "/images/trending/spotlight1.png", alt: "Trending story", verdict: "Partly False", title: PLACEHOLDER_TITLE },
-  { image: "/images/trending/spotlight3.png", alt: "Trending story", verdict: "Partly False", title: PLACEHOLDER_TITLE },
-  { image: "/images/trending/spotlight4.png", alt: "Trending story", verdict: "Partly False", title: PLACEHOLDER_TITLE },
-  { image: "/images/hero-preview-cards/long-format5.png", alt: "Trending story", verdict: "Partly False", title: PLACEHOLDER_TITLE },
-  { image: "/images/spotlight/long-format3-1.png", alt: "Trending story", verdict: "Partly False", title: PLACEHOLDER_TITLE },
+  { image: "/images/trending/spotlight1.png", alt: "Trending story", verdict: "Partly False", title: PLACEHOLDER_TITLE, href: ARTICLE_HREF },
+  { image: "/images/trending/spotlight3.png", alt: "Trending story", verdict: "Partly False", title: PLACEHOLDER_TITLE, href: ARTICLE_HREF },
+  { image: "/images/trending/spotlight4.png", alt: "Trending story", verdict: "Partly False", title: PLACEHOLDER_TITLE, href: ARTICLE_HREF },
+  { image: "/images/hero-preview-cards/long-format5.png", alt: "Trending story", verdict: "Partly False", title: PLACEHOLDER_TITLE, href: ARTICLE_HREF },
+  { image: "/images/spotlight/long-format3-1.png", alt: "Trending story", verdict: "Partly False", title: PLACEHOLDER_TITLE, href: ARTICLE_HREF },
 ];
 
 export const LATEST_FEATURE: Story = {
@@ -110,15 +114,16 @@ export const LATEST_FEATURE: Story = {
   verdict: "Partly False",
   title: PLACEHOLDER_TITLE,
   excerpt: EXCERPT,
+  href: ARTICLE_HREF,
 };
 
 export const LATEST_GRID: Story[] = [
-  { image: "/images/latest-stories/story2.png", alt: "Latest story", verdict: "Partly False", title: PLACEHOLDER_TITLE },
-  { image: "/images/latest-stories/story3.png", alt: "Latest story", verdict: "Partly False", title: PLACEHOLDER_TITLE },
-  { image: "/images/latest-stories/story4.png", alt: "Latest story", verdict: "Partly False", title: PLACEHOLDER_TITLE },
-  { image: "/images/hero-preview-cards/story1.png", alt: "Latest story", verdict: "Partly False", title: PLACEHOLDER_TITLE },
-  { image: "/images/content-desks/content2.png", alt: "Latest story", verdict: "Partly False", title: PLACEHOLDER_TITLE },
-  { image: "/images/content-desks/content4.png", alt: "Latest story", verdict: "Partly False", title: PLACEHOLDER_TITLE },
+  { image: "/images/latest-stories/story2.png", alt: "Latest story", verdict: "Partly False", title: PLACEHOLDER_TITLE, href: ARTICLE_HREF },
+  { image: "/images/latest-stories/story3.png", alt: "Latest story", verdict: "Partly False", title: PLACEHOLDER_TITLE, href: ARTICLE_HREF },
+  { image: "/images/latest-stories/story4.png", alt: "Latest story", verdict: "Partly False", title: PLACEHOLDER_TITLE, href: ARTICLE_HREF },
+  { image: "/images/hero-preview-cards/story1.png", alt: "Latest story", verdict: "Partly False", title: PLACEHOLDER_TITLE, href: ARTICLE_HREF },
+  { image: "/images/content-desks/content2.png", alt: "Latest story", verdict: "Partly False", title: PLACEHOLDER_TITLE, href: ARTICLE_HREF },
+  { image: "/images/content-desks/content4.png", alt: "Latest story", verdict: "Partly False", title: PLACEHOLDER_TITLE, href: ARTICLE_HREF },
 ];
 
 export type Tool = {

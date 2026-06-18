@@ -15,8 +15,8 @@ Marketing and fact-check website for **PesaCheck** — Africa's largest indigeno
 ## Getting started
 
 ```bash
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
@@ -25,10 +25,10 @@ Open [http://localhost:3000](http://localhost:3000).
 
 | Command | Description |
 | --- | --- |
-| `npm run dev` | Start the development server |
-| `npm run build` | Production build |
-| `npm run start` | Serve the production build |
-| `npm run lint` | Run ESLint |
+| `pnpm dev` | Start the development server |
+| `pnpm build` | Production build |
+| `pnpm start` | Serve the production build |
+| `pnpm lint` | Run ESLint |
 
 ## Project structure
 
@@ -126,5 +126,5 @@ for the full procedure and what's automated vs. model-guided.
 
 ## Deployment
 
-The app builds with `npm run build` and serves with `npm run start`. It can be
+The app builds with `pnpm build` and serves with `pnpm start`. It can be
 deployed to any Node host or to [Vercel](https://vercel.com/new).
