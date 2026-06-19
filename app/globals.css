@@ -5,47 +5,47 @@
  * (file cYGW2ILSvzQC8On2klwU22) variable definitions.
  */
 @theme {
-	/* Brand */
-	--color-pesacheck-blue: #0b2aea;
-	--color-pesacheck-black: #021d33;
-	--color-pesacheck-purple: #60279e; /* Truthometer */
-	--color-pesacheck-white: #ffffff;
+  /* Brand */
+  --color-pesacheck-blue: #0b2aea;
+  --color-pesacheck-black: #021d33;
+  --color-pesacheck-purple: #60279e; /* Truthometer */
+  --color-pesacheck-white: #ffffff;
 
-	/* Primary (blue tints) */
-	--color-primary-50: #f1f2ff;
-	--color-primary-100: #c1c9fc;
-	--color-primary-300: #6b7ff8;
+  /* Primary (blue tints) */
+  --color-primary-50: #f1f2ff;
+  --color-primary-100: #c1c9fc;
+  --color-primary-300: #6b7ff8;
 
-	/* Neutrals */
-	--color-neutral-50: #f6f7f8;
-	--color-neutral-100: #dfdfe0;
-	--color-neutral-200: #c9cacb;
-	--color-neutral-300: #b3b4b6;
-	--color-neutral-400: #9d9fa1;
-	--color-neutral-500: #808285;
-	--color-neutral-600: #727477;
-	--color-neutral-800: #48494b;
-	--color-neutral-900: #333435;
+  /* Neutrals */
+  --color-neutral-50: #f6f7f8;
+  --color-neutral-100: #dfdfe0;
+  --color-neutral-200: #c9cacb;
+  --color-neutral-300: #b3b4b6;
+  --color-neutral-400: #9d9fa1;
+  --color-neutral-500: #808285;
+  --color-neutral-600: #727477;
+  --color-neutral-800: #48494b;
+  --color-neutral-900: #333435;
 
-	/* Typography */
-	--font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  /* Typography */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
-	--text-xs: 12px;
-	--text-xs--line-height: 18px;
-	--text-sm: 14px;
-	--text-sm--line-height: 20px;
-	--text-md: 16px;
-	--text-md--line-height: 24px;
-	--text-xl: 20px;
-	--text-xl--line-height: 30px;
+  --text-xs: 12px;
+  --text-xs--line-height: 18px;
+  --text-sm: 14px;
+  --text-sm--line-height: 20px;
+  --text-md: 16px;
+  --text-md--line-height: 24px;
+  --text-xl: 20px;
+  --text-xl--line-height: 30px;
 }
 
 html {
-	scroll-behavior: smooth;
+  scroll-behavior: smooth;
 }
 
 body {
-	background: var(--color-pesacheck-white);
-	color: var(--color-pesacheck-black);
-	font-family: var(--font-sans);
+  background: var(--color-pesacheck-white);
+  color: var(--color-pesacheck-black);
+  font-family: var(--font-sans);
 }

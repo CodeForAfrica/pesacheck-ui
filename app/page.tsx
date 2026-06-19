@@ -8,16 +8,16 @@ import { WhatsappBanner } from "@/components/home/WhatsappBanner";
 import { Impact } from "@/components/ui/Impact";
 
 export default function Home() {
-	return (
-		<>
-			<Hero />
-			<Impact />
-			<Spotlight />
-			<WhatsappBanner />
-			<TrendingStories />
-			<ContentDesks />
-			<LatestStories />
-			<Tools />
-		</>
-	);
+  return (
+    <>
+      <Hero />
+      <Impact />
+      <Spotlight />
+      <WhatsappBanner />
+      <TrendingStories />
+      <ContentDesks />
+      <LatestStories />
+      <Tools />
+    </>
+  );
 }

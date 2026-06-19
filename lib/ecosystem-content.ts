@@ -6,6 +6,6 @@
  */
 
 export const ECOSYSTEM_HERO = {
-	title: "Our Ecosystem",
-	subtitle: "Learn more about Pesacheck's Affiliations & network partnerships",
+  title: "Our Ecosystem",
+  subtitle: "Learn more about Pesacheck's Affiliations & network partnerships",
 };
