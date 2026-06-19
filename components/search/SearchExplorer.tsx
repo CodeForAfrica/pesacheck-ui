@@ -1,16 +1,16 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { FilterBar, type Selection } from "@/components/fact-checks/FilterBar";
 import { Container } from "@/components/ui/SectionHeading";
 import { StoryCard } from "@/components/ui/StoryCard";
-import { FilterBar, type Selection } from "@/components/fact-checks/FilterBar";
 import {
   DEFAULT_FILTERS,
   FEATURE,
   FEATURE_SECONDARY,
   FILTERS,
-  STORIES,
   type FilterDimension,
+  STORIES,
 } from "@/lib/fact-checks-content";
 import type { Story } from "@/lib/home-content";
 
@@ -19,7 +19,11 @@ const POOL: Story[] = [FEATURE, FEATURE_SECONDARY, ...STORIES];
 const EMPTY: Selection = { region: [], language: [], topic: [] };
 
 function clone(sel: Selection): Selection {
-  return { region: [...sel.region], language: [...sel.language], topic: [...sel.topic] };
+  return {
+    region: [...sel.region],
+    language: [...sel.language],
+    topic: [...sel.topic],
+  };
 }
 
 function matchesFilters(story: Story, applied: Selection): boolean {
@@ -70,7 +74,12 @@ function SearchIllustration() {
       <div className="absolute bottom-0 left-[58px] flex size-14 items-center justify-center rounded-full bg-black/20 backdrop-blur-[4px]">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden>
           <circle cx="11" cy="11" r="7" stroke="white" strokeWidth="2" />
-          <path d="M16.5 16.5L21 21" stroke="white" strokeWidth="2" strokeLinecap="round" />
+          <path
+            d="M16.5 16.5L21 21"
+            stroke="white"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
         </svg>
       </div>
     </div>
@@ -78,9 +87,13 @@ function SearchIllustration() {
 }
 
 export function SearchExplorer({ query }: { query: string }) {
-  const [selected, setSelected] = useState<Selection>(() => clone(DEFAULT_FILTERS));
+  const [selected, setSelected] = useState<Selection>(() =>
+    clone(DEFAULT_FILTERS),
+  );
   const [applied, setApplied] = useState<Selection>(() => clone(EMPTY));
-  const [openDropdown, setOpenDropdown] = useState<FilterDimension | null>(null);
+  const [openDropdown, setOpenDropdown] = useState<FilterDimension | null>(
+    null,
+  );
 
   const chips = useMemo(
     () =>
@@ -91,7 +104,8 @@ export function SearchExplorer({ query }: { query: string }) {
   );
 
   const results = useMemo(
-    () => POOL.filter((s) => matchesQuery(s, query) && matchesFilters(s, applied)),
+    () =>
+      POOL.filter((s) => matchesQuery(s, query) && matchesFilters(s, applied)),
     [query, applied],
   );
 
@@ -138,9 +152,12 @@ export function SearchExplorer({ query }: { query: string }) {
             <div className="flex flex-col items-center gap-8 text-center">
               <SearchIllustration />
               <div className="flex flex-col gap-2">
-                <p className="text-lg font-semibold text-neutral-800">No matches found</p>
+                <p className="text-lg font-semibold text-neutral-800">
+                  No matches found
+                </p>
                 <p className="text-sm font-medium text-neutral-600">
-                  Your search for &ldquo;{query}&rdquo; did not match any article. Please try again.
+                  Your search for &ldquo;{query}&rdquo; did not match any
+                  article. Please try again.
                 </p>
               </div>
             </div>
@@ -151,12 +168,14 @@ export function SearchExplorer({ query }: { query: string }) {
         <section className="py-14 lg:py-20">
           <Container>
             <div className="mb-8 border-l-[3px] border-pesacheck-black pl-4">
-              <h2 className="text-[30px] font-extrabold leading-10 text-gray-800">Latest Articles</h2>
+              <h2 className="text-[30px] font-extrabold leading-10 text-gray-800">
+                Latest Articles
+              </h2>
             </div>
             <div className="mt-1 h-px w-full bg-neutral-100" />
             <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-              {POOL.slice(0, 7).map((story, i) => (
-                <StoryCard key={`latest-${i}`} story={story} />
+              {POOL.slice(0, 7).map((story) => (
+                <StoryCard key={story.href ?? story.title} story={story} />
               ))}
             </div>
           </Container>
@@ -172,7 +191,9 @@ export function SearchExplorer({ query }: { query: string }) {
         <p className="text-sm font-medium text-neutral-700">
           {results.length >= 20 ? "20+" : results.length} results found for:
         </p>
-        <p className="mt-1 text-lg font-extrabold text-neutral-900">&ldquo;{query}&rdquo;</p>
+        <p className="mt-1 text-lg font-extrabold text-neutral-900">
+          &ldquo;{query}&rdquo;
+        </p>
       </section>
 
       {/* Filter panel */}
@@ -195,8 +216,8 @@ export function SearchExplorer({ query }: { query: string }) {
       <section className="py-14 lg:py-20">
         <Container>
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {results.map((story, i) => (
-              <StoryCard key={`result-${i}`} story={story} />
+            {results.map((story) => (
+              <StoryCard key={story.href ?? story.title} story={story} />
             ))}
           </div>
         </Container>
