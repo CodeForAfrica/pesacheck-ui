@@ -25,7 +25,7 @@ export type NavLink = {
 export const ABOUT_MENU_ITEMS: NavMenuItem[] = [
   { label: "About Us", href: "/about", icon: "about-grid" },
   { label: "Who We Are", href: "/about/who-we-are", icon: "about-users" },
-  { label: "Our Partners", href: "/about/our-partners", icon: "about-hand" },
+  { label: "Our Partners", href: "/about/partners", icon: "about-hand" },
   { label: "Funding", href: "/about/funding", icon: "about-coins-hand" },
   { label: "Our Impact", href: "/about/our-impact", icon: "about-globe" },
   { label: "FAQs", href: "/about/faqs", icon: "about-faq" },

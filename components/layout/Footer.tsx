@@ -2,64 +2,17 @@ import Image from "next/image";
 import { Container } from "@/components/ui/SectionHeading";
 import { Icon } from "@/components/ui/Icon";
 import {
-  ABOUT_BLURB,
-  ALLIES,
   FOOTER_ABOUT,
   FOOTER_NAV,
   LEGAL,
-  PARTNERS,
   SOCIAL_ICONS,
-  type Logo,
 } from "@/lib/site";
-
-function LogoStrip({ logos }: { logos: Logo[] }) {
-  return (
-    <div className="flex flex-wrap items-center gap-x-8 gap-y-5">
-      {logos.map((logo) => (
-        <Image
-          key={logo.src}
-          src={logo.src}
-          alt={logo.alt}
-          width={logo.width}
-          height={logo.height}
-          className="h-10 w-auto object-contain mix-blend-luminosity"
-        />
-      ))}
-    </div>
-  );
-}
-
-function AllyColumn({ title, logos }: { title: string; logos: Logo[] }) {
-  return (
-    <div>
-      <div className="flex items-center gap-4">
-        <span className="h-10 w-[3px] shrink-0 rounded bg-pesacheck-black" />
-        <h2 className="text-2xl font-extrabold leading-10 text-gray-800 md:text-[30px]">{title}</h2>
-      </div>
-      <div className="relative mt-5 h-px w-full bg-neutral-100">
-        <span className="absolute left-0 top-0 h-px w-44 bg-pesacheck-black" />
-      </div>
-      <p className="mt-7 max-w-[505px] text-sm font-medium leading-5 text-neutral-900">{ABOUT_BLURB}</p>
-      <a href="#" className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-neutral-900">
-        Learn More
-        <Icon name="arrow-up-right" size={20} />
-      </a>
-      <div className="mt-8">
-        <LogoStrip logos={logos} />
-      </div>
-    </div>
-  );
-}
+import { FooterAllySection } from "@/components/layout/FooterAllySection";
 
 export function Footer() {
   return (
     <footer className="mt-10 bg-neutral-50">
-      <Container className="py-16">
-        <div className="grid gap-12 lg:grid-cols-2">
-          <AllyColumn title="Our Allies" logos={ALLIES} />
-          <AllyColumn title="Our Partners" logos={PARTNERS} />
-        </div>
-      </Container>
+      <FooterAllySection />
 
       <Container className="pb-16">
         <div className="flex flex-wrap items-center justify-between gap-6 border-t border-neutral-100 pt-10">
