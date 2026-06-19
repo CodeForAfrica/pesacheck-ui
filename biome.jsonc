@@ -24,6 +24,9 @@
 				// Many links are placeholder href="#" pending real URLs
 				"useValidAnchor": "off"
 			}
+		},
+		"domains": {
+			"next": "recommended"
 		}
 	},
 	"css": {
