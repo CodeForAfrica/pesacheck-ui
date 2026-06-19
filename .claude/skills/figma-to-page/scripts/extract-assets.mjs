@@ -93,9 +93,10 @@ async function main() {
   const constRe =
     /const\s+(\w+)\s*=\s*["'](https?:\/\/[^"']+\/assets\/[^"']+)["']/g;
   const urlToVar = new Map();
-  let m;
-  while ((m = constRe.exec(text))) {
+  let m = constRe.exec(text);
+  while (m !== null) {
     if (!urlToVar.has(m[2])) urlToVar.set(m[2], m[1]);
+    m = constRe.exec(text);
   }
   // Also catch inline urls not bound to a const.
   for (const url of text.match(hostRe) || []) {

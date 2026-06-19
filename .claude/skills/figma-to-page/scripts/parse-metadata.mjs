@@ -49,14 +49,15 @@ function directChildren(xml) {
   tagRe.lastIndex = start;
   let depth = 0;
   let rootEnd = -1;
-  let m;
-  while ((m = tagRe.exec(xml))) {
+  let m = tagRe.exec(xml);
+  while (m !== null) {
     if (m[1] === "/") depth--;
     else if (m[2] !== "/") depth++;
     if (depth === 0) {
       rootEnd = tagRe.lastIndex;
       break;
     }
+    m = tagRe.exec(xml);
   }
   const body = xml.slice(start, rootEnd === -1 ? undefined : rootEnd);
   const inner = body.slice(body.indexOf(">") + 1);
@@ -65,8 +66,8 @@ function directChildren(xml) {
   const children = [];
   const elRe = /<([a-zA-Z][\w-]*)\b([^>]*?)(\/?)>/g;
   let depthC = 0;
-  let m2;
-  while ((m2 = elRe.exec(inner))) {
+  let m2 = elRe.exec(inner);
+  while (m2 !== null) {
     const [, tag, attrs, selfClose] = m2;
     const isClose = false;
     void isClose;
@@ -88,14 +89,16 @@ function directChildren(xml) {
       const closeRe = new RegExp(`</${tag}>|<${tag}\\b[^>]*?(?<!/)>`, "g");
       closeRe.lastIndex = elRe.lastIndex;
       let d = 1;
-      let c;
-      while (d > 0 && (c = closeRe.exec(inner))) {
+      let c = closeRe.exec(inner);
+      while (d > 0 && c !== null) {
         if (c[0].startsWith("</")) d--;
         else d++;
         elRe.lastIndex = closeRe.lastIndex;
+        c = closeRe.exec(inner);
       }
       depthC--;
     }
+    m2 = elRe.exec(inner);
   }
   return children;
 }
