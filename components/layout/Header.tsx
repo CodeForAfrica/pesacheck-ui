@@ -3,15 +3,17 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Icon } from "@/components/ui/Icon";
 import { NAV_LINKS } from "@/lib/site";
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
-  // Which mega-menu is open, keyed by nav label (null = none).
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [openMobile, setOpenMobile] = useState<string | null>(null);
+  const [searchFocused, setSearchFocused] = useState(false);
   const navRef = useRef<HTMLElement | null>(null);
+  const router = useRouter();
 
   // Close the click-opened mega-menu when clicking anywhere outside the nav.
   useEffect(() => {
@@ -25,7 +27,25 @@ export function Header() {
     return () => document.removeEventListener("mousedown", onDocClick);
   }, [openMenu]);
 
+  const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const q = new FormData(e.currentTarget).get("q") as string;
+    if (q.trim()) {
+      setSearchFocused(false);
+      router.push(`/search?q=${encodeURIComponent(q.trim())}`);
+    }
+  };
+
   return (
+    <>
+      {/* Dark overlay when search is focused */}
+      {searchFocused && (
+        <div
+          className="fixed inset-0 z-40 bg-black/30"
+          onClick={() => setSearchFocused(false)}
+          aria-hidden
+        />
+      )}
     <header className="sticky top-0 z-50 h-[90px] w-full border-b border-white/40 bg-white/80 backdrop-blur-md">
       <div className="mx-auto flex h-full max-w-[1440px] items-center gap-4 px-5 sm:px-8 lg:px-[100px]">
         {/* Logo */}
@@ -43,13 +63,18 @@ export function Header() {
         {/* Search (centered, grows) */}
         <form
           role="search"
-          onSubmit={(e) => e.preventDefault()}
-          className="mx-auto hidden h-[60px] w-full max-w-[400px] items-center gap-1 rounded-[13px] border-[0.5px] border-neutral-300 bg-gradient-to-r from-[#f5f5f5] to-[#f5f5f5]/60 px-5 backdrop-blur-[5px] md:flex"
+          onSubmit={handleSearchSubmit}
+          className={`relative z-50 mx-auto hidden h-[60px] w-full max-w-[400px] items-center gap-1 rounded-[13px] border bg-gradient-to-r from-[#f5f5f5] to-[#f5f5f5]/60 px-5 backdrop-blur-[5px] transition-colors duration-200 md:flex ${
+            searchFocused ? "border-neutral-900" : "border-neutral-300"
+          }`}
         >
           <Icon name="search" size={16} className="shrink-0 opacity-60" />
           <input
             type="search"
+            name="q"
             placeholder="Quick Search"
+            onFocus={() => setSearchFocused(true)}
+            onBlur={() => setSearchFocused(false)}
             className="w-full bg-transparent text-sm font-medium text-neutral-900 placeholder:text-neutral-400 focus:outline-none"
           />
         </form>
@@ -150,9 +175,9 @@ export function Header() {
       {/* Mobile dropdown */}
       {menuOpen && (
         <div className="border-t border-neutral-100 bg-white px-5 py-4 lg:hidden">
-          <form role="search" onSubmit={(e) => e.preventDefault()} className="mb-4 flex h-12 items-center gap-2 rounded-[13px] border-[0.5px] border-neutral-300 bg-neutral-50 px-4 md:hidden">
+          <form role="search" onSubmit={handleSearchSubmit} className="mb-4 flex h-12 items-center gap-2 rounded-[13px] border-[0.5px] border-neutral-300 bg-neutral-50 px-4 md:hidden">
             <Icon name="search" size={16} className="opacity-60" />
-            <input type="search" placeholder="Quick Search" className="w-full bg-transparent text-sm font-medium placeholder:text-neutral-400 focus:outline-none" />
+            <input type="search" name="q" placeholder="Quick Search" className="w-full bg-transparent text-sm font-medium placeholder:text-neutral-400 focus:outline-none" />
           </form>
           <nav className="flex flex-col gap-3 text-sm font-semibold text-neutral-900">
             {NAV_LINKS.map((l) =>
@@ -205,5 +230,6 @@ export function Header() {
         </div>
       )}
     </header>
+    </>
   );
 }
