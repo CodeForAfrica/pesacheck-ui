@@ -46,7 +46,6 @@ const RELATED_STORIES: Story[] = [
     date: "Jul 28",
     readTime: "3 min",
     href: "/fact-checks/south-africas-manufacturing-surge",
-
   },
   {
     image: "/images/spotlight/long-format3-2.png",
@@ -59,7 +58,6 @@ const RELATED_STORIES: Story[] = [
     date: "Jul 28",
     readTime: "3 min",
     href: "/fact-checks/south-africas-manufacturing-surge",
-
   },
   {
     image: "/images/spotlight/long-format1-2.png",
@@ -72,7 +70,6 @@ const RELATED_STORIES: Story[] = [
     date: "Jul 28",
     readTime: "3 min",
     href: "/fact-checks/south-africas-manufacturing-surge",
-
   },
   {
     image: "/images/spotlight/long-format4-1.png",
@@ -85,7 +82,6 @@ const RELATED_STORIES: Story[] = [
     date: "Jul 28",
     readTime: "3 min",
     href: "/fact-checks/south-africas-manufacturing-surge",
-
   },
 ];
 

@@ -1,21 +1,25 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { CONTENT_DESKS, deskBySlug } from "@/lib/content-desks";
-import { ARTICLES, getArticleBySlug } from "@/lib/article-content";
+import { ArticleBody } from "@/components/article/ArticleBody";
 import { ArticleHero } from "@/components/article/ArticleHero";
 import { ArticleSidebar } from "@/components/article/ArticleSidebar";
-import { ArticleBody } from "@/components/article/ArticleBody";
 import { RelatedStories } from "@/components/article/RelatedStories";
+import { ARTICLES, getArticleBySlug } from "@/lib/article-content";
+import { CONTENT_DESKS, deskBySlug } from "@/lib/content-desks";
 
 type Params = Promise<{ desk: string; slug: string }>;
 
 export function generateStaticParams() {
   return CONTENT_DESKS.flatMap((desk) =>
-    Object.keys(ARTICLES).map((slug) => ({ desk: desk.slug, slug }))
+    Object.keys(ARTICLES).map((slug) => ({ desk: desk.slug, slug })),
   );
 }
 
-export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Params;
+}): Promise<Metadata> {
   const { slug } = await params;
   const article = getArticleBySlug(slug);
   if (!article) return {};

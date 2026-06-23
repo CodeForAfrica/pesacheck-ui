@@ -21,13 +21,49 @@ const EXCERPT =
 
 export type FilterDimension = "region" | "language" | "topic";
 
-export const REGIONS = ["Kenya", "Nigeria", "Uganda", "Tanzania", "Senegal", "South Africa"];
-export const LANGUAGES = ["English", "French", "Swahili", "Amharic", "Arabic", "Portuguese"];
-export const TOPICS = ["Climate Change", "Gender", "Elections", "Public Finances", "Scams", "Health"];
+export const REGIONS = [
+  "Kenya",
+  "Nigeria",
+  "Uganda",
+  "Tanzania",
+  "Senegal",
+  "South Africa",
+];
+export const LANGUAGES = [
+  "English",
+  "French",
+  "Swahili",
+  "Amharic",
+  "Arabic",
+  "Portuguese",
+];
+export const TOPICS = [
+  "Climate Change",
+  "Gender",
+  "Elections",
+  "Public Finances",
+  "Scams",
+  "Health",
+];
 
-export const FILTERS: { dimension: FilterDimension; label: string; icon: string; options: string[] }[] = [
-  { dimension: "region", label: "Region", icon: "about-globe", options: REGIONS },
-  { dimension: "language", label: "Language", icon: "factcheck-language", options: LANGUAGES },
+export const FILTERS: {
+  dimension: FilterDimension;
+  label: string;
+  icon: string;
+  options: string[];
+}[] = [
+  {
+    dimension: "region",
+    label: "Region",
+    icon: "about-globe",
+    options: REGIONS,
+  },
+  {
+    dimension: "language",
+    label: "Language",
+    icon: "factcheck-language",
+    options: LANGUAGES,
+  },
   { dimension: "topic", label: "Topic", icon: "about-grid", options: TOPICS },
 ];
 
@@ -47,10 +83,26 @@ export const HERO = {
 };
 
 export const HERO_PREVIEW: Story[] = [
-  { image: "/images/hero-preview-cards/story-large.png", alt: "Featured fact-check", title: PLACEHOLDER_TITLE },
-  { image: "/images/hero-preview-cards/long-format5.png", alt: "Featured fact-check", title: PLACEHOLDER_TITLE },
-  { image: "/images/hero-preview-cards/long-format6.png", alt: "Featured fact-check", title: PLACEHOLDER_TITLE },
-  { image: "/images/hero-preview-cards/story1.png", alt: "Featured fact-check", title: PLACEHOLDER_TITLE },
+  {
+    image: "/images/hero-preview-cards/story-large.png",
+    alt: "Featured fact-check",
+    title: PLACEHOLDER_TITLE,
+  },
+  {
+    image: "/images/hero-preview-cards/long-format5.png",
+    alt: "Featured fact-check",
+    title: PLACEHOLDER_TITLE,
+  },
+  {
+    image: "/images/hero-preview-cards/long-format6.png",
+    alt: "Featured fact-check",
+    title: PLACEHOLDER_TITLE,
+  },
+  {
+    image: "/images/hero-preview-cards/story1.png",
+    alt: "Featured fact-check",
+    title: PLACEHOLDER_TITLE,
+  },
 ];
 
 // ── Listing ─────────────────────────────────────────────────────────────---
@@ -83,16 +135,124 @@ export const FEATURE_SECONDARY: Story = {
 };
 
 export const STORIES: Story[] = [
-  { image: "/images/spotlight/long-format1-1.png", alt: "Fact-check", verdict: "Partly False", title: PLACEHOLDER_TITLE, topic: "Health", region: "Kenya", language: "English", href: ARTICLE_HREF },
-  { image: "/images/spotlight/long-format3-2.png", alt: "Fact-check", verdict: "Partly False", title: PLACEHOLDER_TITLE, topic: "Gender", region: "Senegal", language: "French", href: ARTICLE_HREF },
-  { image: "/images/spotlight/long-format1-2.png", alt: "Fact-check", verdict: "Partly False", title: PLACEHOLDER_TITLE, topic: "Elections", region: "Uganda", language: "Swahili", href: ARTICLE_HREF },
-  { image: "/images/spotlight/long-format4-1.png", alt: "Fact-check", verdict: "Partly False", title: PLACEHOLDER_TITLE, topic: "Scams", region: "Tanzania", language: "English", href: ARTICLE_HREF },
-  { image: "/images/trending/spotlight1.png", alt: "Fact-check", verdict: "Partly False", title: PLACEHOLDER_TITLE, topic: "Public Finances", region: "Kenya", language: "Swahili", href: ARTICLE_HREF },
-  { image: "/images/trending/spotlight3.png", alt: "Fact-check", verdict: "Partly False", title: PLACEHOLDER_TITLE, topic: "Climate Change", region: "South Africa", language: "English", href: ARTICLE_HREF },
-  { image: "/images/trending/spotlight4.png", alt: "Fact-check", verdict: "Partly False", title: PLACEHOLDER_TITLE, topic: "Health", region: "Senegal", language: "French", href: ARTICLE_HREF },
-  { image: "/images/latest-stories/story2.png", alt: "Fact-check", verdict: "Partly False", title: PLACEHOLDER_TITLE, topic: "Gender", region: "Kenya", language: "English", href: ARTICLE_HREF },
-  { image: "/images/latest-stories/story3.png", alt: "Fact-check", verdict: "Partly False", title: PLACEHOLDER_TITLE, topic: "Elections", region: "Nigeria", language: "Arabic", href: ARTICLE_HREF },
-  { image: "/images/latest-stories/story4.png", alt: "Fact-check", verdict: "Partly False", title: PLACEHOLDER_TITLE, topic: "Scams", region: "Tanzania", language: "Swahili", href: ARTICLE_HREF },
-  { image: "/images/spotlight/long-format3-1.png", alt: "Fact-check", verdict: "Partly False", title: PLACEHOLDER_TITLE, topic: "Climate Change", region: "Uganda", language: "English", href: ARTICLE_HREF },
-  { image: "/images/spotlight/long-format4-2.png", alt: "Fact-check", verdict: "Partly False", title: PLACEHOLDER_TITLE, topic: "Public Finances", region: "South Africa", language: "Portuguese", href: ARTICLE_HREF },
+  {
+    image: "/images/spotlight/long-format1-1.png",
+    alt: "Fact-check",
+    verdict: "Partly False",
+    title: PLACEHOLDER_TITLE,
+    topic: "Health",
+    region: "Kenya",
+    language: "English",
+    href: ARTICLE_HREF,
+  },
+  {
+    image: "/images/spotlight/long-format3-2.png",
+    alt: "Fact-check",
+    verdict: "Partly False",
+    title: PLACEHOLDER_TITLE,
+    topic: "Gender",
+    region: "Senegal",
+    language: "French",
+    href: ARTICLE_HREF,
+  },
+  {
+    image: "/images/spotlight/long-format1-2.png",
+    alt: "Fact-check",
+    verdict: "Partly False",
+    title: PLACEHOLDER_TITLE,
+    topic: "Elections",
+    region: "Uganda",
+    language: "Swahili",
+    href: ARTICLE_HREF,
+  },
+  {
+    image: "/images/spotlight/long-format4-1.png",
+    alt: "Fact-check",
+    verdict: "Partly False",
+    title: PLACEHOLDER_TITLE,
+    topic: "Scams",
+    region: "Tanzania",
+    language: "English",
+    href: ARTICLE_HREF,
+  },
+  {
+    image: "/images/trending/spotlight1.png",
+    alt: "Fact-check",
+    verdict: "Partly False",
+    title: PLACEHOLDER_TITLE,
+    topic: "Public Finances",
+    region: "Kenya",
+    language: "Swahili",
+    href: ARTICLE_HREF,
+  },
+  {
+    image: "/images/trending/spotlight3.png",
+    alt: "Fact-check",
+    verdict: "Partly False",
+    title: PLACEHOLDER_TITLE,
+    topic: "Climate Change",
+    region: "South Africa",
+    language: "English",
+    href: ARTICLE_HREF,
+  },
+  {
+    image: "/images/trending/spotlight4.png",
+    alt: "Fact-check",
+    verdict: "Partly False",
+    title: PLACEHOLDER_TITLE,
+    topic: "Health",
+    region: "Senegal",
+    language: "French",
+    href: ARTICLE_HREF,
+  },
+  {
+    image: "/images/latest-stories/story2.png",
+    alt: "Fact-check",
+    verdict: "Partly False",
+    title: PLACEHOLDER_TITLE,
+    topic: "Gender",
+    region: "Kenya",
+    language: "English",
+    href: ARTICLE_HREF,
+  },
+  {
+    image: "/images/latest-stories/story3.png",
+    alt: "Fact-check",
+    verdict: "Partly False",
+    title: PLACEHOLDER_TITLE,
+    topic: "Elections",
+    region: "Nigeria",
+    language: "Arabic",
+    href: ARTICLE_HREF,
+  },
+  {
+    image: "/images/latest-stories/story4.png",
+    alt: "Fact-check",
+    verdict: "Partly False",
+    title: PLACEHOLDER_TITLE,
+    topic: "Scams",
+    region: "Tanzania",
+    language: "Swahili",
+    href: ARTICLE_HREF,
+  },
+  {
+    image: "/images/spotlight/long-format3-1.png",
+    alt: "Fact-check",
+    verdict: "Partly False",
+    title: PLACEHOLDER_TITLE,
+    topic: "Climate Change",
+    region: "Uganda",
+    language: "English",
+    href: ARTICLE_HREF,
+  },
+  {
+    image: "/images/spotlight/long-format4-2.png",
+    alt: "Fact-check",
+    verdict: "Partly False",
+    title: PLACEHOLDER_TITLE,
+    topic: "Public Finances",
+    region: "South Africa",
+    language: "Portuguese",
+    href: ARTICLE_HREF,
+  },
 ];

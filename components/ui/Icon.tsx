@@ -19,7 +19,7 @@ export function Icon({
   alt?: string;
 }) {
   return (
-    // eslint-disable-next-line @next/next/no-img-element
+    // biome-ignore lint/performance/noImgElement: small icons don't benefit from next/image optimization
     <img
       src={`/icons/${name}.svg`}
       alt={alt}

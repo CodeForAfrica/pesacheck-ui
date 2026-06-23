@@ -8,9 +8,21 @@ function Arrow({ direction }: { direction: "left" | "right" }) {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
       {direction === "left" ? (
-        <path d="M19 12H5M5 12l6-6M5 12l6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <path
+          d="M19 12H5M5 12l6-6M5 12l6 6"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
       ) : (
-        <path d="M5 12h14M19 12l-6-6M19 12l-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <path
+          d="M5 12h14M19 12l-6-6M19 12l-6 6"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
       )}
     </svg>
   );
@@ -21,11 +33,14 @@ function buildItems(current: number, total: number): (number | "ellipsis")[] {
   if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
 
   const items: (number | "ellipsis")[] = [1];
-  const window = [current - 1, current, current + 1].filter((p) => p > 1 && p < total);
+  const window = [current - 1, current, current + 1].filter(
+    (p) => p > 1 && p < total,
+  );
 
   if (window.length === 0 || window[0] > 2) items.push("ellipsis");
   items.push(...window);
-  if (window.length === 0 || window[window.length - 1] < total - 1) items.push("ellipsis");
+  if (window.length === 0 || window[window.length - 1] < total - 1)
+    items.push("ellipsis");
   items.push(total);
   return items;
 }
@@ -49,7 +64,10 @@ export function Pagination({
   const atEnd = page >= totalPages;
 
   return (
-    <nav aria-label="Pagination" className="flex items-center justify-end gap-2">
+    <nav
+      aria-label="Pagination"
+      className="flex items-center justify-end gap-2"
+    >
       <button
         type="button"
         aria-label="Previous page"
@@ -64,12 +82,19 @@ export function Pagination({
         <Arrow direction="left" />
       </button>
 
-      {items.map((item, i) =>
-        item === "ellipsis" ? (
-          <span key={`gap-${i}`} className="flex size-10 items-center justify-center text-sm font-medium text-neutral-400">
-            …
-          </span>
-        ) : (
+      {items.map((item, i) => {
+        if (item === "ellipsis") {
+          const key = i < items.length / 2 ? "ellipsis-start" : "ellipsis-end";
+          return (
+            <span
+              key={key}
+              className="flex size-10 items-center justify-center text-sm font-medium text-neutral-400"
+            >
+              …
+            </span>
+          );
+        }
+        return (
           <button
             key={item}
             type="button"
@@ -84,8 +109,8 @@ export function Pagination({
           >
             {item}
           </button>
-        ),
-      )}
+        );
+      })}
 
       <button
         type="button"

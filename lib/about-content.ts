@@ -23,10 +23,6 @@ export const ABOUT_INTRO_IMAGES = [
   { src: "/images/about/intro-2.png", alt: "Fact-checkers analysing data" },
 ];
 
-
-
-
-
 export type TeamMember = {
   name: string;
   role: string;

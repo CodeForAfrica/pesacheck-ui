@@ -1,7 +1,7 @@
 import Image from "next/image";
-import type { Article } from "@/lib/article-content";
-import { VerdictBadge } from "@/components/ui/VerdictBadge";
 import { Icon } from "@/components/ui/Icon";
+import { VerdictBadge } from "@/components/ui/VerdictBadge";
+import type { Article } from "@/lib/article-content";
 import { ShareButtons } from "./ShareButtons";
 
 /** Tag chip shown on the hero (links to filtered fact-checks). */

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { FundingHero } from "@/components/about/FundingHero";
 import { FundingBody } from "@/components/about/FundingBody";
+import { FundingHero } from "@/components/about/FundingHero";
 
 export const metadata: Metadata = {
   title: "Funding — PesaCheck",

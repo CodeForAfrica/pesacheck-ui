@@ -1,6 +1,6 @@
 import Image from "next/image";
-import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import { Icon } from "@/components/ui/Icon";
+import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import { TOOLS, type Tool } from "@/lib/home-content";
 import { ABOUT_BLURB } from "@/lib/site";
 
@@ -22,11 +22,17 @@ function ToolCard({ tool }: { tool: Tool }) {
       <div className="relative mt-auto flex flex-col gap-2 p-8 text-white">
         <h3 className="text-lg font-extrabold">{tool.name}</h3>
         <p className="text-sm font-medium">{tool.tagline}</p>
-        <p className="max-w-[550px] text-sm font-medium leading-5 text-white/90">{tool.body}</p>
+        <p className="max-w-[550px] text-sm font-medium leading-5 text-white/90">
+          {tool.body}
+        </p>
         <span className="my-1 h-0.5 w-10 rounded bg-white" />
         <span className="flex items-center gap-1 text-sm font-medium">
           {tool.cta}
-          <Icon name="arrow-up-right" size={10} className="brightness-0 invert" />
+          <Icon
+            name="arrow-up-right"
+            size={10}
+            className="brightness-0 invert"
+          />
         </span>
       </div>
     </a>

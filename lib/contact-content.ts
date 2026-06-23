@@ -13,7 +13,8 @@ export const CONTACT_HERO = {
 // HQ contact block beneath the form.
 export const CONTACT_HQ = {
   heading: "Pesacheck HQ",
-  address: "Nairobi Garage, 8th Floor, Pinetree Plaza, Kamburu Drive, Nairobi, Kenya.",
+  address:
+    "Nairobi Garage, 8th Floor, Pinetree Plaza, Kamburu Drive, Nairobi, Kenya.",
   email: "hello@pesacheck.org",
   phone: "+254 769 014382",
 };
@@ -72,7 +73,13 @@ export const CONTACT_FORM = {
       required: true,
       span: "full",
       type: "select",
-      options: ["General enquiry", "Report a claim", "Partnerships", "Media", "Other"],
+      options: [
+        "General enquiry",
+        "Report a claim",
+        "Partnerships",
+        "Media",
+        "Other",
+      ],
     },
     {
       name: "description",
@@ -95,22 +102,94 @@ export type LocationCard = {
 };
 
 export const CONTACT_LOCATIONS: LocationCard[] = [
-  { country: "Benin", city: "Cotonou", email: "hello@pesacheck.org", phone: "+254 769 014382" },
-  { country: "Burkina Faso", city: "Ouagadougou", name: "Françoise Dembele", email: "francoise.dembele@pesacheck.org" },
-  { country: "Burundi", city: "Bujumbura", name: "Cedrick Irakoze", email: "cedrick@pesacheck.org" },
-  { country: "Cameroon", city: "Douala", name: "Nicole Minim", email: "nicole@pesacheck.org" },
-  { country: "Central African Republic (CAR)", name: "Doreen Wainainah", email: "doreen@pesacheck.org" },
-  { country: "Cote d’Ivoire", city: "Cotonou", name: "Mardochée Boli", email: "mardochee@pesacheck.org" },
-  { country: "Democratic Republic of Congo (DRC)", city: "Goma", name: "Gustave Katsura", email: "gustave.katsuva@pesacheck.org" },
-  { country: "Ethiopia", city: "Addis Ababa", name: "Eden Berhane", email: "eden@pesacheck.org" },
-  { country: "Guinea", city: "Conakry", name: "Arsene Assogba", email: "arsene@pesacheck.org" },
-  { country: "Mali", city: "Bamako", name: "Mardochée Boli", email: "mardochee@pesacheck.org" },
+  {
+    country: "Benin",
+    city: "Cotonou",
+    email: "hello@pesacheck.org",
+    phone: "+254 769 014382",
+  },
+  {
+    country: "Burkina Faso",
+    city: "Ouagadougou",
+    name: "Françoise Dembele",
+    email: "francoise.dembele@pesacheck.org",
+  },
+  {
+    country: "Burundi",
+    city: "Bujumbura",
+    name: "Cedrick Irakoze",
+    email: "cedrick@pesacheck.org",
+  },
+  {
+    country: "Cameroon",
+    city: "Douala",
+    name: "Nicole Minim",
+    email: "nicole@pesacheck.org",
+  },
+  {
+    country: "Central African Republic (CAR)",
+    name: "Doreen Wainainah",
+    email: "doreen@pesacheck.org",
+  },
+  {
+    country: "Cote d’Ivoire",
+    city: "Cotonou",
+    name: "Mardochée Boli",
+    email: "mardochee@pesacheck.org",
+  },
+  {
+    country: "Democratic Republic of Congo (DRC)",
+    city: "Goma",
+    name: "Gustave Katsura",
+    email: "gustave.katsuva@pesacheck.org",
+  },
+  {
+    country: "Ethiopia",
+    city: "Addis Ababa",
+    name: "Eden Berhane",
+    email: "eden@pesacheck.org",
+  },
+  {
+    country: "Guinea",
+    city: "Conakry",
+    name: "Arsene Assogba",
+    email: "arsene@pesacheck.org",
+  },
+  {
+    country: "Mali",
+    city: "Bamako",
+    name: "Mardochée Boli",
+    email: "mardochee@pesacheck.org",
+  },
   { country: "Niger", name: "Simon Muli", email: "simon@pesacheck.org" },
-  { country: "Nigeria", city: "Addis Ababa", name: "Doreen Wainainah", email: "doreen@pesacheck.org" },
-  { country: "Senegal", name: "Josaphat Finogbé", email: "josaphat@pesacheck.org" },
-  { country: "Somalia", name: "Hassan Istiila", email: "hassan.osman@pesacheck.org" },
-  { country: "South Africa", city: "Cape Town", name: "Christiaan van der Merwe", email: "christiaan@pesacheck.org" },
-  { country: "Uganda", city: "Kampala", name: "Pius Enywaru", email: "pius@pesacheck.org" },
+  {
+    country: "Nigeria",
+    city: "Addis Ababa",
+    name: "Doreen Wainainah",
+    email: "doreen@pesacheck.org",
+  },
+  {
+    country: "Senegal",
+    name: "Josaphat Finogbé",
+    email: "josaphat@pesacheck.org",
+  },
+  {
+    country: "Somalia",
+    name: "Hassan Istiila",
+    email: "hassan.osman@pesacheck.org",
+  },
+  {
+    country: "South Africa",
+    city: "Cape Town",
+    name: "Christiaan van der Merwe",
+    email: "christiaan@pesacheck.org",
+  },
+  {
+    country: "Uganda",
+    city: "Kampala",
+    name: "Pius Enywaru",
+    email: "pius@pesacheck.org",
+  },
   { country: "Tanzania", name: "Simon Muli", email: "simon@pesacheck.org" },
 ];
 

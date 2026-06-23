@@ -22,8 +22,8 @@ export function LatestStories() {
         </div>
 
         <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {LATEST_GRID.slice(1).map((story, i) => (
-            <StoryCard key={i} story={story} />
+          {LATEST_GRID.slice(1).map((story) => (
+            <StoryCard key={story.href ?? story.title} story={story} />
           ))}
         </div>
       </Container>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { MethodologyHero } from "@/components/about/MethodologyHero";
 import { MethodologyBody } from "@/components/about/MethodologyBody";
+import { MethodologyHero } from "@/components/about/MethodologyHero";
 
 export const metadata: Metadata = {
   title: "Methodology — PesaCheck",

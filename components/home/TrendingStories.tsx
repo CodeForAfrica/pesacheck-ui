@@ -1,9 +1,9 @@
 "use client";
 
 import { useRef } from "react";
+import { Icon } from "@/components/ui/Icon";
 import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import { StoryCard } from "@/components/ui/StoryCard";
-import { Icon } from "@/components/ui/Icon";
 import { TRENDING } from "@/lib/home-content";
 
 export function TrendingStories() {
@@ -46,8 +46,11 @@ export function TrendingStories() {
           ref={trackRef}
           className="mt-10 flex snap-x snap-mandatory gap-8 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
-          {TRENDING.map((story, i) => (
-            <div key={i} className="w-[280px] shrink-0 snap-start sm:w-[295px]">
+          {TRENDING.map((story) => (
+            <div
+              key={story.href ?? story.title}
+              className="w-[280px] shrink-0 snap-start sm:w-[295px]"
+            >
               <StoryCard story={story} />
             </div>
           ))}

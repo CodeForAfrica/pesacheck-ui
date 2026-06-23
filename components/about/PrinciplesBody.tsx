@@ -1,10 +1,10 @@
-import { Container, SectionHeading } from "@/components/ui/SectionHeading";
-import { Icon } from "@/components/ui/Icon";
 import { PrinciplesSectionNav } from "@/components/about/PrinciplesSectionNav";
+import { Icon } from "@/components/ui/Icon";
+import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import {
+  type ImageSlot,
   PRINCIPLES_SECTIONS,
   type PrinciplesSection,
-  type ImageSlot,
 } from "@/lib/principles-content";
 
 // Grey placeholder boxes mirror the design's image rectangles until real assets
@@ -29,11 +29,13 @@ function SectionImages({ images }: { images: ImageSlot[] }) {
       {small.length > 0 && (
         <div className="grid grid-cols-2 gap-5">
           {small.map((slot, i) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: placeholder images have no stable id
             <PlaceholderImage key={`s-${i}`} slot={slot} />
           ))}
         </div>
       )}
       {large.map((slot, i) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: placeholder images have no stable id
         <PlaceholderImage key={`l-${i}`} slot={slot} />
       ))}
     </div>
@@ -47,13 +49,13 @@ function Section({ section }: { section: PrinciplesSection }) {
 
       <div className="mt-8 max-w-[610px]">
         <div className="flex flex-col gap-5 text-sm font-medium leading-5 text-neutral-900">
-          {section.blocks.map((block, i) =>
+          {section.blocks.map((block) =>
             block.type === "p" ? (
-              <p key={i}>{block.text}</p>
+              <p key={block.text}>{block.text}</p>
             ) : (
-              <ul key={i} className="list-disc pl-5">
-                {block.items.map((item, j) => (
-                  <li key={j}>{item}</li>
+              <ul key={block.items[0]} className="list-disc pl-5">
+                {block.items.map((item) => (
+                  <li key={item}>{item}</li>
                 ))}
               </ul>
             ),
@@ -61,13 +63,13 @@ function Section({ section }: { section: PrinciplesSection }) {
         </div>
 
         {section.learnMore && (
-          <a
-            href="#"
+          <button
+            type="button"
             className="mt-5 inline-flex items-center gap-1 text-sm font-medium text-neutral-900 transition-colors hover:text-pesacheck-blue"
           >
             Learn More
             <Icon name="arrow-up-right" size={20} />
-          </a>
+          </button>
         )}
 
         <SectionImages images={section.images} />

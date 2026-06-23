@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import type { Story } from "@/lib/home-content";
-import { StoryCard } from "@/components/ui/StoryCard";
-import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Icon } from "@/components/ui/Icon";
+import { SectionHeading } from "@/components/ui/SectionHeading";
+import { StoryCard } from "@/components/ui/StoryCard";
+import type { Story } from "@/lib/home-content";
 
 const PAGE_SIZE = 4;
 
@@ -22,6 +22,7 @@ export function RelatedStories({ stories }: { stories: Story[] }) {
           {totalPages > 1 && (
             <div className="mt-1 flex shrink-0 items-center gap-2">
               <button
+                type="button"
                 onClick={() => setPage((p) => Math.max(0, p - 1))}
                 disabled={page === 0}
                 aria-label="Previous page"
@@ -30,6 +31,7 @@ export function RelatedStories({ stories }: { stories: Story[] }) {
                 <Icon name="chevron-left" size={18} />
               </button>
               <button
+                type="button"
                 onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
                 disabled={page === totalPages - 1}
                 aria-label="Next page"
@@ -43,9 +45,9 @@ export function RelatedStories({ stories }: { stories: Story[] }) {
 
         {/* Story grid */}
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {visible.map((story, i) => (
+          {visible.map((story) => (
             <StoryCard
-              key={i}
+              key={story.href ?? story.title}
               story={story}
               imageClassName="aspect-[295/150]"
               showExcerpt={false}

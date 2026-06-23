@@ -1,6 +1,6 @@
 import Image from "next/image";
-import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import { Icon } from "@/components/ui/Icon";
+import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import { IMPACT_STATS } from "@/lib/site";
 
 export function Impact() {

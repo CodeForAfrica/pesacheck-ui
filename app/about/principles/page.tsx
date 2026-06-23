@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { PrinciplesHero } from "@/components/about/PrinciplesHero";
 import { PrinciplesBody } from "@/components/about/PrinciplesBody";
+import { PrinciplesHero } from "@/components/about/PrinciplesHero";
 
 export const metadata: Metadata = {
   title: "Principles — PesaCheck",

@@ -1,6 +1,6 @@
-import { Container, SectionHeading } from "@/components/ui/SectionHeading";
-import { Icon } from "@/components/ui/Icon";
 import { KnowledgeNav } from "@/components/knowledge/KnowledgeNav";
+import { Icon } from "@/components/ui/Icon";
+import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import {
   KNOWLEDGE_SECTIONS,
   type KnowledgeSection,
@@ -26,14 +26,14 @@ function Section({ section }: { section: KnowledgeSection }) {
       {/* Body content sits in a 610px column on the left of the section. */}
       <div className="mt-8 max-w-[610px]">
         <div className="space-y-5 text-sm font-medium leading-5 text-neutral-900">
-          {section.body.map((para, i) => (
-            <p key={i}>{para}</p>
+          {section.body.map((para) => (
+            <p key={para}>{para}</p>
           ))}
 
           {section.fundingItems && (
             <ul className="list-disc space-y-1 pl-5">
-              {section.fundingItems.map((item, i) => (
-                <li key={i}>{item}</li>
+              {section.fundingItems.map((item) => (
+                <li key={item}>{item}</li>
               ))}
             </ul>
           )}
@@ -41,16 +41,17 @@ function Section({ section }: { section: KnowledgeSection }) {
           {section.closing && <p>{section.closing}</p>}
         </div>
 
-        <a
-          href="#"
+        <button
+          type="button"
           className="mt-7 inline-flex items-center gap-1 text-sm font-semibold text-pesacheck-blue transition-colors hover:text-pesacheck-black"
         >
           Learn More
           <Icon name="arrow-up-right" size={20} />
-        </a>
+        </button>
 
         <div className="mt-10 grid grid-cols-2 gap-5">
           {section.images.map((image, i) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: placeholder images have no stable id
             <ImageBlock key={i} image={image} />
           ))}
         </div>
@@ -60,7 +61,10 @@ function Section({ section }: { section: KnowledgeSection }) {
 }
 
 export function KnowledgeBody() {
-  const navItems = KNOWLEDGE_SECTIONS.map((s) => ({ id: s.id, label: s.title }));
+  const navItems = KNOWLEDGE_SECTIONS.map((s) => ({
+    id: s.id,
+    label: s.title,
+  }));
 
   return (
     <Container className="py-16 lg:py-20">

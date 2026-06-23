@@ -19,7 +19,10 @@ export function EcosystemHero() {
         sizes="100vw"
         className="object-cover object-right"
       />
-      <div className="absolute inset-0" style={{ backgroundImage: HERO_GRADIENT }} />
+      <div
+        className="absolute inset-0"
+        style={{ backgroundImage: HERO_GRADIENT }}
+      />
 
       <Container className="relative flex min-h-[420px] flex-col justify-center py-16 sm:min-h-[500px] lg:min-h-[550px]">
         <div className="max-w-[635px]">

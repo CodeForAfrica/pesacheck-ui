@@ -24,7 +24,7 @@ const SOCIAL_SHARE = [
     name: "WhatsApp",
     icon: "/icons/social-whatsapp.svg",
     getUrl: (url: string, title: string) =>
-      `https://wa.me/?text=${encodeURIComponent(title + " " + url)}`,
+      `https://wa.me/?text=${encodeURIComponent(`${title} ${url}`)}`,
   },
   {
     name: "Email",

@@ -41,7 +41,10 @@ export const FAQ_GROUPS: FaqGroup[] = [
       { question: "What is your cancellation policy?", answer: A_CANCELLATION },
       { question: "Can other info be added to an invoice?", answer: A_INVOICE },
       { question: "How does billing work?", answer: A_BILLING },
-      { question: "How do I change my account email?", answer: A_ACCOUNT_EMAIL },
+      {
+        question: "How do I change my account email?",
+        answer: A_ACCOUNT_EMAIL,
+      },
     ],
   },
   {

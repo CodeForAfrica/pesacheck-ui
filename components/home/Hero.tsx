@@ -1,6 +1,6 @@
 import Image from "next/image";
-import { Container } from "@/components/ui/SectionHeading";
 import { DateRow } from "@/components/ui/MetaRow";
+import { Container } from "@/components/ui/SectionHeading";
 import { HERO, HERO_PREVIEW, type Story } from "@/lib/home-content";
 
 const HERO_GRADIENT =
@@ -13,10 +13,18 @@ function PreviewCard({ story }: { story: Story }) {
       className="flex h-[160px] w-[340px] shrink-0 snap-start items-start gap-4 rounded-[10px] border-[0.5px] border-white/80 bg-white/70 p-[15px] backdrop-blur-[5px] sm:w-[400px]"
     >
       <div className="relative size-[130px] shrink-0 overflow-hidden rounded-2xl">
-        <Image src={story.image} alt={story.alt} fill sizes="130px" className="object-cover" />
+        <Image
+          src={story.image}
+          alt={story.alt}
+          fill
+          sizes="130px"
+          className="object-cover"
+        />
       </div>
       <div className="flex h-full flex-col justify-between py-1">
-        <p className="text-sm font-bold leading-5 text-gray-800">{story.title}</p>
+        <p className="text-sm font-bold leading-5 text-gray-800">
+          {story.title}
+        </p>
         <DateRow date={story.date} readTime={story.readTime} />
       </div>
     </a>
@@ -34,7 +42,10 @@ export function Hero() {
         sizes="100vw"
         className="object-cover"
       />
-      <div className="absolute inset-0" style={{ backgroundImage: HERO_GRADIENT }} />
+      <div
+        className="absolute inset-0"
+        style={{ backgroundImage: HERO_GRADIENT }}
+      />
 
       <Container className="relative flex min-h-[720px] flex-col justify-between py-16 lg:py-[88px]">
         <div className="max-w-[611px]">
@@ -55,8 +66,8 @@ export function Hero() {
 
         {/* Preview carousel */}
         <div className="mt-12 flex snap-x snap-mandatory gap-5 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {HERO_PREVIEW.map((story, i) => (
-            <PreviewCard key={i} story={story} />
+          {HERO_PREVIEW.map((story) => (
+            <PreviewCard key={story.href ?? story.title} story={story} />
           ))}
         </div>
       </Container>

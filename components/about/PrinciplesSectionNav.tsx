@@ -28,7 +28,9 @@ export function PrinciplesSectionNav({ items }: { items: NavItem[] }) {
       { rootMargin: "-110px 0px -65% 0px", threshold: 0 },
     );
 
-    sections.forEach((section) => observer.observe(section));
+    sections.forEach((section) => {
+      observer.observe(section);
+    });
     return () => observer.disconnect();
   }, [items]);
 

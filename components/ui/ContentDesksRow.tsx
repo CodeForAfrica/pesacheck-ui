@@ -1,5 +1,5 @@
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 import { CONTENT_DESKS } from "@/lib/content-desks";
 
 /**
@@ -19,8 +19,16 @@ export function ContentDesksRow({ activeSlug }: { activeSlug?: string }) {
             className="flex w-[160px] shrink-0 flex-col gap-2 text-left outline-none sm:w-[190px]"
           >
             <span className="relative h-[84px] w-full overflow-hidden rounded-lg">
-              <Image src={desk.image} alt={desk.name} fill sizes="190px" className="object-cover" />
-              {isActive && <span className="absolute inset-0 bg-pesacheck-blue/70" />}
+              <Image
+                src={desk.image}
+                alt={desk.name}
+                fill
+                sizes="190px"
+                className="object-cover"
+              />
+              {isActive && (
+                <span className="absolute inset-0 bg-pesacheck-blue/70" />
+              )}
             </span>
             <span
               className={`text-base font-bold ${isActive ? "text-pesacheck-blue" : "text-neutral-800"}`}

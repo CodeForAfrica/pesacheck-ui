@@ -1,8 +1,8 @@
 import Image from "next/image";
 import type { Story } from "@/lib/home-content";
 import { Icon } from "./Icon";
-import { VerdictBadge } from "./VerdictBadge";
 import { DateRow, TaxonomyRow } from "./MetaRow";
+import { VerdictBadge } from "./VerdictBadge";
 
 /** Circular translucent arrow button overlaid on a thumbnail (top-right). */
 function ArrowButton() {
@@ -37,7 +37,9 @@ export function StoryCard({
       href={story.href ?? "#"}
       className="group flex flex-col gap-3 outline-none focus-visible:ring-2 focus-visible:ring-pesacheck-blue"
     >
-      <div className={`relative w-full overflow-hidden rounded-lg ${imageClassName}`}>
+      <div
+        className={`relative w-full overflow-hidden rounded-lg ${imageClassName}`}
+      >
         <Image
           src={story.image}
           alt={story.alt}
@@ -57,7 +59,11 @@ export function StoryCard({
       </div>
 
       {showTaxonomy && (
-        <TaxonomyRow topic={story.topic} region={story.region} language={story.language} />
+        <TaxonomyRow
+          topic={story.topic}
+          region={story.region}
+          language={story.language}
+        />
       )}
 
       <h3
@@ -67,7 +73,9 @@ export function StoryCard({
       </h3>
 
       {showExcerpt && story.excerpt && (
-        <p className="text-sm font-medium leading-5 text-neutral-900">{story.excerpt}</p>
+        <p className="text-sm font-medium leading-5 text-neutral-900">
+          {story.excerpt}
+        </p>
       )}
 
       {showDate && <DateRow date={story.date} readTime={story.readTime} />}
