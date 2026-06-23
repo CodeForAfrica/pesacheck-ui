@@ -11,7 +11,7 @@ import { FooterAllySection } from "@/components/layout/FooterAllySection";
 
 export function Footer() {
   return (
-    <footer className="mt-10 bg-neutral-50">
+    <footer className="bg-neutral-50">
       <FooterAllySection />
 
       <Container className="pb-16">

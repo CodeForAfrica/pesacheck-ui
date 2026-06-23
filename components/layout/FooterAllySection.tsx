@@ -51,7 +51,7 @@ export function FooterAllySection() {
   if (pathname === "/about/partners") return null;
 
   return (
-    <Container className="py-16">
+    <Container className="mt-10 py-16">
       <div className="grid gap-12 lg:grid-cols-2">
         <AllyColumn title="Our Allies" logos={ALLIES} />
         <AllyColumn title="Our Partners" logos={PARTNERS} />
