@@ -8,7 +8,7 @@ export function MediaCentreHero() {
   return (
     <section className="relative overflow-hidden bg-pesacheck-black">
       <Image
-        src="/images/media-center/hero.png"
+        src="/images/media-centre/hero.png"
         alt=""
         fill
         priority

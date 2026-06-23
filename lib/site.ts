@@ -44,7 +44,7 @@ export const ABOUT_MENU_ITEMS: NavMenuItem[] = [
   },
   {
     label: "Media Centre",
-    href: "/about/media-center",
+    href: "/about/media-centre",
     icon: "about-announcement",
   },
 ];
