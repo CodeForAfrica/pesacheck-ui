@@ -1,6 +1,6 @@
 import Image from "next/image";
-import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import { Icon } from "@/components/ui/Icon";
+import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import {
   CONTACT_FORM,
   CONTACT_HQ,
@@ -9,10 +9,19 @@ import {
 } from "@/lib/contact-content";
 
 // Shared field shell: label + required asterisk above the control.
-function Field({ field, children }: { field: ContactField; children: React.ReactNode }) {
+function Field({
+  field,
+  children,
+}: {
+  field: ContactField;
+  children: React.ReactNode;
+}) {
   return (
     <div className={field.span === "full" ? "sm:col-span-2" : ""}>
-      <label htmlFor={field.name} className="flex gap-0.5 text-sm font-medium text-neutral-800">
+      <label
+        htmlFor={field.name}
+        className="flex gap-0.5 text-sm font-medium text-neutral-800"
+      >
         {field.label}
         {field.required && <span className="text-[#fc0d1b]">*</span>}
       </label>
@@ -78,7 +87,13 @@ function FormControl({ field }: { field: ContactField }) {
   );
 }
 
-function ContactRow({ icon, children }: { icon: string; children: React.ReactNode }) {
+function ContactRow({
+  icon,
+  children,
+}: {
+  icon: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="flex items-start gap-2 text-sm font-medium text-neutral-900">
       <Icon name={icon} size={24} className="mt-px shrink-0" />
@@ -95,7 +110,9 @@ export function ContactForm() {
       <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_400px] lg:gap-12">
         {/* Message form */}
         <div className="rounded-xl border border-neutral-100 bg-white p-6 lg:p-7">
-          <h3 className="text-xl font-semibold text-neutral-900">{CONTACT_FORM.heading}</h3>
+          <h3 className="text-xl font-semibold text-neutral-900">
+            {CONTACT_FORM.heading}
+          </h3>
           <form className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2">
             {CONTACT_FORM.fields.map((field) => (
               <Field key={field.name} field={field}>
@@ -133,7 +150,9 @@ export function ContactForm() {
         <ContactRow icon="phone-call">{CONTACT_HQ.phone}</ContactRow>
 
         <div className="mt-2 flex items-center gap-4">
-          <span className="text-sm font-medium text-neutral-900">Follow Us:</span>
+          <span className="text-sm font-medium text-neutral-900">
+            Follow Us:
+          </span>
           <div className="flex items-center gap-3">
             {CONTACT_SOCIALS.map((social, i) => (
               <div key={social.name} className="flex items-center gap-3">

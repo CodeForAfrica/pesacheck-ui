@@ -1,13 +1,8 @@
 import Image from "next/image";
-import { Container } from "@/components/ui/SectionHeading";
-import { Icon } from "@/components/ui/Icon";
-import {
-  FOOTER_ABOUT,
-  FOOTER_NAV,
-  LEGAL,
-  SOCIAL_ICONS,
-} from "@/lib/site";
 import { FooterAllySection } from "@/components/layout/FooterAllySection";
+import { Icon } from "@/components/ui/Icon";
+import { Container } from "@/components/ui/SectionHeading";
+import { FOOTER_ABOUT, FOOTER_NAV, LEGAL, SOCIAL_ICONS } from "@/lib/site";
 
 export function Footer() {
   return (
@@ -24,7 +19,9 @@ export function Footer() {
               height={39}
               className="h-[39px] w-auto mix-blend-exclusion"
             />
-            <span className="text-xs font-medium text-neutral-500">An intitative of:</span>
+            <span className="text-xs font-medium text-neutral-500">
+              An intitative of:
+            </span>
             <Image
               src="/images/footer/cfa-logo-bw.svg"
               alt="Code for Africa"
@@ -48,7 +45,11 @@ export function Footer() {
 
         <nav className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold text-neutral-900">
           {FOOTER_NAV.map((l) => (
-            <a key={l} href="#" className="transition-colors hover:text-pesacheck-blue">
+            <a
+              key={l}
+              href="#"
+              className="transition-colors hover:text-pesacheck-blue"
+            >
               {l}
             </a>
           ))}
@@ -58,7 +59,9 @@ export function Footer() {
 
         <div className="mt-6 flex flex-wrap items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <span className="text-sm font-semibold text-neutral-900">Follow PesaCheck on:</span>
+            <span className="text-sm font-semibold text-neutral-900">
+              Follow PesaCheck on:
+            </span>
             <div className="flex items-center gap-4">
               {SOCIAL_ICONS.map((s) => (
                 <a key={s.name} href="#" aria-label={s.label}>

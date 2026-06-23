@@ -16,15 +16,33 @@ function Chevron({ open }: { open: boolean }) {
       aria-hidden
       className={`shrink-0 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
     >
-      <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d="M6 9l6 6 6-6"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
 
 function Close({ className = "" }: { className?: string }) {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden className={className}>
-      <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden
+      className={className}
+    >
+      <path
+        d="M6 6l12 12M18 6L6 18"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
@@ -32,7 +50,13 @@ function Close({ className = "" }: { className?: string }) {
 function Check() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
-      <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d="M5 13l4 4L19 7"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
@@ -76,7 +100,7 @@ function Dropdown({
       </button>
 
       {open && (
-        <ul
+        <div
           role="listbox"
           aria-label={label}
           className="absolute left-0 top-full z-30 mt-2 max-h-72 w-56 overflow-auto rounded-[10px] border-[0.5px] border-neutral-200 bg-white p-1.5 shadow-[0px_10px_20px_0px_rgba(0,0,0,0.1)]"
@@ -94,7 +118,9 @@ function Dropdown({
                 >
                   <span
                     className={`flex size-4 shrink-0 items-center justify-center rounded border ${
-                      checked ? "border-pesacheck-blue bg-pesacheck-blue text-white" : "border-neutral-300"
+                      checked
+                        ? "border-pesacheck-blue bg-pesacheck-blue text-white"
+                        : "border-neutral-300"
                     }`}
                   >
                     {checked && <Check />}
@@ -104,7 +130,7 @@ function Dropdown({
               </li>
             );
           })}
-        </ul>
+        </div>
       )}
     </div>
   );
@@ -148,7 +174,9 @@ export function FilterBar({
       ref={ref}
       className="mx-auto w-full max-w-[1030px] rounded-[20px] border-[0.5px] border-neutral-200 bg-white p-6 shadow-[0px_10px_30px_0px_rgba(2,29,51,0.08)] sm:p-8"
     >
-      <p className="text-center text-base font-bold text-gray-800">Filter By:</p>
+      <p className="text-center text-base font-bold text-gray-800">
+        Filter By:
+      </p>
 
       <div className="mt-5 flex flex-wrap items-center justify-center gap-4">
         {FILTERS.map((f) => (

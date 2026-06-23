@@ -31,8 +31,8 @@ export function Spotlight() {
         </div>
 
         <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {SPOTLIGHT_GRID.map((story, i) => (
-            <StoryCard key={i} story={story} />
+          {SPOTLIGHT_GRID.map((story) => (
+            <StoryCard key={story.href ?? story.title} story={story} />
           ))}
         </div>
       </Container>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { ToolsHero } from "@/components/tools/ToolsHero";
 import { ComingSoon } from "@/components/tools/ComingSoon";
+import { ToolsHero } from "@/components/tools/ToolsHero";
 
 export const metadata: Metadata = {
   title: "Tools — PesaCheck",

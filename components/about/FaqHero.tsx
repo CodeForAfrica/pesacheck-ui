@@ -11,7 +11,10 @@ const HERO_GRADIENT =
 export function FaqHero() {
   return (
     <section className="relative overflow-hidden bg-neutral-900">
-      <div className="absolute inset-0" style={{ backgroundImage: HERO_GRADIENT }} />
+      <div
+        className="absolute inset-0"
+        style={{ backgroundImage: HERO_GRADIENT }}
+      />
 
       <Container className="relative flex min-h-[360px] flex-col justify-center py-16 sm:min-h-[420px] lg:min-h-[480px]">
         <div className="max-w-[660px]">
@@ -19,7 +22,9 @@ export function FaqHero() {
           <h1 className="text-[40px] font-extrabold leading-[1.1] text-white sm:text-[52px]">
             {FAQ_HERO.title}
           </h1>
-          <p className="mt-4 text-xl font-medium text-white/90">{FAQ_HERO.subtitle}</p>
+          <p className="mt-4 text-xl font-medium text-white/90">
+            {FAQ_HERO.subtitle}
+          </p>
         </div>
       </Container>
     </section>

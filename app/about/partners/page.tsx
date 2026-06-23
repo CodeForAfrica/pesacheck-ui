@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { PartnersHero } from "@/components/partners/PartnersHero";
 import { AlliesSection } from "@/components/partners/AlliesSection";
 import { OurPartnersSection } from "@/components/partners/OurPartnersSection";
+import { PartnersHero } from "@/components/partners/PartnersHero";
 
 export const metadata: Metadata = {
   title: "Our Partners — PesaCheck",

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { AboutHero } from "@/components/about/AboutHero";
 import { AboutIntro } from "@/components/about/AboutIntro";
-import { Impact } from "@/components/ui/Impact";
 import { AboutTeam } from "@/components/about/AboutTeam";
+import { Impact } from "@/components/ui/Impact";
 
 export const metadata: Metadata = {
   title: "About Us — PesaCheck",

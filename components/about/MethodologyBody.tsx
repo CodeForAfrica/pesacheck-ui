@@ -1,10 +1,10 @@
-import { Container, SectionHeading } from "@/components/ui/SectionHeading";
-import { Icon } from "@/components/ui/Icon";
 import { MethodologySectionNav } from "@/components/about/MethodologySectionNav";
+import { Icon } from "@/components/ui/Icon";
+import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import {
+  type ImageSlot,
   METHODOLOGY_SECTIONS,
   type MethodologySection,
-  type ImageSlot,
 } from "@/lib/methodology-content";
 
 // Grey placeholder boxes mirror the design's image rectangles until real assets
@@ -29,11 +29,13 @@ function SectionImages({ images }: { images: ImageSlot[] }) {
       {small.length > 0 && (
         <div className="grid grid-cols-2 gap-5">
           {small.map((slot, i) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: placeholder images have no stable id
             <PlaceholderImage key={`s-${i}`} slot={slot} />
           ))}
         </div>
       )}
       {large.map((slot, i) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: placeholder images have no stable id
         <PlaceholderImage key={`l-${i}`} slot={slot} />
       ))}
     </div>
@@ -47,13 +49,13 @@ function Section({ section }: { section: MethodologySection }) {
 
       <div className="mt-8 max-w-[610px]">
         <div className="flex flex-col gap-5 text-sm font-medium leading-5 text-neutral-900">
-          {section.blocks.map((block, i) =>
+          {section.blocks.map((block) =>
             block.type === "p" ? (
-              <p key={i}>{block.text}</p>
+              <p key={block.text}>{block.text}</p>
             ) : (
-              <ul key={i} className="list-disc pl-5">
-                {block.items.map((item, j) => (
-                  <li key={j}>{item}</li>
+              <ul key={block.items[0]} className="list-disc pl-5">
+                {block.items.map((item) => (
+                  <li key={item}>{item}</li>
                 ))}
               </ul>
             ),
@@ -61,13 +63,13 @@ function Section({ section }: { section: MethodologySection }) {
         </div>
 
         {section.learnMore && (
-          <a
-            href="#"
+          <button
+            type="button"
             className="mt-5 inline-flex items-center gap-1 text-sm font-medium text-neutral-900 transition-colors hover:text-pesacheck-blue"
           >
             Learn More
             <Icon name="arrow-up-right" size={20} />
-          </a>
+          </button>
         )}
 
         <SectionImages images={section.images} />
@@ -81,7 +83,10 @@ export function MethodologyBody() {
     <Container className="py-14 lg:py-[70px]">
       <div className="grid gap-12 lg:grid-cols-[180px_1fr] lg:gap-16">
         <MethodologySectionNav
-          items={METHODOLOGY_SECTIONS.map((s) => ({ id: s.id, title: s.title }))}
+          items={METHODOLOGY_SECTIONS.map((s) => ({
+            id: s.id,
+            title: s.title,
+          }))}
         />
         <div className="flex flex-col gap-16 lg:gap-20">
           {METHODOLOGY_SECTIONS.map((section) => (

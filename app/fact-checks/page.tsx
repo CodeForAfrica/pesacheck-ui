@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { FactChecksExplorer } from "@/components/fact-checks/FactChecksExplorer";
 import { FactChecksContentDesks } from "@/components/fact-checks/FactChecksContentDesks";
+import { FactChecksExplorer } from "@/components/fact-checks/FactChecksExplorer";
 
 export const metadata: Metadata = {
   title: "Fact-Checks — PesaCheck",

@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { ContactHero } from "@/components/about/ContactHero";
 import { ContactForm } from "@/components/about/ContactForm";
+import { ContactHero } from "@/components/about/ContactHero";
+import { ContactLicensing } from "@/components/about/ContactLicensing";
 import { ContactLocations } from "@/components/about/ContactLocations";
 import { ContactWhatsapp } from "@/components/about/ContactWhatsapp";
-import { ContactLicensing } from "@/components/about/ContactLicensing";
 
 export const metadata: Metadata = {
   title: "Contact Us — PesaCheck",

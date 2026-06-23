@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { KnowledgeHero } from "@/components/knowledge/KnowledgeHero";
 import { KnowledgeBody } from "@/components/knowledge/KnowledgeBody";
+import { KnowledgeHero } from "@/components/knowledge/KnowledgeHero";
 
 export const metadata: Metadata = {
   title: "Knowledge — PesaCheck",

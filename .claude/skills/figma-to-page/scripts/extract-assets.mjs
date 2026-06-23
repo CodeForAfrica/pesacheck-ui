@@ -25,7 +25,7 @@
  *   --dry-run          parse + report, do not download
  */
 
-import { mkdir, writeFile, readFile, stat } from "node:fs/promises";
+import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 
 function parseArgs(argv) {
@@ -37,7 +37,10 @@ function parseArgs(argv) {
     else if (k === "--public") a.public = argv[++i];
     else if (k === "--asset-host") a.assetHost = argv[++i];
     else if (k === "--svg-as-image")
-      a.svgAsImage = (argv[++i] || "").split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
+      a.svgAsImage = (argv[++i] || "")
+        .split(",")
+        .map((s) => s.trim().toLowerCase())
+        .filter(Boolean);
     else if (k === "--dry-run") a.dryRun = true;
   }
   return a;
@@ -56,28 +59,44 @@ function readStdin() {
 // imgLongFormat11 -> long-format-11 ; img -> stripped leading "img"
 function kebab(varName) {
   let s = varName.replace(/^img/, "");
-  s = s.replace(/([a-z0-9])([A-Z])/g, "$1-$2").replace(/([A-Z]+)([A-Z][a-z])/g, "$1-$2");
+  s = s
+    .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
+    .replace(/([A-Z]+)([A-Z][a-z])/g, "$1-$2");
   s = s.replace(/([a-zA-Z])(\d)/g, "$1-$2");
-  return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "asset";
+  return (
+    s
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "asset"
+  );
 }
 
 async function main() {
   const args = parseArgs(process.argv);
-  const text = args.input ? await readFile(args.input, "utf8") : await readStdin();
+  const text = args.input
+    ? await readFile(args.input, "utf8")
+    : await readStdin();
   if (!text.trim()) {
-    console.error("No input. Pass --input <file> or pipe design-context text via stdin.");
+    console.error(
+      "No input. Pass --input <file> or pipe design-context text via stdin.",
+    );
     process.exit(1);
   }
 
   const host = args.assetHost.replace(/\/$/, "");
-  const hostRe = new RegExp(`${host.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}/assets/[^"'\\s)]+`, "g");
+  const hostRe = new RegExp(
+    `${host.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}/assets/[^"'\\s)]+`,
+    "g",
+  );
 
   // Map url -> first var name that referenced it (for a readable filename).
-  const constRe = /const\s+(\w+)\s*=\s*["'](https?:\/\/[^"']+\/assets\/[^"']+)["']/g;
+  const constRe =
+    /const\s+(\w+)\s*=\s*["'](https?:\/\/[^"']+\/assets\/[^"']+)["']/g;
   const urlToVar = new Map();
-  let m;
-  while ((m = constRe.exec(text))) {
+  let m = constRe.exec(text);
+  while (m !== null) {
     if (!urlToVar.has(m[2])) urlToVar.set(m[2], m[1]);
+    m = constRe.exec(text);
   }
   // Also catch inline urls not bound to a const.
   for (const url of text.match(hostRe) || []) {
@@ -94,20 +113,32 @@ async function main() {
   const iconsDir = join(publicDir, "icons");
   const imagesDir = join(publicDir, "images", args.section || "misc");
   const seenNames = new Set();
-  const manifest = { section: args.section || null, assetHost: host, assets: [] };
+  const manifest = {
+    section: args.section || null,
+    assetHost: host,
+    assets: [],
+  };
 
   const svgAsImage = new Set(args.svgAsImage || []);
   for (const url of urls) {
-    const ext = (url.split(".").pop() || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+    const ext = (url.split(".").pop() || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, "");
     const isSvg = ext === "svg";
     const varName = urlToVar.get(url);
-    const base = varName ? kebab(varName) : url.split("/").pop().split(".")[0].slice(0, 12);
+    const base = varName
+      ? kebab(varName)
+      : url.split("/").pop().split(".")[0].slice(0, 12);
     // SVGs go to icons/ unless explicitly marked as image (logos/illustrations).
-    const forceImage = isSvg && (svgAsImage.has(base) || (varName && svgAsImage.has(varName.toLowerCase())));
+    const forceImage =
+      isSvg &&
+      (svgAsImage.has(base) ||
+        (varName && svgAsImage.has(varName.toLowerCase())));
     const dir = isSvg && !forceImage ? iconsDir : imagesDir;
     let name = `${base}.${ext || "bin"}`;
     let n = 2;
-    while (seenNames.has(join(dir, name))) name = `${base}-${n++}.${ext || "bin"}`;
+    while (seenNames.has(join(dir, name)))
+      name = `${base}-${n++}.${ext || "bin"}`;
     seenNames.add(join(dir, name));
 
     const dest = join(dir, name);

@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { FactChecksHero } from "@/components/fact-checks/FactChecksHero";
-import { FactChecksExplorer } from "@/components/fact-checks/FactChecksExplorer";
-import { FactChecksContentDesks } from "@/components/fact-checks/FactChecksContentDesks";
-import { CONTENT_DESKS, deskBySlug } from "@/lib/content-desks";
-import { ARTICLES, getArticleBySlug } from "@/lib/article-content";
+import { ArticleBody } from "@/components/article/ArticleBody";
 import { ArticleHero } from "@/components/article/ArticleHero";
 import { ArticleSidebar } from "@/components/article/ArticleSidebar";
-import { ArticleBody } from "@/components/article/ArticleBody";
 import { RelatedStories } from "@/components/article/RelatedStories";
+import { FactChecksContentDesks } from "@/components/fact-checks/FactChecksContentDesks";
+import { FactChecksExplorer } from "@/components/fact-checks/FactChecksExplorer";
+import { FactChecksHero } from "@/components/fact-checks/FactChecksHero";
+import { ARTICLES, getArticleBySlug } from "@/lib/article-content";
+import { CONTENT_DESKS, deskBySlug } from "@/lib/content-desks";
 
 type Params = Promise<{ desk: string }>;
 
@@ -19,7 +19,11 @@ export function generateStaticParams() {
   return [...deskParams, ...articleParams];
 }
 
-export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Params;
+}): Promise<Metadata> {
   const { desk: slug } = await params;
 
   const article = getArticleBySlug(slug);
@@ -41,7 +45,11 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   return {};
 }
 
-export default async function ContentDeskOrArticlePage({ params }: { params: Params }) {
+export default async function ContentDeskOrArticlePage({
+  params,
+}: {
+  params: Params;
+}) {
   const { desk: slug } = await params;
 
   // Article slug takes precedence over desk slug.

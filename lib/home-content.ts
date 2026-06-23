@@ -36,10 +36,26 @@ export const HERO = {
 
 // Small glassmorphic preview cards inside the hero band (horizontal carousel).
 export const HERO_PREVIEW: Story[] = [
-  { image: "/images/hero-preview-cards/story-large.png", alt: "Featured story", title: PLACEHOLDER_TITLE },
-  { image: "/images/hero-preview-cards/long-format5.png", alt: "Featured story", title: PLACEHOLDER_TITLE },
-  { image: "/images/hero-preview-cards/long-format6.png", alt: "Featured story", title: PLACEHOLDER_TITLE },
-  { image: "/images/hero-preview-cards/story1.png", alt: "Featured story", title: PLACEHOLDER_TITLE },
+  {
+    image: "/images/hero-preview-cards/story-large.png",
+    alt: "Featured story",
+    title: PLACEHOLDER_TITLE,
+  },
+  {
+    image: "/images/hero-preview-cards/long-format5.png",
+    alt: "Featured story",
+    title: PLACEHOLDER_TITLE,
+  },
+  {
+    image: "/images/hero-preview-cards/long-format6.png",
+    alt: "Featured story",
+    title: PLACEHOLDER_TITLE,
+  },
+  {
+    image: "/images/hero-preview-cards/story1.png",
+    alt: "Featured story",
+    title: PLACEHOLDER_TITLE,
+  },
 ];
 
 // Spotlight: one feature story + a grid of smaller ones.
@@ -61,10 +77,34 @@ export const SPOTLIGHT_SECONDARY: Story = {
 };
 
 export const SPOTLIGHT_GRID: Story[] = [
-  { image: "/images/spotlight/long-format4-2.png", alt: "Spotlight story", verdict: "Partly False", title: PLACEHOLDER_TITLE, href: ARTICLE_HREF },
-  { image: "/images/spotlight/long-format3-2.png", alt: "Spotlight story", verdict: "Partly False", title: PLACEHOLDER_TITLE, href: ARTICLE_HREF },
-  { image: "/images/spotlight/long-format1-1.png", alt: "Spotlight story", verdict: "Partly False", title: PLACEHOLDER_TITLE, href: ARTICLE_HREF },
-  { image: "/images/spotlight/long-format4-1.png", alt: "Spotlight story", verdict: "Partly False", title: PLACEHOLDER_TITLE, href: ARTICLE_HREF },
+  {
+    image: "/images/spotlight/long-format4-2.png",
+    alt: "Spotlight story",
+    verdict: "Partly False",
+    title: PLACEHOLDER_TITLE,
+    href: ARTICLE_HREF,
+  },
+  {
+    image: "/images/spotlight/long-format3-2.png",
+    alt: "Spotlight story",
+    verdict: "Partly False",
+    title: PLACEHOLDER_TITLE,
+    href: ARTICLE_HREF,
+  },
+  {
+    image: "/images/spotlight/long-format1-1.png",
+    alt: "Spotlight story",
+    verdict: "Partly False",
+    title: PLACEHOLDER_TITLE,
+    href: ARTICLE_HREF,
+  },
+  {
+    image: "/images/spotlight/long-format4-1.png",
+    alt: "Spotlight story",
+    verdict: "Partly False",
+    title: PLACEHOLDER_TITLE,
+    href: ARTICLE_HREF,
+  },
 ];
 
 export const WHATSAPP_BANNER = "/images/whatsapp-banner/banner3.png";
@@ -101,11 +141,41 @@ export const WHATSAPP_COLUMNS: WhatsappColumn[] = [
 ];
 
 export const TRENDING: Story[] = [
-  { image: "/images/trending/spotlight1.png", alt: "Trending story", verdict: "Partly False", title: PLACEHOLDER_TITLE, href: ARTICLE_HREF },
-  { image: "/images/trending/spotlight3.png", alt: "Trending story", verdict: "Partly False", title: PLACEHOLDER_TITLE, href: ARTICLE_HREF },
-  { image: "/images/trending/spotlight4.png", alt: "Trending story", verdict: "Partly False", title: PLACEHOLDER_TITLE, href: ARTICLE_HREF },
-  { image: "/images/hero-preview-cards/long-format5.png", alt: "Trending story", verdict: "Partly False", title: PLACEHOLDER_TITLE, href: ARTICLE_HREF },
-  { image: "/images/spotlight/long-format3-1.png", alt: "Trending story", verdict: "Partly False", title: PLACEHOLDER_TITLE, href: ARTICLE_HREF },
+  {
+    image: "/images/trending/spotlight1.png",
+    alt: "Trending story",
+    verdict: "Partly False",
+    title: PLACEHOLDER_TITLE,
+    href: ARTICLE_HREF,
+  },
+  {
+    image: "/images/trending/spotlight3.png",
+    alt: "Trending story",
+    verdict: "Partly False",
+    title: PLACEHOLDER_TITLE,
+    href: ARTICLE_HREF,
+  },
+  {
+    image: "/images/trending/spotlight4.png",
+    alt: "Trending story",
+    verdict: "Partly False",
+    title: PLACEHOLDER_TITLE,
+    href: ARTICLE_HREF,
+  },
+  {
+    image: "/images/hero-preview-cards/long-format5.png",
+    alt: "Trending story",
+    verdict: "Partly False",
+    title: PLACEHOLDER_TITLE,
+    href: ARTICLE_HREF,
+  },
+  {
+    image: "/images/spotlight/long-format3-1.png",
+    alt: "Trending story",
+    verdict: "Partly False",
+    title: PLACEHOLDER_TITLE,
+    href: ARTICLE_HREF,
+  },
 ];
 
 export const LATEST_FEATURE: Story = {
@@ -118,12 +188,48 @@ export const LATEST_FEATURE: Story = {
 };
 
 export const LATEST_GRID: Story[] = [
-  { image: "/images/latest-stories/story2.png", alt: "Latest story", verdict: "Partly False", title: PLACEHOLDER_TITLE, href: ARTICLE_HREF },
-  { image: "/images/latest-stories/story3.png", alt: "Latest story", verdict: "Partly False", title: PLACEHOLDER_TITLE, href: ARTICLE_HREF },
-  { image: "/images/latest-stories/story4.png", alt: "Latest story", verdict: "Partly False", title: PLACEHOLDER_TITLE, href: ARTICLE_HREF },
-  { image: "/images/hero-preview-cards/story1.png", alt: "Latest story", verdict: "Partly False", title: PLACEHOLDER_TITLE, href: ARTICLE_HREF },
-  { image: "/images/content-desks/content2.png", alt: "Latest story", verdict: "Partly False", title: PLACEHOLDER_TITLE, href: ARTICLE_HREF },
-  { image: "/images/content-desks/content4.png", alt: "Latest story", verdict: "Partly False", title: PLACEHOLDER_TITLE, href: ARTICLE_HREF },
+  {
+    image: "/images/latest-stories/story2.png",
+    alt: "Latest story",
+    verdict: "Partly False",
+    title: PLACEHOLDER_TITLE,
+    href: ARTICLE_HREF,
+  },
+  {
+    image: "/images/latest-stories/story3.png",
+    alt: "Latest story",
+    verdict: "Partly False",
+    title: PLACEHOLDER_TITLE,
+    href: ARTICLE_HREF,
+  },
+  {
+    image: "/images/latest-stories/story4.png",
+    alt: "Latest story",
+    verdict: "Partly False",
+    title: PLACEHOLDER_TITLE,
+    href: ARTICLE_HREF,
+  },
+  {
+    image: "/images/hero-preview-cards/story1.png",
+    alt: "Latest story",
+    verdict: "Partly False",
+    title: PLACEHOLDER_TITLE,
+    href: ARTICLE_HREF,
+  },
+  {
+    image: "/images/content-desks/content2.png",
+    alt: "Latest story",
+    verdict: "Partly False",
+    title: PLACEHOLDER_TITLE,
+    href: ARTICLE_HREF,
+  },
+  {
+    image: "/images/content-desks/content4.png",
+    alt: "Latest story",
+    verdict: "Partly False",
+    title: PLACEHOLDER_TITLE,
+    href: ARTICLE_HREF,
+  },
 ];
 
 export type Tool = {
@@ -139,8 +245,32 @@ const TOOL_BODY =
 
 // Row-major order: top-left, top-right, bottom-left, bottom-right.
 export const TOOLS: Tool[] = [
-  { name: "Pesayetu", tagline: "Explore | Visualise | Contextualise.", body: TOOL_BODY, cta: "Visit website", image: "/images/tools/pesayetu.png" },
-  { name: "Promise Tracker", tagline: "Do policies follow promises? Find out", body: TOOL_BODY, cta: "Visit website", image: "/images/tools/promise-tracker.png" },
-  { name: "Tax Clock", tagline: "How much of your time is your own? Find out", body: TOOL_BODY, cta: "Visit website", image: "/images/tools/tax-clock.png" },
-  { name: "Biscuit Index", tagline: "The biscuit index. Find out more", body: TOOL_BODY, cta: "Visit website", image: "/images/tools/biscuit-index.png" },
+  {
+    name: "Pesayetu",
+    tagline: "Explore | Visualise | Contextualise.",
+    body: TOOL_BODY,
+    cta: "Visit website",
+    image: "/images/tools/pesayetu.png",
+  },
+  {
+    name: "Promise Tracker",
+    tagline: "Do policies follow promises? Find out",
+    body: TOOL_BODY,
+    cta: "Visit website",
+    image: "/images/tools/promise-tracker.png",
+  },
+  {
+    name: "Tax Clock",
+    tagline: "How much of your time is your own? Find out",
+    body: TOOL_BODY,
+    cta: "Visit website",
+    image: "/images/tools/tax-clock.png",
+  },
+  {
+    name: "Biscuit Index",
+    tagline: "The biscuit index. Find out more",
+    body: TOOL_BODY,
+    cta: "Visit website",
+    image: "/images/tools/biscuit-index.png",
+  },
 ];

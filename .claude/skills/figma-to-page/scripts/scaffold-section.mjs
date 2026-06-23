@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 /**
  * scaffold-section.mjs — generate a section component stub that follows this
  * repo's conventions (Container + SectionHeading, Server Component by default).
@@ -16,8 +17,8 @@
  *   --force            overwrite if the file already exists
  */
 
-import { mkdir, writeFile, access } from "node:fs/promises";
 import { constants } from "node:fs";
+import { access, mkdir, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 
 function parseArgs(argv) {
@@ -37,7 +38,9 @@ function template({ name, client, heading }) {
   const lines = [];
   if (client) lines.push(`"use client";`, "");
   if (client) lines.push(`import { useState } from "react";`);
-  lines.push(`import { Container${heading ? ", SectionHeading" : ""} } from "@/components/ui/SectionHeading";`);
+  lines.push(
+    `import { Container${heading ? ", SectionHeading" : ""} } from "@/components/ui/SectionHeading";`,
+  );
   lines.push("");
   lines.push(`export function ${name}() {`);
   if (client) lines.push(`  const [active, setActive] = useState(0);`);
@@ -45,7 +48,9 @@ function template({ name, client, heading }) {
   lines.push(`    <section className="py-14 lg:py-20">`);
   lines.push(`      <Container>`);
   if (heading) lines.push(`        <SectionHeading title="${heading}" />`);
-  lines.push(`        {/* TODO: translate the Figma section into responsive JSX + Tailwind tokens */}`);
+  lines.push(
+    `        {/* TODO: translate the Figma section into responsive JSX + Tailwind tokens */}`,
+  );
   lines.push(`      </Container>`);
   lines.push(`    </section>`);
   lines.push(`  );`);
@@ -81,7 +86,9 @@ async function main() {
   }
   await mkdir(dir, { recursive: true });
   await writeFile(file, template(a));
-  console.log(`Created components/${a.page}/${a.name}.tsx${a.client ? " (client)" : ""}`);
+  console.log(
+    `Created components/${a.page}/${a.name}.tsx${a.client ? " (client)" : ""}`,
+  );
 }
 
 main().catch((e) => {

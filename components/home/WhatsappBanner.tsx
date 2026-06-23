@@ -1,7 +1,11 @@
 import Image from "next/image";
-import { Container } from "@/components/ui/SectionHeading";
 import { Icon } from "@/components/ui/Icon";
-import { WHATSAPP_BANNER, WHATSAPP_COLUMNS, type WhatsappColumn } from "@/lib/home-content";
+import { Container } from "@/components/ui/SectionHeading";
+import {
+  WHATSAPP_BANNER,
+  WHATSAPP_COLUMNS,
+  type WhatsappColumn,
+} from "@/lib/home-content";
 
 function ColumnGraphic({ graphic }: { graphic: WhatsappColumn["graphic"] }) {
   if (graphic === "whatsapp")
@@ -45,17 +49,21 @@ export function WhatsappBanner() {
         <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-0">
           {WHATSAPP_COLUMNS.map((col, i) => (
             <div
-              key={i}
+              key={col.title}
               className={`flex flex-col gap-3 lg:px-8 ${i > 0 ? "lg:border-l lg:border-neutral-200" : ""}`}
             >
               <ColumnGraphic graphic={col.graphic} />
-              <p className="text-base font-bold text-neutral-900">{col.title}</p>
+              <p className="text-base font-bold text-neutral-900">
+                {col.title}
+              </p>
               {col.highlight && (
                 <p className="text-[30px] font-extrabold leading-10 text-gray-800">
                   {col.highlight}
                 </p>
               )}
-              <p className="text-sm font-medium leading-5 text-neutral-900">{col.body}</p>
+              <p className="text-sm font-medium leading-5 text-neutral-900">
+                {col.body}
+              </p>
             </div>
           ))}
         </div>

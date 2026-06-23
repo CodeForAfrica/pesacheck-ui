@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { FaqHero } from "@/components/about/FaqHero";
-import { FaqGroups } from "@/components/about/FaqGroups";
 import { FaqCta } from "@/components/about/FaqCta";
+import { FaqGroups } from "@/components/about/FaqGroups";
+import { FaqHero } from "@/components/about/FaqHero";
 
 export const metadata: Metadata = {
   title: "FAQs — PesaCheck",

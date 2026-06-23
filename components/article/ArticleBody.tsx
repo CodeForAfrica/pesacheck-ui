@@ -17,8 +17,12 @@ function ArticleTag({ label }: { label: string }) {
 function Footnote({ text, index }: { text: string; index: number }) {
   return (
     <div>
-      {index > 0 && <div className="my-5 h-px w-full rounded-full bg-neutral-100" />}
-      <p className="text-xs font-medium italic leading-5 text-neutral-700">{text}</p>
+      {index > 0 && (
+        <div className="my-5 h-px w-full rounded-full bg-neutral-100" />
+      )}
+      <p className="text-xs font-medium italic leading-5 text-neutral-700">
+        {text}
+      </p>
     </div>
   );
 }
@@ -28,8 +32,8 @@ export function ArticleBody({ article }: { article: Article }) {
     <div className="w-full min-w-0 lg:w-[610px]">
       {/* Lead paragraphs */}
       <div className="flex flex-col gap-5">
-        {article.leadParagraphs.map((p, i) => (
-          <p key={i} className="text-sm font-medium leading-5 text-neutral-900">
+        {article.leadParagraphs.map((p) => (
+          <p key={p} className="text-sm font-medium leading-5 text-neutral-900">
             {p}
           </p>
         ))}
@@ -51,8 +55,11 @@ export function ArticleBody({ article }: { article: Article }) {
       {/* Body paragraphs after image */}
       {article.bodyParagraphs.length > 0 && (
         <div className="mt-8 flex flex-col gap-5">
-          {article.bodyParagraphs.map((p, i) => (
-            <p key={i} className="text-sm font-medium leading-5 text-neutral-900">
+          {article.bodyParagraphs.map((p) => (
+            <p
+              key={p}
+              className="text-sm font-medium leading-5 text-neutral-900"
+            >
               {p}
             </p>
           ))}
@@ -74,7 +81,7 @@ export function ArticleBody({ article }: { article: Article }) {
           <div className="h-px w-full rounded-full bg-neutral-100" />
           <div className="mt-5 flex flex-col gap-0">
             {article.footnotes.map((footnote, i) => (
-              <Footnote key={i} text={footnote} index={i} />
+              <Footnote key={footnote} text={footnote} index={i} />
             ))}
           </div>
         </div>

@@ -18,7 +18,10 @@ export function KnowledgeHero() {
         sizes="100vw"
         className="object-cover"
       />
-      <div className="absolute inset-0" style={{ backgroundImage: HERO_GRADIENT }} />
+      <div
+        className="absolute inset-0"
+        style={{ backgroundImage: HERO_GRADIENT }}
+      />
 
       <Container className="relative flex min-h-[420px] flex-col justify-center py-16 sm:min-h-[520px] lg:min-h-[640px] lg:py-[88px]">
         <div className="max-w-[611px]">

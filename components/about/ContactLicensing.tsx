@@ -21,7 +21,10 @@ export function ContactLicensing() {
         </div>
 
         {/* Image placeholder */}
-        <div className="aspect-[505/574] w-full rounded-xl bg-neutral-100" aria-hidden="true" />
+        <div
+          className="aspect-[505/574] w-full rounded-xl bg-neutral-100"
+          aria-hidden="true"
+        />
       </div>
     </Container>
   );
