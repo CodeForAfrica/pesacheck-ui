@@ -25,16 +25,28 @@ export type NavLink = {
 export const ABOUT_MENU_ITEMS: NavMenuItem[] = [
   { label: "About Us", href: "/about", icon: "about-grid" },
   { label: "Who We Are", href: "/about/who-we-are", icon: "about-users" },
-  { label: "Our Partners", href: "/about/our-partners", icon: "about-hand" },
+  { label: "Our Partners", href: "/about/partners", icon: "about-hand" },
   { label: "Funding", href: "/about/funding", icon: "about-coins-hand" },
   { label: "Our Impact", href: "/about/our-impact", icon: "about-globe" },
   { label: "FAQs", href: "/about/faqs", icon: "about-faq" },
   { label: "Methodology", href: "/about/methodology", icon: "about-refresh" },
   { label: "Contact Us", href: "/about/contact-us", icon: "about-phone" },
-  { label: "Our Ecosystem", href: "/about/our-ecosystem", icon: "about-server" },
+  {
+    label: "Our Ecosystem",
+    href: "/about/our-ecosystem",
+    icon: "about-server",
+  },
   { label: "Principles", href: "/about/principles", icon: "about-scales" },
-  { label: "Our Staff + Expertise", href: "/about/staff-expertise", icon: "about-users" },
-  { label: "Media Centre", href: "/about/media-centre", icon: "about-announcement" },
+  {
+    label: "Our Staff + Expertise",
+    href: "/about/staff-expertise",
+    icon: "about-users",
+  },
+  {
+    label: "Media Centre",
+    href: "/about/media-centre",
+    icon: "about-announcement",
+  },
 ];
 
 /**
@@ -44,10 +56,22 @@ export const ABOUT_MENU_ITEMS: NavMenuItem[] = [
  */
 export const FACT_CHECKS_MENU_ITEMS: NavMenuItem[] = [
   { label: "All fact-checks", href: "/fact-checks", icon: "about-grid" },
-  { label: "By Language", href: "/fact-checks/by-language", icon: "factcheck-language" },
+  {
+    label: "By Language",
+    href: "/fact-checks/by-language",
+    icon: "factcheck-language",
+  },
   { label: "By Topic", href: "/fact-checks/by-topic", icon: "factcheck-topic" },
-  { label: "Quick Reads", href: "/fact-checks/quick-reads", icon: "factcheck-reads" },
-  { label: "Explainers", href: "/fact-checks/explainers", icon: "factcheck-play" },
+  {
+    label: "Quick Reads",
+    href: "/fact-checks/quick-reads",
+    icon: "factcheck-reads",
+  },
+  {
+    label: "Explainers",
+    href: "/fact-checks/explainers",
+    icon: "factcheck-play",
+  },
   { label: "By Country", href: "/fact-checks/by-country", icon: "about-globe" },
 ];
 
@@ -97,17 +121,57 @@ export const LEGAL = ["Copyright 2026 PesaCheck", "Imprint", "Privacy policy"];
 export type Logo = { src: string; alt: string; width: number; height: number };
 
 export const ALLIES: Logo[] = [
-  { src: "/images/footer/ally-logo.svg", alt: "Ally logo", width: 120, height: 40 },
-  { src: "/images/footer/ally-frame125.png", alt: "Ally logo", width: 120, height: 40 },
-  { src: "/images/footer/ally-image3.png", alt: "Ally logo", width: 120, height: 40 },
-  { src: "/images/footer/ancir-ilab-logo.png", alt: "ANCIR iLAB", width: 120, height: 40 },
+  {
+    src: "/images/partners/ally-civic-signal.png",
+    alt: "Civic Signal",
+    width: 120,
+    height: 40,
+  },
+  {
+    src: "/images/partners/ally-takwimu.png",
+    alt: "Takwimu",
+    width: 176,
+    height: 40,
+  },
+  {
+    src: "/images/partners/ally-academy-africa.svg",
+    alt: "Academy Africa",
+    width: 88,
+    height: 40,
+  },
+  {
+    src: "/images/partners/ally-ancir-ilab.png",
+    alt: "ANCIR iLAB",
+    width: 142,
+    height: 40,
+  },
 ];
 
 export const PARTNERS: Logo[] = [
-  { src: "/images/footer/partner-image4.png", alt: "Partner logo", width: 120, height: 40 },
-  { src: "/images/footer/partner-image5.png", alt: "Partner logo", width: 120, height: 40 },
-  { src: "/images/footer/partner-image6.png", alt: "Partner logo", width: 120, height: 40 },
-  { src: "/images/footer/partner-rectangle195.png", alt: "Partner logo", width: 120, height: 40 },
+  {
+    src: "/images/partners/partner-meta.png",
+    alt: "Meta",
+    width: 186,
+    height: 40,
+  },
+  {
+    src: "/images/partners/partner-un.png",
+    alt: "United Nations",
+    width: 130,
+    height: 40,
+  },
+  {
+    src: "/images/partners/partner-tiktok.png",
+    alt: "TikTok",
+    width: 143,
+    height: 49,
+  },
+  {
+    src: "/images/partners/partner-dw.png",
+    alt: "Deutsche Welle",
+    width: 151,
+    height: 40,
+  },
 ];
 
 export const SOCIAL_ICONS = [
@@ -118,7 +182,8 @@ export const SOCIAL_ICONS = [
   { name: "social-layer13", label: "YouTube" },
 ];
 
-const STAT_BLURB = "Pesacheck has lorem ipsum dolor sit amet consectetur adipiscing";
+const STAT_BLURB =
+  "Pesacheck has lorem ipsum dolor sit amet consectetur adipiscing";
 
 export type ImpactStat = {
   icon: string;
@@ -129,7 +194,15 @@ export type ImpactStat = {
 // Row-major order matching the 2x2 Figma grid.
 export const IMPACT_STATS: ImpactStat[] = [
   { icon: "translate", value: "6 Publishing Languages", label: STAT_BLURB },
-  { icon: "search-refraction", value: "10,000+ Fact-checks", label: STAT_BLURB },
-  { icon: "calendar-impact", value: "8+ Years in operation", label: STAT_BLURB },
+  {
+    icon: "search-refraction",
+    value: "10,000+ Fact-checks",
+    label: STAT_BLURB,
+  },
+  {
+    icon: "calendar-impact",
+    value: "8+ Years in operation",
+    label: STAT_BLURB,
+  },
   { icon: "globe", value: "18+ Countries we operate in", label: STAT_BLURB },
 ];
