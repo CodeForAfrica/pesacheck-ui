@@ -105,7 +105,7 @@ export const ABOUT_BLURB =
   "PesaCheck is an initiative of Code for Africa (CfA) and was co-founded in 2016 by Justin Arenstein and Catherine Gicheru as part of their ICFJ Knight Fellowships, underwritten by an innovateAFRICA.fund award";
 
 export const FOOTER_ABOUT =
-  "This site is a project of Code for Africa, the continent’s largest network of civic technology and data journalism labs. All content is released under a Creative Commons Attribution Licence. Reuse it to help empower your own community.";
+  "This site is a project of Code for Africa, the continent's largest network of civic technology and data journalism labs. All content is released under a Creative Commons Attribution Licence. Reuse it to help empower your own community.";
 
 export const FOOTER_NAV = [
   "Knowledge Base",
