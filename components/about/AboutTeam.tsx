@@ -27,7 +27,7 @@ function TeamCard({ member }: { member: TeamMember }) {
 
 export function AboutTeam() {
   return (
-    <section className="py-14 lg:py-20">
+    <section id="our-team" className="py-14 lg:py-20">
       <Container>
         <SectionHeading title="Our team" />
         <div className="mt-10 grid gap-x-5 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">

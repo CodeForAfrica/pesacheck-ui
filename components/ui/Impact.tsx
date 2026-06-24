@@ -5,7 +5,7 @@ import { IMPACT_STATS } from "@/lib/site";
 
 export function Impact() {
   return (
-    <section className="bg-neutral-50 py-14 lg:py-20">
+    <section id="our-impact" className="bg-neutral-50 py-14 lg:py-20">
       <Container>
         <SectionHeading title="Our Impact" />
         <div className="mt-10 grid items-center gap-10 lg:grid-cols-[1fr_610px]">
