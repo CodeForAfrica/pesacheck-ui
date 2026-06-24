@@ -199,14 +199,14 @@ export function FilterBar({
           {chips.map((chip) => (
             <span
               key={`${chip.dimension}-${chip.value}`}
-              className="inline-flex items-center gap-2 rounded-full border-[0.5px] border-neutral-300 bg-neutral-50 py-1.5 pl-3 pr-2.5 text-sm font-medium text-neutral-900"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-pesacheck-blue py-[5px] pl-3 pr-2.5 text-sm font-medium text-white"
             >
               {chip.value}
               <button
                 type="button"
                 aria-label={`Remove ${chip.value} filter`}
                 onClick={() => onRemoveChip(chip.dimension, chip.value)}
-                className="text-neutral-500 transition-colors hover:text-pesacheck-black"
+                className="text-white/80 transition-colors hover:text-white"
               >
                 <Close />
               </button>
@@ -224,7 +224,7 @@ export function FilterBar({
           <button
             type="button"
             onClick={onClear}
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-neutral-600 transition-colors hover:text-pesacheck-black"
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#fc0d18] transition-colors hover:text-[#d00b15]"
           >
             <Close />
             Clear Filters
