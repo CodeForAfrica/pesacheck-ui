@@ -11,13 +11,13 @@ export function Footer() {
 
       <Container className="pb-16">
         <div className="flex flex-wrap items-center justify-between gap-6 border-t border-neutral-100 pt-10">
-          <div className="flex items-center gap-4">
+          <div className="flex items-end gap-4">
             <Image
-              src="/images/header-logo/pesacheck-logo.png"
+              src="/pesacheck-logo.png"
               alt="PesaCheck"
               width={190}
-              height={39}
-              className="h-[39px] w-auto mix-blend-exclusion"
+              height={52}
+              className="h-auto w-auto grayscale"
             />
             <span className="text-xs font-medium text-neutral-500">
               An intitative of:

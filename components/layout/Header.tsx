@@ -55,12 +55,12 @@ export function Header() {
             aria-label="PesaCheck home"
           >
             <Image
-              src="/images/header-logo/pesacheck-logo.png"
+              src="/pesacheck-logo.png"
               alt="PesaCheck"
               width={190}
               height={39}
               priority
-              className="h-[39px] w-auto mix-blend-exclusion"
+              className="h-auto w-auto grayscale"
             />
           </Link>
 
