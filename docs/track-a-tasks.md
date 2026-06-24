@@ -45,19 +45,32 @@ The plan assumed `/fact-checks/[slug]`. Actual structure:
 
 ## PR 1 — Foundation + proof-of-seam (Content Desks) — Phase 1
 Lowest-risk vertical slice: stand up the data layer and convert the one 1:1 row.
-- [ ] Add deps: `graphql-request`, `graphql`
-- [ ] `.env.local` (+ `.env.example`): `NEXT_PUBLIC_API_URL`,
-      `NEXT_PUBLIC_TENANT_CODE=e6lkum`, `NEXT_PUBLIC_MEDIA_URL`
-- [ ] `next.config.ts`: add media host to `images.remotePatterns`
-- [ ] `lib/data/client.ts` — graphql-request client reading `NEXT_PUBLIC_API_URL`
-- [ ] `lib/data/queries/` — port route query from `pesacheck-pwa-app-router/services/routeService`
-- [ ] `lib/data/map.ts` — `findRendition` (rendition→URL), `findSubject(meta, scheme)`,
+- [x] Add deps: `graphql-request`, `graphql`
+- [x] `.env.local` (+ `.env.example`): `NEXT_PUBLIC_API_URL`,
+      `NEXT_PUBLIC_TENANT_CODE=e6lkum`, `NEXT_PUBLIC_MEDIA_URL` (+ `!.env.example`
+      gitignore exception so the example is committed)
+- [x] `next.config.ts`: add media host to `images.remotePatterns`
+- [x] `lib/data/client.ts` — graphql-request client reading `NEXT_PUBLIC_API_URL`
+- [x] `lib/data/queries/routes.ts` — collection-routes query
+- [x] `lib/data/map.ts` — `findRendition` (rendition→URL), `findSubject(meta, scheme)`,
       `getVerdict`, `parseMetadata` helpers
-- [ ] `lib/data/desks.ts` — `getContentDesks(): ContentDesk[]` (routes where
-      `type:"collection"` matching Figma desks); decide desk `image` source (TBD)
-- [ ] Convert **Content Desks** end-to-end: `app/page.tsx` fetches → passes to
-      `components/home/ContentDesks` (refactor to accept props) with `?? CONTENT_DESKS`
-- [ ] Verify against staging in the browser preview
+- [x] `lib/data/desks.ts` — `getContentDesks(): ContentDesk[]`. Inclusion/order
+      driven by live collection routes; images + display names stay curated
+      (routes carry no image; staging names have inconsistent casing).
+- [x] Convert **Content Desks** end-to-end: `app/page.tsx` (now async) fetches →
+      passes to `components/home/ContentDesks` (refactored to accept props) →
+      `ContentDesksRow` (optional `desks` prop, defaults to static) with
+      `?? CONTENT_DESKS` fallback.
+- [x] Verify against staging: row renders **6 live desks** (Migration absent —
+      no backing route; would be 7 if static). tsc + biome clean.
+
+**Carry-overs / notes for later PRs:**
+- `migration` desk has no staging route → absent in live mode. Decide whether to
+  create the route (Track B) or drop it from the curated catalog.
+- Desk `image` source still TBD (currently curated local assets).
+- Pre-existing console warning: duplicate React keys on story cards (placeholder
+  `href` reused as key in `lib/*-content.ts`) — unrelated to this PR; fix when
+  those cards get real data (PR 2a/2b) since slugs become unique then.
 
 ## PR 2a — Home listings (Spotlight / Latest / Trending) — Phase 2
 - [ ] `lib/data/queries/` — content-list queries (Hero, Spotlight, Trending,

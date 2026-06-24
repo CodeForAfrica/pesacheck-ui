@@ -1,16 +1,23 @@
 import Image from "next/image";
 import Link from "next/link";
-import { CONTENT_DESKS } from "@/lib/content-desks";
+import { CONTENT_DESKS, type ContentDesk } from "@/lib/content-desks";
 
 /**
  * Horizontally scrolling row of content-desk thumbnails. Each desk links to its
  * landing page at `/fact-checks/<slug>`. Pass `activeSlug` to highlight the desk
- * for the page currently being viewed (used on the single-desk page).
+ * for the page currently being viewed (used on the single-desk page). `desks`
+ * defaults to the static catalog; the home page passes live (Hasura) data.
  */
-export function ContentDesksRow({ activeSlug }: { activeSlug?: string }) {
+export function ContentDesksRow({
+  activeSlug,
+  desks = CONTENT_DESKS,
+}: {
+  activeSlug?: string;
+  desks?: ContentDesk[];
+}) {
   return (
     <div className="mt-8 flex gap-6 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-      {CONTENT_DESKS.map((desk) => {
+      {desks.map((desk) => {
         const isActive = desk.slug === activeSlug;
         return (
           <Link
