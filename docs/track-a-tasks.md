@@ -80,14 +80,41 @@ Lowest-risk vertical slice: stand up the data layer and convert the one 1:1 row.
   `href` reused as key in `lib/*-content.ts`) — unrelated to this PR; fix when
   those cards get real data (PR 2a/2b) since slugs become unique then.
 
-## PR 2a — Home listings (Spotlight / Latest / Trending) — Phase 2
-- [ ] `lib/data/queries/` — content-list queries (Hero, Spotlight, Trending,
-      Top news) ported from `contentListService.queries.js`
-- [ ] `lib/data/stories.ts` — `getSpotlight()`, `getTrending()`, `getLatest()`
-      returning `Story[]`; map `verdict`/`image`/`date`; compute `readTime`
-- [ ] Refactor `Spotlight`, `LatestStories`, `TrendingStories` to accept props
-- [ ] `app/page.tsx` fetches and passes data with `?? fallback`
-- [ ] Verify cards render (image, verdict, date) against staging
+## PR 2a — Home listings (Spotlight / Latest / Trending) — Phase 2 ✅
+- [x] `lib/data/queries/content-lists.ts` — `GET_CONTENT_LIST_ITEMS` ported from
+      `contentListService.queries.js`, plus `metadata` (verdict) and `body`
+      (readTime). One generic list query covers Spotlight/Trending/Top news.
+- [x] `lib/data/stories.ts` — `getSpotlight()`, `getTrending()`, `getLatest()`
+      returning `Story[]` via `mapStory`. List→section mapping (verified
+      staging lists): Spotlight→`Homepage — Spotlight`, Trending→`Homepage —
+      Trending`, Latest→`Top news` (no "Latest" curated list exists; "Top news"
+      is the listed source). **Names use an EM DASH (—) — must match exactly.**
+- [x] `lib/data/map.ts` — `mapStory` (+ `formatStoryDate`, `computeReadTime`,
+      rendition picker). Maps `verdict`/`image`/`date`; computes `readTime` from
+      body word count. Null-safe; `topic`/`region`/`language` left to PR4.
+- [x] Refactor `Spotlight`, `LatestStories`, `TrendingStories` to accept an
+      optional `stories?: Story[]` prop (default to static fallback). Spotlight/
+      Latest derive feature+secondary+grid from the flat list.
+- [x] `app/page.tsx` fetches all three in parallel, each with `?? fallback`.
+- [x] Verify cards render (image, verdict badge, date, readTime) against staging
+      — confirmed live in the browser. tsc + biome clean; 27 Vitest tests pass
+      (11 new for `mapStory`/`formatStoryDate`/`computeReadTime`).
+
+**Notes:**
+- Staging rendition names are `thumbnail|viewImage|baseImage|original|square`
+  (not prod's `400x240`) — the picker prefers `viewImage` and falls back to any
+  resolvable rendition, then a local placeholder.
+- The duplicate-React-key warning now only fires for the **Hero preview**
+  carousel (`HERO_PREVIEW`, still static — out of PR2a scope). Spotlight/
+  Trending/Latest no longer warn (live hrefs are unique).
+- Card href = `/fact-checks/<route-slug>/<article-slug>` — forward-compatible
+  with the canonical `[desk]/[slug]` route (wired to live data in PR3/PR5).
+- **Language filter:** curated lists are polluted with non-article entries
+  (team-member profiles on the `team` route). The query filters items
+  server-side to `LANGUAGE_ROUTE_SLUGS` (`english|français|kiswahili|
+  african-languages`) via a nested `swp_article.swp_route.slug` `_in`. No column
+  distinguishes language routes from other collections, so the set is editorial
+  (mirrors migration-plan; PR4 reuses it for the language filter).
 
 ## PR 2b — Fact-checks grid — Phase 2
 Heavier: client-component data lifting.
