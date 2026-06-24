@@ -136,7 +136,7 @@ export const SPOTLIGHT_GRID: Story[] = [
   },
 ];
 
-export const WHATSAPP_BANNER = "/images/whatsapp-banner/banner3.png";
+export const WHATSAPP_BANNER = "/images/whatsapp-banner/banner2.png";
 
 export type WhatsappColumn = {
   graphic: "whatsapp" | "qr" | "message" | "";
