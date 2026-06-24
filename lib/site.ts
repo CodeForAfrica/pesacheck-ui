@@ -124,14 +124,14 @@ export const ALLIES: Logo[] = [
   {
     src: "/images/partners/ally-civic-signal.png",
     alt: "Civic Signal",
-    width: 120,
-    height: 40,
+    width: 1024,
+    height: 337,
   },
   {
     src: "/images/partners/ally-takwimu.png",
     alt: "Takwimu",
-    width: 176,
-    height: 40,
+    width: 292,
+    height: 48,
   },
   {
     src: "/images/partners/ally-academy-africa.svg",
@@ -142,8 +142,8 @@ export const ALLIES: Logo[] = [
   {
     src: "/images/partners/ally-ancir-ilab.png",
     alt: "ANCIR iLAB",
-    width: 142,
-    height: 40,
+    width: 305,
+    height: 86,
   },
 ];
 
@@ -151,26 +151,26 @@ export const PARTNERS: Logo[] = [
   {
     src: "/images/partners/partner-meta.png",
     alt: "Meta",
-    width: 186,
-    height: 40,
+    width: 522,
+    height: 196,
   },
   {
     src: "/images/partners/partner-un.png",
     alt: "United Nations",
-    width: 130,
-    height: 40,
+    width: 1970,
+    height: 610,
   },
   {
     src: "/images/partners/partner-tiktok.png",
     alt: "TikTok",
-    width: 143,
-    height: 49,
+    width: 298,
+    height: 102,
   },
   {
     src: "/images/partners/partner-dw.png",
     alt: "Deutsche Welle",
-    width: 151,
-    height: 40,
+    width: 1200,
+    height: 323,
   },
 ];
 
