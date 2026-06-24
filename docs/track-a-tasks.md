@@ -63,8 +63,16 @@ Lowest-risk vertical slice: stand up the data layer and convert the one 1:1 row.
       `?? CONTENT_DESKS` fallback.
 - [x] Verify against staging: row renders **6 live desks** (Migration absent —
       no backing route; would be 7 if static). tsc + biome clean.
+- [x] Test harness: **Vitest** (`pnpm test` / `test:watch`, `vitest.config.ts`
+      with `@/*` alias + `NEXT_PUBLIC_MEDIA_URL` test env). `lib/data/map.test.ts`
+      — 16 tests covering `findRendition`, `parseMetadata`, `findSubject`,
+      `getVerdict` (fixtures mirror real staging fact-checks). All green.
 
 **Carry-overs / notes for later PRs:**
+- **Extend `map.test.ts`** as PR2/PR3 add `Story`/`Article` mappers and
+  `convertBodyImages` — the test pattern is now established.
+- **CI/pre-commit:** `pnpm test` is not yet wired into `lint-staged` or CI
+  (only biome runs pre-commit). Hook it up when convenient.
 - `migration` desk has no staging route → absent in live mode. Decide whether to
   create the route (Track B) or drop it from the curated catalog.
 - Desk `image` source still TBD (currently curated local assets).
@@ -137,4 +145,6 @@ PR1 must land first. PR2a / PR2b / PR3 can then proceed in parallel.
 - **Types are the contract:** mappers return the existing `Story` / `Article` /
   `ContentDesk` shapes unchanged.
 - **Verdict:** always via `getVerdict(metadata)`; tolerate missing (empty `subject[]`).
+- **Test pure mappers:** add cases to `lib/data/map.test.ts` (Vitest) for any new
+  mapper logic — pure functions only; no live-Hasura or component tests.
 - **Convergence (Track B):** when local stack is ready, only env vars change.
