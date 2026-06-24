@@ -26,7 +26,7 @@ export function TrendingStories() {
                 type="button"
                 aria-label="Previous"
                 onClick={() => scroll(-1)}
-                className="flex size-9 items-center justify-center rounded-full border border-neutral-200 text-neutral-600 transition-colors hover:bg-neutral-50"
+                className="flex size-9 items-center justify-center rounded-full bg-neutral-300 text-white transition-colors hover:bg-neutral-400"
               >
                 <Icon name="chevron-left" size={18} />
               </button>
@@ -34,7 +34,7 @@ export function TrendingStories() {
                 type="button"
                 aria-label="Next"
                 onClick={() => scroll(1)}
-                className="flex size-9 items-center justify-center rounded-full border border-neutral-200 text-neutral-600 transition-colors hover:bg-neutral-50"
+                className="flex size-9 items-center justify-center rounded-full bg-neutral-300 text-white transition-colors hover:bg-neutral-400"
               >
                 <Icon name="chevron-right" size={18} />
               </button>
