@@ -14,19 +14,18 @@ export function AlliesSection() {
         </div>
         <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-6">
           {ALLIES_LOGOS.map((logo) => (
-            <div
+            <Image
               key={logo.alt}
-              className="relative grayscale transition hover:grayscale-0"
-              style={{ width: logo.width, height: logo.height }}
-            >
-              <Image
-                src={logo.src}
-                alt={logo.alt}
-                fill
-                className="object-contain"
-                sizes="200px"
-              />
-            </div>
+              src={logo.src}
+              alt={logo.alt}
+              width={logo.width}
+              height={logo.height}
+              style={{
+                height: "40px",
+                width: `${Math.round((logo.width / logo.height) * 40)}px`,
+              }}
+              className="shrink-0 object-contain grayscale transition hover:grayscale-0"
+            />
           ))}
         </div>
       </Container>

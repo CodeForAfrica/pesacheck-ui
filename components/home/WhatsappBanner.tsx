@@ -13,9 +13,9 @@ function ColumnGraphic({ graphic }: { graphic: WhatsappColumn["graphic"] }) {
       <Image
         src="/images/whatsapp-icon.svg"
         alt="WhatsApp"
-        width={40}
-        height={40}
-        className="size-18"
+        width={120}
+        height={120}
+        className="size-[120px]"
       />
     );
   if (graphic === "qr")
@@ -23,13 +23,15 @@ function ColumnGraphic({ graphic }: { graphic: WhatsappColumn["graphic"] }) {
       <Image
         src="/images/whatsapp-banner/qr-code.png"
         alt="WhatsApp QR code"
-        width={64}
-        height={64}
-        className="size-16 rounded-md object-contain"
+        width={120}
+        height={120}
+        className="size-[120px] rounded-md object-contain"
       />
     );
   if (graphic === "message")
-    return <Icon name="message-dots-circle" size={64} className="size-16" />;
+    return (
+      <Icon name="message-dots-circle" size={120} className="size-[120px]" />
+    );
 }
 
 export function WhatsappBanner() {
@@ -50,20 +52,22 @@ export function WhatsappBanner() {
           {WHATSAPP_COLUMNS.map((col, i) => (
             <div
               key={col.title}
-              className={`flex flex-col gap-3 lg:px-8 ${i > 0 ? "lg:border-l lg:border-neutral-200" : ""}`}
+              className={`flex flex-col items-start justify-between gap-3 text-left ${i > 0 ? "lg:border-l lg:border-neutral-200 lg:px-8" : ""}`}
             >
-              <ColumnGraphic graphic={col.graphic} />
-              <p className="text-base font-bold text-neutral-900">
-                {col.title}
-              </p>
-              {col.highlight && (
-                <p className="text-[30px] font-extrabold leading-10 text-gray-800">
-                  {col.highlight}
+              <div className="flex flex-col gap-3">
+                <p className="whitespace-nowrap text-base font-bold text-neutral-900">
+                  {col.title}
                 </p>
-              )}
-              <p className="text-sm font-medium leading-5 text-neutral-900">
-                {col.body}
-              </p>
+                {col.highlight && (
+                  <p className="whitespace-nowrap text-[30px] font-extrabold leading-10 text-gray-800">
+                    {col.highlight}
+                  </p>
+                )}
+                <p className="text-sm font-medium leading-5 text-neutral-900">
+                  {col.body}
+                </p>
+              </div>
+              <ColumnGraphic graphic={col.graphic} />
             </div>
           ))}
         </div>

@@ -1,4 +1,11 @@
+"use client";
+
 import Image from "next/image";
+import { useState } from "react";
+import { FreeMode } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
+import type { Swiper as SwiperType } from "swiper/types";
+import "swiper/css";
 import { DateRow } from "@/components/ui/MetaRow";
 import { Container } from "@/components/ui/SectionHeading";
 import { HERO, HERO_PREVIEW, type Story } from "@/lib/home-content";
@@ -6,11 +13,14 @@ import { HERO, HERO_PREVIEW, type Story } from "@/lib/home-content";
 const HERO_GRADIENT =
   "linear-gradient(100.768deg, rgba(4, 26, 109, 0.9) 45.439%, rgba(102, 102, 102, 0) 66.403%)";
 
+// Mirrors Container's left padding exactly: px-5 / sm:px-8 / lg:centered with max-w-[1240px]
+const INDENT = "pl-5 sm:pl-8 lg:pl-[max(0px,calc((100vw-1240px)/2))]";
+
 function PreviewCard({ story }: { story: Story }) {
   return (
     <a
       href={story.href ?? "#"}
-      className="flex h-[160px] w-[340px] shrink-0 snap-start items-start gap-4 rounded-[10px] border-[0.5px] border-white/80 bg-white/70 p-[15px] backdrop-blur-[5px] sm:w-[400px]"
+      className="flex h-[160px] w-[340px] items-start gap-4 rounded-[10px] border-[0.5px] border-white/80 bg-white/70 p-[15px] backdrop-blur-[5px] sm:w-[400px]"
     >
       <div className="relative size-[130px] shrink-0 overflow-hidden rounded-2xl">
         <Image
@@ -31,7 +41,24 @@ function PreviewCard({ story }: { story: Story }) {
   );
 }
 
+function calcDotCount(s: SwiperType): number {
+  if (!s.slides.length) return 1;
+  const gap = (s.params.spaceBetween as number) ?? 0;
+  const slideWidth = (s.slides[0] as HTMLElement).offsetWidth + gap;
+  const visible = Math.floor(s.width / slideWidth);
+  return Math.max(1, s.slides.length - visible + 1);
+}
+
 export function Hero() {
+  const [swiperInstance, setSwiperInstance] = useState<SwiperType | null>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [dotCount, setDotCount] = useState(0);
+
+  const handleSwiper = (s: SwiperType) => {
+    setSwiperInstance(s);
+    setDotCount(calcDotCount(s));
+  };
+
   return (
     <section className="relative overflow-hidden bg-pesacheck-black">
       <Image
@@ -47,7 +74,7 @@ export function Hero() {
         style={{ backgroundImage: HERO_GRADIENT }}
       />
 
-      <Container className="relative flex min-h-[720px] flex-col justify-between py-16 lg:py-[88px]">
+      <Container className="relative pt-16 lg:pt-[88px]">
         <div className="max-w-[611px]">
           <span className="mb-5 block h-[3px] w-[190px] rounded bg-white/70" />
           <h1 className="text-[34px] font-extrabold leading-[1.18] text-white sm:text-[44px] lg:text-[52px]">
@@ -58,19 +85,58 @@ export function Hero() {
           </p>
           <a
             href="#fact-checks"
-            className="mt-7 inline-flex h-[54px] items-center justify-center rounded-[10px] bg-white px-5 text-base font-semibold text-pesacheck-blue transition-colors hover:bg-white/90"
+            className="mt-7 inline-flex h-[54px] items-center justify-center rounded-[10px] bg-pesacheck-purple px-5 text-base font-semibold text-white transition-colors hover:bg-pesacheck-purple/90"
           >
             {HERO.cta}
           </a>
         </div>
+      </Container>
 
-        {/* Preview carousel */}
-        <div className="mt-12 flex snap-x snap-mandatory gap-5 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {HERO_PREVIEW.map((story) => (
-            <PreviewCard key={story.href ?? story.title} story={story} />
+      <div className="relative mt-12 pb-10 lg:pb-[88px]">
+        {/*
+         * INDENT on a plain wrapper div — pure CSS, no JS measurement, no flash.
+         * Swiper uses overflow:visible so cards bleed to the right; section clips it.
+         */}
+        <div className={INDENT}>
+          <Swiper
+            modules={[FreeMode]}
+            slidesPerView="auto"
+            spaceBetween={20}
+            freeMode
+            grabCursor
+            className="hero-swiper !overflow-visible [&_.swiper-slide]:mr-5"
+            slidesOffsetAfter={20}
+            onSwiper={handleSwiper}
+            onRealIndexChange={(s: SwiperType) => setActiveIndex(s.realIndex)}
+            onResize={(s: SwiperType) => setDotCount(calcDotCount(s))}
+          >
+            {HERO_PREVIEW.map((story) => (
+              <SwiperSlide
+                key={`${story.image}-${story.date}`}
+                className="!w-auto"
+              >
+                <PreviewCard story={story} />
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </div>
+
+        <div className={`mt-4 flex items-center gap-2 ${INDENT}`}>
+          {HERO_PREVIEW.slice(0, dotCount).map((story, i) => (
+            <button
+              key={`dot-${story.image}-${story.date}`}
+              type="button"
+              aria-label={`Go to slide ${i + 1}`}
+              onClick={() => swiperInstance?.slideTo(i)}
+              className={`h-2 rounded-full transition-all duration-300 ${
+                i === activeIndex
+                  ? "w-6 bg-white"
+                  : "w-2 bg-white/40 hover:bg-white/60"
+              }`}
+            />
           ))}
         </div>
-      </Container>
+      </div>
     </section>
   );
 }

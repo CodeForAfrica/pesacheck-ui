@@ -22,6 +22,7 @@ export function StoryCard({
   titleClassName = "text-base",
   sizes = "(max-width: 768px) 100vw, 295px",
   priority = false,
+  horizontal = false,
 }: {
   story: Story;
   imageClassName?: string;
@@ -31,14 +32,47 @@ export function StoryCard({
   titleClassName?: string;
   sizes?: string;
   priority?: boolean;
+  /** Feature layout: text on the left, image on the right. */
+  horizontal?: boolean;
 }) {
   return (
     <a
       href={story.href ?? "#"}
-      className="group flex flex-col gap-3 outline-none focus-visible:ring-2 focus-visible:ring-pesacheck-blue"
+      className={`group flex gap-6 outline-none focus-visible:ring-2 focus-visible:ring-pesacheck-blue ${
+        horizontal ? "flex-col sm:flex-row" : "flex-col"
+      }`}
     >
+      {/* Text — comes first in the DOM so it appears on the left in horizontal mode */}
+      {horizontal && (
+        <div className="flex flex-1 flex-col justify-between gap-3">
+          <div className="flex flex-col gap-3">
+            {showTaxonomy && (
+              <TaxonomyRow
+                topic={story.topic}
+                region={story.region}
+                language={story.language}
+              />
+            )}
+            <h3
+              className={`font-extrabold leading-6 text-gray-800 ${titleClassName}`}
+            >
+              {story.title}
+            </h3>
+            {showExcerpt && story.excerpt && (
+              <p className="text-sm font-medium leading-5 text-neutral-900">
+                {story.excerpt}
+              </p>
+            )}
+          </div>
+          {showDate && <DateRow date={story.date} readTime={story.readTime} />}
+        </div>
+      )}
+
+      {/* Image */}
       <div
-        className={`relative w-full overflow-hidden rounded-lg ${imageClassName}`}
+        className={`relative shrink-0 overflow-hidden rounded-lg ${imageClassName} ${
+          horizontal ? "w-full sm:w-[55%]" : "w-full"
+        }`}
       >
         <Image
           src={story.image}
@@ -58,27 +92,29 @@ export function StoryCard({
         </span>
       </div>
 
-      {showTaxonomy && (
-        <TaxonomyRow
-          topic={story.topic}
-          region={story.region}
-          language={story.language}
-        />
+      {/* Text — stacked layout only */}
+      {!horizontal && (
+        <div className="flex flex-col gap-3">
+          {showTaxonomy && (
+            <TaxonomyRow
+              topic={story.topic}
+              region={story.region}
+              language={story.language}
+            />
+          )}
+          <h3
+            className={`font-extrabold leading-6 text-gray-800 ${titleClassName}`}
+          >
+            {story.title}
+          </h3>
+          {showExcerpt && story.excerpt && (
+            <p className="text-sm font-medium leading-5 text-neutral-900">
+              {story.excerpt}
+            </p>
+          )}
+          {showDate && <DateRow date={story.date} readTime={story.readTime} />}
+        </div>
       )}
-
-      <h3
-        className={`font-extrabold leading-6 text-gray-800 ${titleClassName}`}
-      >
-        {story.title}
-      </h3>
-
-      {showExcerpt && story.excerpt && (
-        <p className="text-sm font-medium leading-5 text-neutral-900">
-          {story.excerpt}
-        </p>
-      )}
-
-      {showDate && <DateRow date={story.date} readTime={story.readTime} />}
     </a>
   );
 }

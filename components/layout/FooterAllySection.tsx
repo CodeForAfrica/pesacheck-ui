@@ -8,7 +8,7 @@ import { ABOUT_BLURB, ALLIES, type Logo, PARTNERS } from "@/lib/site";
 
 function LogoStrip({ logos }: { logos: Logo[] }) {
   return (
-    <div className="flex flex-wrap items-center gap-x-8 gap-y-5">
+    <div className="flex flex-wrap items-center gap-x-8 gap-y-8">
       {logos.map((logo) => (
         <Image
           key={logo.src}
@@ -16,7 +16,11 @@ function LogoStrip({ logos }: { logos: Logo[] }) {
           alt={logo.alt}
           width={logo.width}
           height={logo.height}
-          className="h-10 w-auto object-contain mix-blend-luminosity"
+          style={{
+            height: "48px",
+            width: `${Math.round((logo.width / logo.height) * 48)}px`,
+          }}
+          className="shrink-0 object-contain grayscale"
         />
       ))}
     </div>

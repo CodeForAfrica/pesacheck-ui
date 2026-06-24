@@ -24,10 +24,10 @@ export type NavLink = {
  */
 export const ABOUT_MENU_ITEMS: NavMenuItem[] = [
   { label: "About Us", href: "/about", icon: "about-grid" },
-  { label: "Who We Are", href: "/about/who-we-are", icon: "about-users" },
+  { label: "Who We Are", href: "/about#our-team", icon: "about-users" },
   { label: "Our Partners", href: "/about/partners", icon: "about-hand" },
   { label: "Funding", href: "/about/funding", icon: "about-coins-hand" },
-  { label: "Our Impact", href: "/about/our-impact", icon: "about-globe" },
+  { label: "Our Impact", href: "/about#our-impact", icon: "about-globe" },
   { label: "FAQs", href: "/about/faqs", icon: "about-faq" },
   { label: "Methodology", href: "/about/methodology", icon: "about-refresh" },
   { label: "Contact Us", href: "/about/contact-us", icon: "about-phone" },
@@ -39,7 +39,7 @@ export const ABOUT_MENU_ITEMS: NavMenuItem[] = [
   { label: "Principles", href: "/about/principles", icon: "about-scales" },
   {
     label: "Our Staff + Expertise",
-    href: "/about/staff-expertise",
+    href: "/about#our-team",
     icon: "about-users",
   },
   {
@@ -124,14 +124,14 @@ export const ALLIES: Logo[] = [
   {
     src: "/images/partners/ally-civic-signal.png",
     alt: "Civic Signal",
-    width: 120,
-    height: 40,
+    width: 1024,
+    height: 337,
   },
   {
     src: "/images/partners/ally-takwimu.png",
     alt: "Takwimu",
-    width: 176,
-    height: 40,
+    width: 292,
+    height: 48,
   },
   {
     src: "/images/partners/ally-academy-africa.svg",
@@ -142,8 +142,8 @@ export const ALLIES: Logo[] = [
   {
     src: "/images/partners/ally-ancir-ilab.png",
     alt: "ANCIR iLAB",
-    width: 142,
-    height: 40,
+    width: 305,
+    height: 86,
   },
 ];
 
@@ -151,26 +151,26 @@ export const PARTNERS: Logo[] = [
   {
     src: "/images/partners/partner-meta.png",
     alt: "Meta",
-    width: 186,
-    height: 40,
+    width: 522,
+    height: 196,
   },
   {
     src: "/images/partners/partner-un.png",
     alt: "United Nations",
-    width: 130,
-    height: 40,
+    width: 1970,
+    height: 610,
   },
   {
     src: "/images/partners/partner-tiktok.png",
     alt: "TikTok",
-    width: 143,
-    height: 49,
+    width: 298,
+    height: 102,
   },
   {
     src: "/images/partners/partner-dw.png",
     alt: "Deutsche Welle",
-    width: 151,
-    height: 40,
+    width: 1200,
+    height: 323,
   },
 ];
 
