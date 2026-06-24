@@ -16,10 +16,11 @@ export function Spotlight() {
           <div className="lg:col-span-2">
             <StoryCard
               story={SPOTLIGHT_FEATURE}
-              imageClassName="aspect-[16/9]"
-              titleClassName="text-lg"
+              imageClassName="aspect-[330/220]"
+              titleClassName="text-xl lg:text-2xl"
               showExcerpt
-              sizes="(max-width: 1024px) 100vw, 800px"
+              horizontal
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 60vw, 440px"
               priority
             />
           </div>
