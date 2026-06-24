@@ -31,11 +31,11 @@ export function Footer() {
             />
           </div>
           <Image
-            src="/images/footer/image17.png"
-            alt=""
+            src="/images/footer/ifcn.png"
+            alt="IFCN"
             width={108}
             height={131}
-            className="h-24 w-auto object-contain"
+            className="h-24 w-auto object-contain grayscale"
           />
         </div>
 
