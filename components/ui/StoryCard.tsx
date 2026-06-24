@@ -1,6 +1,6 @@
+import { ArrowUpRight } from "@untitledui/icons/ArrowUpRight";
 import Image from "next/image";
 import type { Story } from "@/lib/home-content";
-import { Icon } from "./Icon";
 import { DateRow, TaxonomyRow } from "./MetaRow";
 import { VerdictBadge } from "./VerdictBadge";
 
@@ -8,7 +8,7 @@ import { VerdictBadge } from "./VerdictBadge";
 function ArrowButton() {
   return (
     <span className="flex size-[30px] items-center justify-center rounded-full bg-black/30 backdrop-blur-[2px]">
-      <Icon name="arrow-up-right" size={10} className="brightness-0 invert" />
+      <ArrowUpRight size={10} className="brightness-0 invert" aria-hidden />
     </span>
   );
 }

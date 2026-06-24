@@ -1,7 +1,8 @@
 "use client";
 
+import { ChevronLeft } from "@untitledui/icons/ChevronLeft";
+import { ChevronRight } from "@untitledui/icons/ChevronRight";
 import { useRef } from "react";
-import { Icon } from "@/components/ui/Icon";
 import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import { StoryCard } from "@/components/ui/StoryCard";
 import { TRENDING } from "@/lib/home-content";
@@ -28,7 +29,7 @@ export function TrendingStories() {
                 onClick={() => scroll(-1)}
                 className="flex size-9 items-center justify-center rounded-full bg-neutral-300 text-white transition-colors hover:bg-neutral-400"
               >
-                <Icon name="chevron-left" size={18} />
+                <ChevronLeft size={18} aria-hidden />
               </button>
               <button
                 type="button"
@@ -36,7 +37,7 @@ export function TrendingStories() {
                 onClick={() => scroll(1)}
                 className="flex size-9 items-center justify-center rounded-full bg-neutral-300 text-white transition-colors hover:bg-neutral-400"
               >
-                <Icon name="chevron-right" size={18} />
+                <ChevronRight size={18} aria-hidden />
               </button>
             </div>
           }

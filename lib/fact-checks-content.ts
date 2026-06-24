@@ -6,6 +6,10 @@
  * filter the listing client-side.
  */
 
+import { Globe01 } from "@untitledui/icons/Globe01";
+import { MessageAlertCircle } from "@untitledui/icons/MessageAlertCircle";
+import { Translate01 } from "@untitledui/icons/Translate01";
+import type { ElementType } from "react";
 import type { Story } from "@/lib/home-content";
 
 const PLACEHOLDER_TITLE =
@@ -49,22 +53,22 @@ export const TOPICS = [
 export const FILTERS: {
   dimension: FilterDimension;
   label: string;
-  icon: string;
+  icon: ElementType;
   options: string[];
 }[] = [
-  {
-    dimension: "region",
-    label: "Region",
-    icon: "about-globe",
-    options: REGIONS,
-  },
+  { dimension: "region", label: "Region", icon: Globe01, options: REGIONS },
   {
     dimension: "language",
     label: "Language",
-    icon: "factcheck-language",
+    icon: Translate01,
     options: LANGUAGES,
   },
-  { dimension: "topic", label: "Topic", icon: "about-grid", options: TOPICS },
+  {
+    dimension: "topic",
+    label: "Topic",
+    icon: MessageAlertCircle,
+    options: TOPICS,
+  },
 ];
 
 // Selections shown pre-applied in the Figma design.

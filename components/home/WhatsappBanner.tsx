@@ -1,5 +1,5 @@
+import { MessageDotsCircle } from "@untitledui/icons/MessageDotsCircle";
 import Image from "next/image";
-import { Icon } from "@/components/ui/Icon";
 import { Container } from "@/components/ui/SectionHeading";
 import {
   WHATSAPP_BANNER,
@@ -30,7 +30,7 @@ function ColumnGraphic({ graphic }: { graphic: WhatsappColumn["graphic"] }) {
     );
   if (graphic === "message")
     return (
-      <Icon name="message-dots-circle" size={120} className="size-[120px]" />
+      <MessageDotsCircle size={120} className="size-[120px]" aria-hidden />
     );
 }
 

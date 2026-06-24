@@ -1,5 +1,8 @@
+import { ChevronDown } from "@untitledui/icons/ChevronDown";
+import { Mail01 } from "@untitledui/icons/Mail01";
+import { MarkerPin01 } from "@untitledui/icons/MarkerPin01";
+import { PhoneCall01 } from "@untitledui/icons/PhoneCall01";
 import Image from "next/image";
-import { Icon } from "@/components/ui/Icon";
 import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import {
   CONTACT_FORM,
@@ -64,18 +67,19 @@ function FormControl({ field }: { field: ContactField }) {
             </option>
           ))}
         </select>
-        <Icon
-          name="chevron-down"
+        <ChevronDown
           size={16}
           className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2"
+          aria-hidden
         />
       </div>
     );
   }
 
+  const FieldIcon = field.icon;
   return (
     <div className="relative flex h-12 items-center gap-2 rounded-lg border border-neutral-200 bg-white px-3.5 focus-within:border-pesacheck-blue">
-      {field.icon && <Icon name={field.icon} size={16} className="shrink-0" />}
+      {FieldIcon && <FieldIcon size={16} className="shrink-0" aria-hidden />}
       <input
         id={field.name}
         name={field.name}
@@ -88,15 +92,15 @@ function FormControl({ field }: { field: ContactField }) {
 }
 
 function ContactRow({
-  icon,
+  icon: ContactIcon,
   children,
 }: {
-  icon: string;
+  icon: React.ElementType;
   children: React.ReactNode;
 }) {
   return (
     <div className="flex items-start gap-2 text-sm font-medium text-neutral-900">
-      <Icon name={icon} size={24} className="mt-px shrink-0" />
+      <ContactIcon size={24} className="mt-px shrink-0" aria-hidden />
       <span>{children}</span>
     </div>
   );
@@ -145,23 +149,26 @@ export function ContactForm() {
 
       {/* HQ contact details */}
       <div className="mt-10 flex flex-col gap-3">
-        <ContactRow icon="marker-pin">{CONTACT_HQ.address}</ContactRow>
-        <ContactRow icon="mail">{CONTACT_HQ.email}</ContactRow>
-        <ContactRow icon="phone-call">{CONTACT_HQ.phone}</ContactRow>
+        <ContactRow icon={MarkerPin01}>{CONTACT_HQ.address}</ContactRow>
+        <ContactRow icon={Mail01}>{CONTACT_HQ.email}</ContactRow>
+        <ContactRow icon={PhoneCall01}>{CONTACT_HQ.phone}</ContactRow>
 
         <div className="mt-2 flex items-center gap-4">
           <span className="text-sm font-medium text-neutral-900">
             Follow Us:
           </span>
           <div className="flex items-center gap-3">
-            {CONTACT_SOCIALS.map((social, i) => (
-              <div key={social.name} className="flex items-center gap-3">
-                {i > 0 && <span className="h-2.5 w-px bg-neutral-200" />}
-                <a href={social.href} aria-label={social.label}>
-                  <Icon name={social.name} size={24} alt={social.label} />
-                </a>
-              </div>
-            ))}
+            {CONTACT_SOCIALS.map((social, i) => {
+              const SocialIcon = social.icon;
+              return (
+                <div key={social.label} className="flex items-center gap-3">
+                  {i > 0 && <span className="h-2.5 w-px bg-neutral-200" />}
+                  <a href={social.href} aria-label={social.label}>
+                    <SocialIcon size={24} color={social.color} aria-hidden />
+                  </a>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { Icon } from "@/components/ui/Icon";
+import { type ElementType, useEffect, useRef } from "react";
 import { FILTERS, type FilterDimension } from "@/lib/fact-checks-content";
 
 export type Selection = Record<FilterDimension, string[]>;
@@ -64,7 +63,7 @@ function Check() {
 function Dropdown({
   dimension,
   label,
-  icon,
+  icon: FilterIcon,
   options,
   selected,
   open,
@@ -73,7 +72,7 @@ function Dropdown({
 }: {
   dimension: FilterDimension;
   label: string;
-  icon: string;
+  icon: ElementType;
   options: string[];
   selected: string[];
   open: boolean;
@@ -89,7 +88,7 @@ function Dropdown({
         onClick={onToggleOpen}
         className="flex h-11 items-center gap-2 rounded-[10px] border-[0.5px] border-neutral-300 bg-white px-[18px] text-sm font-medium text-neutral-900 transition-colors hover:border-pesacheck-blue"
       >
-        <Icon name={icon} size={20} className="shrink-0" />
+        <FilterIcon size={20} className="shrink-0" aria-hidden />
         {label}
         {selected.length > 0 && (
           <span className="flex size-5 items-center justify-center rounded-full bg-pesacheck-blue text-xs font-semibold text-white">

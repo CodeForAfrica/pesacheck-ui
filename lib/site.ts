@@ -3,7 +3,28 @@
  * Header, Footer). Page-specific content lives in `lib/<page>-content.ts`.
  */
 
-export type NavMenuItem = { label: string; href: string; icon: string };
+import { Announcement01 } from "@untitledui/icons/Announcement01";
+import { BookOpen01 } from "@untitledui/icons/BookOpen01";
+import { CoinsHand } from "@untitledui/icons/CoinsHand";
+import { Globe01 } from "@untitledui/icons/Globe01";
+import { Grid01 } from "@untitledui/icons/Grid01";
+import { Hand } from "@untitledui/icons/Hand";
+import { MessageAlertCircle } from "@untitledui/icons/MessageAlertCircle";
+import { MessageQuestionCircle } from "@untitledui/icons/MessageQuestionCircle";
+import { Phone01 } from "@untitledui/icons/Phone01";
+import { Play } from "@untitledui/icons/Play";
+import { RefreshCw01 } from "@untitledui/icons/RefreshCw01";
+import { Scales01 } from "@untitledui/icons/Scales01";
+import { SearchRefraction } from "@untitledui/icons/SearchRefraction";
+import { Server01 } from "@untitledui/icons/Server01";
+import { Translate01 } from "@untitledui/icons/Translate01";
+import { Users01 } from "@untitledui/icons/Users01";
+import type { ElementType } from "react";
+import { FaWhatsapp } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
+import { FiFacebook, FiLinkedin, FiSlack } from "react-icons/fi";
+
+export type NavMenuItem = { label: string; href: string; icon: ElementType };
 
 export type NavLink = {
   label: string;
@@ -23,30 +44,18 @@ export type NavLink = {
  * (mirrors the Figma "Group 34738225" dropdown, node 2866:4472).
  */
 export const ABOUT_MENU_ITEMS: NavMenuItem[] = [
-  { label: "About Us", href: "/about", icon: "about-grid" },
-  { label: "Who We Are", href: "/about#our-team", icon: "about-users" },
-  { label: "Our Partners", href: "/about/partners", icon: "about-hand" },
-  { label: "Funding", href: "/about/funding", icon: "about-coins-hand" },
-  { label: "Our Impact", href: "/about#our-impact", icon: "about-globe" },
-  { label: "FAQs", href: "/about/faqs", icon: "about-faq" },
-  { label: "Methodology", href: "/about/methodology", icon: "about-refresh" },
-  { label: "Contact Us", href: "/about/contact-us", icon: "about-phone" },
-  {
-    label: "Our Ecosystem",
-    href: "/about/our-ecosystem",
-    icon: "about-server",
-  },
-  { label: "Principles", href: "/about/principles", icon: "about-scales" },
-  {
-    label: "Our Staff + Expertise",
-    href: "/about#our-team",
-    icon: "about-users",
-  },
-  {
-    label: "Media Centre",
-    href: "/about/media-centre",
-    icon: "about-announcement",
-  },
+  { label: "About Us", href: "/about", icon: Grid01 },
+  { label: "Who We Are", href: "/about#our-team", icon: Users01 },
+  { label: "Our Partners", href: "/about/partners", icon: Hand },
+  { label: "Funding", href: "/about/funding", icon: CoinsHand },
+  { label: "Our Impact", href: "/about#our-impact", icon: Globe01 },
+  { label: "FAQs", href: "/about/faqs", icon: MessageQuestionCircle },
+  { label: "Methodology", href: "/about/methodology", icon: RefreshCw01 },
+  { label: "Contact Us", href: "/about/contact-us", icon: Phone01 },
+  { label: "Our Ecosystem", href: "/about/our-ecosystem", icon: Server01 },
+  { label: "Principles", href: "/about/principles", icon: Scales01 },
+  { label: "Our Staff + Expertise", href: "/about#our-team", icon: Users01 },
+  { label: "Media Centre", href: "/about/media-centre", icon: Announcement01 },
 ];
 
 /**
@@ -55,24 +64,16 @@ export const ABOUT_MENU_ITEMS: NavMenuItem[] = [
  * 4–5 column 3 (mirrors the Figma "Fact Checks" dropdown, node 2866:7355).
  */
 export const FACT_CHECKS_MENU_ITEMS: NavMenuItem[] = [
-  { label: "All fact-checks", href: "/fact-checks", icon: "about-grid" },
+  { label: "All fact-checks", href: "/fact-checks", icon: Grid01 },
+  { label: "By Language", href: "/fact-checks/by-language", icon: Translate01 },
   {
-    label: "By Language",
-    href: "/fact-checks/by-language",
-    icon: "factcheck-language",
+    label: "By Topic",
+    href: "/fact-checks/by-topic",
+    icon: MessageAlertCircle,
   },
-  { label: "By Topic", href: "/fact-checks/by-topic", icon: "factcheck-topic" },
-  {
-    label: "Quick Reads",
-    href: "/fact-checks/quick-reads",
-    icon: "factcheck-reads",
-  },
-  {
-    label: "Explainers",
-    href: "/fact-checks/explainers",
-    icon: "factcheck-play",
-  },
-  { label: "By Country", href: "/fact-checks/by-country", icon: "about-globe" },
+  { label: "Quick Reads", href: "/fact-checks/quick-reads", icon: BookOpen01 },
+  { label: "Explainers", href: "/fact-checks/explainers", icon: Play },
+  { label: "By Country", href: "/fact-checks/by-country", icon: Globe01 },
 ];
 
 export const NAV_LINKS: NavLink[] = [
@@ -174,35 +175,27 @@ export const PARTNERS: Logo[] = [
   },
 ];
 
-export const SOCIAL_ICONS = [
-  { name: "social-twitter-x", label: "Twitter / X" },
-  { name: "social-facebook", label: "Facebook" },
-  { name: "social-icon1", label: "Instagram" },
-  { name: "social-icon2", label: "LinkedIn" },
-  { name: "social-layer13", label: "YouTube" },
+export const SOCIAL_ICONS: { icon: ElementType; label: string }[] = [
+  { icon: FaXTwitter, label: "Twitter / X" },
+  { icon: FiFacebook, label: "Facebook" },
+  { icon: FaWhatsapp, label: "WhatsApp" },
+  { icon: FiSlack, label: "Slack" },
+  { icon: FiLinkedin, label: "LinkedIn" },
 ];
 
 const STAT_BLURB =
   "Pesacheck has lorem ipsum dolor sit amet consectetur adipiscing";
 
 export type ImpactStat = {
-  icon: string;
+  icon: ElementType;
   value: string;
   label: string;
 };
 
 // Row-major order matching the 2x2 Figma grid.
 export const IMPACT_STATS: ImpactStat[] = [
-  { icon: "translate", value: "6 Publishing Languages", label: STAT_BLURB },
-  {
-    icon: "search-refraction",
-    value: "10,000+ Fact-checks",
-    label: STAT_BLURB,
-  },
-  {
-    icon: "calendar-impact",
-    value: "8+ Years in operation",
-    label: STAT_BLURB,
-  },
-  { icon: "globe", value: "18+ Countries we operate in", label: STAT_BLURB },
+  { icon: Translate01, value: "6 Publishing Languages", label: STAT_BLURB },
+  { icon: SearchRefraction, value: "10,000+ Fact-checks", label: STAT_BLURB },
+  { icon: RefreshCw01, value: "8+ Years in operation", label: STAT_BLURB },
+  { icon: Globe01, value: "18+ Countries we operate in", label: STAT_BLURB },
 ];

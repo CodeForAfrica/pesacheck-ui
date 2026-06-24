@@ -1,4 +1,4 @@
-import { Icon } from "@/components/ui/Icon";
+import { FaLinkedinIn } from "react-icons/fa";
 import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import { ABOUT_TEAM, type TeamMember } from "@/lib/about-content";
 
@@ -10,8 +10,8 @@ function TeamCard({ member }: { member: TeamMember }) {
         <p className="text-sm font-bold leading-5 text-neutral-900">
           {member.name}
         </p>
-        <span className="flex size-4 items-center justify-center rounded-[3px] bg-neutral-600">
-          <Icon name="linkedin" size={9} alt={`${member.name} on LinkedIn`} />
+        <span className="flex size-5 items-center justify-center rounded-full bg-neutral-600">
+          <FaLinkedinIn size={11} color="white" aria-hidden />
         </span>
       </div>
       <p className="mt-1 text-sm font-medium leading-5 text-neutral-500">

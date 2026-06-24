@@ -1,5 +1,5 @@
+import { ArrowUpRight } from "@untitledui/icons/ArrowUpRight";
 import { FundingSectionNav } from "@/components/about/FundingSectionNav";
-import { Icon } from "@/components/ui/Icon";
 import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import {
   FUNDING_SECTIONS,
@@ -68,7 +68,7 @@ function Section({ section }: { section: FundingSection }) {
             className="mt-5 inline-flex items-center gap-1 text-sm font-medium text-neutral-900 transition-colors hover:text-pesacheck-blue"
           >
             Learn More
-            <Icon name="arrow-up-right" size={20} />
+            <ArrowUpRight size={20} aria-hidden />
           </button>
         )}
 

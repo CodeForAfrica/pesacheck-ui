@@ -1,5 +1,7 @@
+import { Calendar } from "@untitledui/icons/Calendar";
+import { Clock } from "@untitledui/icons/Clock";
+import { User03 } from "@untitledui/icons/User03";
 import Image from "next/image";
-import { Icon } from "@/components/ui/Icon";
 import { VerdictBadge } from "@/components/ui/VerdictBadge";
 import type { Article } from "@/lib/article-content";
 import { ShareButtons } from "./ShareButtons";
@@ -61,17 +63,17 @@ export function ArticleHero({ article }: { article: Article }) {
           {/* Date · read-time · author */}
           <div className="flex flex-wrap items-center gap-2 text-sm font-medium text-white">
             <span className="flex items-center gap-[5px]">
-              <Icon name="calendar" size={20} className="brightness-0 invert" />
+              <Calendar size={20} className="brightness-0 invert" aria-hidden />
               {article.date}
             </span>
             <span className="size-1.5 rounded-full bg-white/60" />
             <span className="flex items-center gap-[5px]">
-              <Icon name="clock" size={20} className="brightness-0 invert" />
+              <Clock size={20} className="brightness-0 invert" aria-hidden />
               {article.readTime}
             </span>
             <span className="size-1.5 rounded-full bg-white/60" />
             <span className="flex items-center gap-[5px]">
-              <Icon name="user-03" size={20} className="brightness-0 invert" />
+              <User03 size={20} className="brightness-0 invert" aria-hidden />
               {article.author}
             </span>
           </div>
