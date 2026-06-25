@@ -1,8 +1,5 @@
-import { ChevronDown } from "@untitledui/icons/ChevronDown";
-import { Mail01 } from "@untitledui/icons/Mail01";
-import { MarkerPin01 } from "@untitledui/icons/MarkerPin01";
-import { PhoneCall01 } from "@untitledui/icons/PhoneCall01";
 import Image from "next/image";
+import { FiChevronDown, FiMail, FiMapPin, FiPhoneCall } from "react-icons/fi";
 import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import {
   CONTACT_FORM,
@@ -67,7 +64,7 @@ function FormControl({ field }: { field: ContactField }) {
             </option>
           ))}
         </select>
-        <ChevronDown
+        <FiChevronDown
           size={16}
           className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2"
           aria-hidden
@@ -149,9 +146,9 @@ export function ContactForm() {
 
       {/* HQ contact details */}
       <div className="mt-10 flex flex-col gap-3">
-        <ContactRow icon={MarkerPin01}>{CONTACT_HQ.address}</ContactRow>
-        <ContactRow icon={Mail01}>{CONTACT_HQ.email}</ContactRow>
-        <ContactRow icon={PhoneCall01}>{CONTACT_HQ.phone}</ContactRow>
+        <ContactRow icon={FiMapPin}>{CONTACT_HQ.address}</ContactRow>
+        <ContactRow icon={FiMail}>{CONTACT_HQ.email}</ContactRow>
+        <ContactRow icon={FiPhoneCall}>{CONTACT_HQ.phone}</ContactRow>
 
         <div className="mt-2 flex items-center gap-4">
           <span className="text-sm font-medium text-neutral-900">

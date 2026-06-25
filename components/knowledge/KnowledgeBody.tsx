@@ -1,4 +1,4 @@
-import { ArrowUpRight } from "@untitledui/icons/ArrowUpRight";
+import { FiArrowUpRight } from "react-icons/fi";
 import { KnowledgeNav } from "@/components/knowledge/KnowledgeNav";
 import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import {
@@ -46,7 +46,7 @@ function Section({ section }: { section: KnowledgeSection }) {
           className="mt-7 inline-flex items-center gap-1 text-sm font-semibold text-pesacheck-blue transition-colors hover:text-pesacheck-black"
         >
           Learn More
-          <ArrowUpRight size={20} aria-hidden />
+          <FiArrowUpRight size={20} aria-hidden />
         </button>
 
         <div className="mt-10 grid grid-cols-2 gap-5">

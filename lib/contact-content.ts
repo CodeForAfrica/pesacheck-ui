@@ -4,8 +4,7 @@
  * lives in `lib/site.ts`; the Allies/Partners and footer chrome at the bottom of
  * the design are rendered by the shared layout Footer, not this page.
  */
-import { Mail01 } from "@untitledui/icons/Mail01";
-import { User03 } from "@untitledui/icons/User03";
+import { FiMail, FiUser } from "react-icons/fi";
 
 export const CONTACT_HERO = {
   eyebrow: "Contact Pesacheck",
@@ -67,7 +66,7 @@ export const CONTACT_FORM = {
       required: true,
       span: "half",
       type: "text",
-      icon: User03,
+      icon: FiUser,
     },
     {
       name: "email",
@@ -76,7 +75,7 @@ export const CONTACT_FORM = {
       required: true,
       span: "half",
       type: "email",
-      icon: Mail01,
+      icon: FiMail,
     },
     {
       name: "subject",

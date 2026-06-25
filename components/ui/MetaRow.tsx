@@ -1,5 +1,4 @@
-import { Calendar } from "@untitledui/icons/Calendar";
-import { Clock } from "@untitledui/icons/Clock";
+import { FiCalendar, FiClock } from "react-icons/fi";
 
 /** Taxonomy row: Topic · Region · Language (text-xs, tiny 2px dot separators). */
 export function TaxonomyRow({
@@ -33,12 +32,12 @@ export function DateRow({
   return (
     <div className="flex items-center gap-2 text-sm font-medium text-neutral-900">
       <span className="flex items-center gap-[5px]">
-        <Calendar size={20} aria-hidden />
+        <FiCalendar size={20} aria-hidden />
         {date}
       </span>
       <span className="size-1.5 shrink-0 rounded-full bg-neutral-300" />
       <span className="flex items-center gap-[5px]">
-        <Clock size={20} aria-hidden />
+        <FiClock size={20} aria-hidden />
         {readTime}
       </span>
     </div>

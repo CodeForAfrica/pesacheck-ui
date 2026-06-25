@@ -1,5 +1,5 @@
-import { ArrowUpRight } from "@untitledui/icons/ArrowUpRight";
 import Image from "next/image";
+import { FiArrowUpRight } from "react-icons/fi";
 import type { Story } from "@/lib/home-content";
 import { DateRow, TaxonomyRow } from "./MetaRow";
 import { VerdictBadge } from "./VerdictBadge";
@@ -8,7 +8,7 @@ import { VerdictBadge } from "./VerdictBadge";
 function ArrowButton() {
   return (
     <span className="flex size-[30px] items-center justify-center rounded-full bg-black/30 backdrop-blur-[2px]">
-      <ArrowUpRight size={10} className="brightness-0 invert" aria-hidden />
+      <FiArrowUpRight size={10} className="brightness-0 invert" aria-hidden />
     </span>
   );
 }

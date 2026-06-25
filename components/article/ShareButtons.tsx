@@ -1,6 +1,5 @@
 "use client";
 
-import { Mail01 } from "@untitledui/icons/Mail01";
 import type { IconType } from "react-icons";
 import {
   FaFacebook,
@@ -9,6 +8,7 @@ import {
   FaWhatsapp,
 } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
+import { FiMail } from "react-icons/fi";
 
 const SOCIAL_SHARE: {
   name: string;
@@ -98,7 +98,7 @@ export function ShareButtons({
         type="button"
         className="shrink-0 cursor-pointer transition-opacity hover:opacity-70"
       >
-        <Mail01
+        <FiMail
           size={20}
           color={labelColor === "text-white" ? "white" : "#374151"}
           aria-hidden

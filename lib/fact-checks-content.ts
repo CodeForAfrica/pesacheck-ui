@@ -6,10 +6,9 @@
  * filter the listing client-side.
  */
 
-import { Globe01 } from "@untitledui/icons/Globe01";
-import { MessageAlertCircle } from "@untitledui/icons/MessageAlertCircle";
-import { Translate01 } from "@untitledui/icons/Translate01";
 import type { ElementType } from "react";
+import { FiGlobe } from "react-icons/fi";
+import { LuLanguages, LuMessageCircleWarning } from "react-icons/lu";
 import type { Story } from "@/lib/home-content";
 
 const PLACEHOLDER_TITLE =
@@ -56,17 +55,17 @@ export const FILTERS: {
   icon: ElementType;
   options: string[];
 }[] = [
-  { dimension: "region", label: "Region", icon: Globe01, options: REGIONS },
+  { dimension: "region", label: "Region", icon: FiGlobe, options: REGIONS },
   {
     dimension: "language",
     label: "Language",
-    icon: Translate01,
+    icon: LuLanguages,
     options: LANGUAGES,
   },
   {
     dimension: "topic",
     label: "Topic",
-    icon: MessageAlertCircle,
+    icon: LuMessageCircleWarning,
     options: TOPICS,
   },
 ];

@@ -1,4 +1,4 @@
-import { ArrowUpRight } from "@untitledui/icons/ArrowUpRight";
+import { FiArrowUpRight } from "react-icons/fi";
 import { PrinciplesSectionNav } from "@/components/about/PrinciplesSectionNav";
 import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import {
@@ -68,7 +68,7 @@ function Section({ section }: { section: PrinciplesSection }) {
             className="mt-5 inline-flex items-center gap-1 text-sm font-medium text-neutral-900 transition-colors hover:text-pesacheck-blue"
           >
             Learn More
-            <ArrowUpRight size={20} aria-hidden />
+            <FiArrowUpRight size={20} aria-hidden />
           </button>
         )}
 

@@ -1,10 +1,10 @@
 "use client";
 
-import { SearchLg } from "@untitledui/icons/SearchLg";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { FiSearch } from "react-icons/fi";
 import { NAV_LINKS } from "@/lib/site";
 
 export function Header() {
@@ -71,7 +71,7 @@ export function Header() {
               searchFocused ? "border-neutral-900" : "border-neutral-300"
             }`}
           >
-            <SearchLg size={16} className="shrink-0 opacity-60" aria-hidden />
+            <FiSearch size={16} className="shrink-0 opacity-60" aria-hidden />
             <input
               type="search"
               name="q"
@@ -220,7 +220,7 @@ export function Header() {
               onSubmit={handleSearchSubmit}
               className="mb-4 flex h-12 items-center gap-2 rounded-[13px] border-[0.5px] border-neutral-300 bg-neutral-50 px-4 md:hidden"
             >
-              <SearchLg size={16} className="opacity-60" aria-hidden />
+              <FiSearch size={16} className="opacity-60" aria-hidden />
               <input
                 type="search"
                 name="q"
