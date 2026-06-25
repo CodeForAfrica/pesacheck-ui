@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { ArticleTag } from "@/components/article/ArticleTag";
 import type { Article } from "@/lib/article-content";
 
 type BodyImage = NonNullable<Article["images"]>[number];
@@ -70,6 +71,14 @@ export function ArticleBodyShort({ article }: { article: Article }) {
         <p className="mt-8 text-sm font-semibold leading-5 text-neutral-900">
           {article.verdictSummary}
         </p>
+      )}
+
+      {article.tags.length > 0 && (
+        <div className="mt-8 flex flex-wrap gap-2.5">
+          {article.tags.map((tag) => (
+            <ArticleTag key={tag} label={tag} />
+          ))}
+        </div>
       )}
     </div>
   );

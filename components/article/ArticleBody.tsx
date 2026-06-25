@@ -1,17 +1,6 @@
 import Image from "next/image";
+import { ArticleTag } from "@/components/article/ArticleTag";
 import type { Article } from "@/lib/article-content";
-
-/** Small tag chip at end-of-article. */
-function ArticleTag({ label }: { label: string }) {
-  return (
-    <a
-      href={`/fact-checks?topic=${encodeURIComponent(label)}`}
-      className="rounded-lg bg-neutral-100 px-3 py-1 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-200"
-    >
-      {label}
-    </a>
-  );
-}
 
 export function ArticleBody({ article }: { article: Article }) {
   return (
