@@ -11,6 +11,9 @@
   --color-pesacheck-purple: #60279e; /* Truthometer */
   --color-pesacheck-white: #ffffff;
 
+  /* Verdict */
+  --color-red-400: #fd424d; /* "False" verdict chip */
+
   /* Primary (blue tints) */
   --color-primary-50: #f1f2ff;
   --color-primary-100: #c1c9fc;

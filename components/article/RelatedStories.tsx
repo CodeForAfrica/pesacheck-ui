@@ -47,7 +47,7 @@ export function RelatedStories({ stories }: { stories: Story[] }) {
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {visible.map((story) => (
             <StoryCard
-              key={story.href ?? story.title}
+              key={story.image}
               story={story}
               imageClassName="aspect-[295/150]"
               showExcerpt={false}
