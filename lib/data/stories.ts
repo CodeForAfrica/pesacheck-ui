@@ -1,14 +1,5 @@
-/**
- * Story listings fetched from Hasura content lists. Each function returns the
- * Figma `Story[]` card type (via `mapStory`) so components stay on the contract.
- * Throws on network/GraphQL error — pages use the `?? fallback` pattern.
- *
- * The curated lists map 1:1 to the home sections (verified on staging):
- * `Homepage — Spotlight`, `Homepage — Trending`, `Top news`. Names use an EM
- * DASH (—, U+2014) and must match exactly.
- */
 import { gql, TENANT_CODE } from "@/lib/data/client";
-import { getVerdict, mapStory, type RawArticle } from "@/lib/data/map";
+import { mapStory, type RawArticle } from "@/lib/data/map";
 import { GET_CONTENT_LIST_ITEMS } from "@/lib/data/queries/content-lists";
 import { GET_FACT_CHECK_ARTICLES } from "@/lib/data/queries/fact-checks";
 import type { Story } from "@/lib/home-content";
@@ -17,7 +8,17 @@ type ContentListResponse = {
   list: { items: { article: RawArticle | null }[] }[];
 };
 
-type FactCheckResponse = { items: RawArticle[] };
+type FactCheckResponse = {
+  total: { aggregate: { totalCount: number } };
+  items: RawArticle[];
+};
+
+/** One page of the fact-checks listing: the mapped cards + paging metadata. */
+export type FactCheckListing = {
+  stories: Story[];
+  page: number;
+  totalPages: number;
+};
 
 /**
  * Routes for PesaCheck's publishing languages. Curated home lists mix real
@@ -35,6 +36,12 @@ export const LANGUAGE_ROUTE_SLUGS = [
   "kiswahili",
   "african-languages",
 ];
+
+/**
+ * Fact-checks per listing page. One large feature + one secondary + an 8-card
+ * grid fill a page (mirrors the Figma layout). Pages are fetched from the DB by offset
+ */
+export const FACT_CHECKS_PAGE_SIZE = 10;
 
 /** Fetch a content list's language articles, in curated order, as `Story[]`. */
 async function getContentListStories(name: string): Promise<Story[]> {
@@ -68,23 +75,37 @@ export function getHeroPreview(): Promise<Story[]> {
 }
 
 /**
- * All published fact-checks as `Story[]`, newest first — backs the
- * `/fact-checks` grid. Queries `swp_article` directly (not a curated list).
+ * A page of published fact-checks as `Story[]`, newest first — backs the
+ * `/fact-checks` grid. Queries `swp_article` directly (not a curated list) and
+ * paginates server-side via `limit`/`offset` + an `_aggregate` count.
  *
- * A "fact-check" is defined by carrying a `Debunk` verdict tag, so we filter to
- * articles where `getVerdict` resolves. This is the only signal that cleanly
- * separates fact-checks from the other published content on the same routes —
- * homepage content-blocks and editorial test stubs share `route`/`profile` and
- * would otherwise leak into the grid. Verdict-presence is also route-agnostic,
- * so it keeps working once fact-checks are published under topic desks (the
- * staging desks are currently empty; everything sits on `english`).
+ * A "fact-check" is an article carrying a `Debunk` verdict; the query enforces
+ * that server-side (see `GET_FACT_CHECK_ARTICLES`), which also excludes the
+ * other published content sharing these routes (homepage content-blocks,
+ * editorial test stubs). The filter is route-agnostic, so it keeps working once
+ * fact-checks are published under topic desks (staging desks are empty;
+ * everything currently sits on `english`).
  *
- * Caveat (staging data): an article with a title verdict prefix but no
- * structured `Debunk` tag is dropped (the contract treats verdict as optional
+ * `page` is 1-based and clamped to `[1, totalPages]`.
  */
-export async function getFactChecks(): Promise<Story[]> {
-  const { items } = await gql<FactCheckResponse>(GET_FACT_CHECK_ARTICLES, {
-    tenant: TENANT_CODE,
-  });
-  return items.filter((a) => getVerdict(a.metadata) != null).map(mapStory);
+export async function getFactChecks(page = 1): Promise<FactCheckListing> {
+  const requested = Math.max(1, Math.floor(page));
+  const { total, items } = await gql<FactCheckResponse>(
+    GET_FACT_CHECK_ARTICLES,
+    {
+      tenant: TENANT_CODE,
+      limit: FACT_CHECKS_PAGE_SIZE,
+      offset: (requested - 1) * FACT_CHECKS_PAGE_SIZE,
+    },
+  );
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(total.aggregate.totalCount / FACT_CHECKS_PAGE_SIZE),
+  );
+  return {
+    stories: items.map(mapStory),
+    page: Math.min(requested, totalPages),
+    totalPages,
+  };
 }

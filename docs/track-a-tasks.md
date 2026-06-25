@@ -118,39 +118,50 @@ Lowest-risk vertical slice: stand up the data layer and convert the one 1:1 row.
 
 ## PR 2b — Fact-checks grid — Phase 2 ✅
 Heavier: client-component data lifting.
-- [x] `lib/data/queries/fact-checks.ts` — `GET_FACT_CHECK_ARTICLES`: published
-      articles for the tenant, newest first, selecting the same fields as
-      `GET_CONTENT_LIST_ITEMS` so `mapStory` consumes the rows unchanged.
-- [x] `lib/data/stories.ts` — `getFactChecks(): Story[]`. **A fact-check is
-      defined by carrying a `Debunk` verdict** (filtered via the verified jsonb
-      path `getVerdict`). This is the only signal that separates fact-checks
-      from the other published content on the same routes — homepage
-      content-blocks + editorial test stubs share `route`/`profile` and would
-      otherwise leak. Verdict-presence is route-agnostic, so it keeps working
+- [x] `lib/data/queries/fact-checks.ts` — `GET_FACT_CHECK_ARTICLES`: one page of
+      published fact-checks (newest first) + an `_aggregate` total count. Filters
+      **server-side** to the `Debunk` verdict via the normalized
+      `swp_article_metadata.swp_article_metadata_subjects` relation, with
+      `$limit`/`$offset`. Selects the same fields as `GET_CONTENT_LIST_ITEMS` so
+      `mapStory` consumes the rows unchanged.
+- [x] `lib/data/stories.ts` — `getFactChecks(page): FactCheckListing` (`{ stories,
+      page, totalPages }`), `FACT_CHECKS_PAGE_SIZE = 10`. **A fact-check is
+      defined by carrying a `Debunk` verdict**, enforced in the query (the only
+      signal separating fact-checks from homepage content-blocks + editorial test
+      stubs that share `route`/`profile`). Route-agnostic, so it keeps working
       once fact-checks land on topic desks (staging desks are empty; everything
       sits on `english`).
-- [x] `app/fact-checks/page.tsx` made async; fetches with the `?? fallback`
-      pattern (static `[FEATURE, FEATURE_SECONDARY, ...STORIES]` pool).
-- [x] `FactChecksExplorer` (client) now takes an optional `stories?: Story[]`
-      prop; static pool kept as the in-component default.
-- [x] Verify against staging: grid renders **6 live fact-checks** (verdict
-      badges, dates, readTime, real media) in the feature+secondary+4-col
-      layout. tsc + biome clean; 27 Vitest tests pass.
+- [x] `app/fact-checks/page.tsx` made async; reads `?page=`, fetches that DB page
+      with the `?? fallback` pattern (static pool, paged identically).
+- [x] `FactChecksExplorer` (client) takes `stories` + `page`/`totalPages`;
+      pagination navigates by `?page=N` (server re-fetch) — never loads the corpus
+      client-side.
+- [x] `app/fact-checks/[desk]/page.tsx` (PR5 placeholder) passes the static pool
+      on a single page so it compiles + hides pagination.
+- [x] Verify against staging: grid renders live fact-checks (verdict badges,
+      dates, readTime, real media). **Server pagination proven** end-to-end by
+      temporarily setting page size to 2 (5 items → 3 pages): each page is a
+      distinct DB slice, `?page=N` drives the fetch, boundary disables "Next".
+      Restored to 10. tsc + biome clean; 27 Vitest tests pass.
 
 **Notes:**
-- The verified jsonb verdict path is **more complete** than the normalized
-  `swp_article_metadata_subjects` relation — the relation drops `altered-yvonne`
-  (a real fact-check). `getFactChecks` filters in JS via `getVerdict` to match
-  the path `mapStory`/the contract already use.
-- **Dropped on staging:** a French article with a "FAUX" title prefix but **no
-  structured `Debunk` tag** — the contract treats verdict as optional, but
-  verdict-presence is the only clean selector available. One test stub ("Full
-  Article Test") leaks because it carries a real `Hoax` tag. Both are staging
-  artifacts; PR4 wires the real taxonomy + filters.
-- Filters remain **static** (region/language/topic from `fact-checks-content`):
-  staged chips show but `applied` starts empty, so the full live grid is visible
-  on load. Live `Story`s carry no `topic`/`region`/`language` yet (PR4), so
-  clicking "Apply Filters" with the default chips narrows to empty — expected.
+- **Why server-side verdict filter (not the verified jsonb path):** the jsonb
+  `metadata` column is exposed by Hasura as an opaque `String` (no jsonb
+  operators), so it can't filter or paginate server-side. Pagination at scale
+  (prod: tens of thousands of fact-checks) forces the normalized relation —
+  which the reference prod app also uses (`GET_COLLECTION_BY_METADATA_QUERY`).
+- **Relation vs jsonb divergence:** the relation drops `altered-yvonne` on
+  staging (its `swp_article_metadata` is `null` though the jsonb carries the
+  verdict — a staging integrity gap). All relation-matched articles still carry
+  the jsonb verdict *name*, so `mapStory`'s badge is unaffected. The French
+  "FAUX" article (no structured `Debunk` tag) is also absent. Both are staging
+  artifacts; production data is consistently pipelined.
+- Filters remain **static** (region/language/topic from `fact-checks-content`)
+  and now operate **client-side on the current page only**: staged chips show
+  but `applied` starts empty, so the full server page is visible on load. Live
+  `Story`s carry no taxonomy yet, so "Apply Filters" narrows to empty — expected.
+  PR4 makes filtering server-side, layering filter params onto the same `?page=`
+  URL the pagination already uses.
 
 ## PR 3 — Single article — Phase 3
 - [ ] `lib/data/queries/` — single-article query (`articleService.queries.js`):
@@ -164,13 +175,18 @@ Heavier: client-component data lifting.
       working when fetching live (article lookup by slug vs desk lookup)
 - [ ] Verify a real fact-check (e.g. `false-equating-somalia-and-al-shabab-is-untrue`)
 
-## PR 4 — Filters & pagination — Phase 4 (depends on 2b)
+## PR 4 — Filters — Phase 4 (depends on 2b)
+> Offset pagination already shipped in PR 2b (server-side `limit`/`offset` +
+> `_aggregate`, driven by `?page=`). PR 4 makes **filtering** server-side and
+> wires it onto that same URL mechanism.
 - [ ] Map filter dimensions to real taxonomy: `region` → `subject[countries]`,
       `topic` → `subject[01harm]`/route, `language` → article language/route
+      (extend `mapStory` to populate `topic`/`region`/`language` on `Story`)
 - [ ] Derive filter option lists from live data (replace hardcoded `REGIONS`/
       `LANGUAGES`/`TOPICS` in `fact-checks-content`)
-- [ ] Offset pagination (cf. `collectionService` + `_aggregate` for counts)
-- [ ] Decide client-side filter vs server query params; verify filtering works
+- [ ] Push selected filters into the query `where` (server-side) + reflect them
+      in the URL alongside `?page=`; reset to page 1 on filter change. Replace
+      the interim client-side, current-page-only filtering in `FactChecksExplorer`.
 
 ## PR 5 — Desk pages — Phase 5 (depends on 3 for route dispatch)
 - [ ] `lib/data/stories.ts` — `getByDesk(slug): Story[]` (by route collection)

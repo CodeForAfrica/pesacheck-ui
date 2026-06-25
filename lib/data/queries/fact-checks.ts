@@ -3,29 +3,49 @@
  * the `/fact-checks` grid is the full body of published fact-checks, so this
  * queries `swp_article` directly. Adapted from
  * `pesacheck-pwa-app-router/services/collectionService.queries.js`
- * (`GET_COLLECTION_LATEST_ARTICLES_QUERY`).
+ * (`GET_COLLECTION_BY_METADATA_QUERY` — same `Debunk`-subject filter + offset
+ * pagination + `_aggregate` count).
  *
  * It selects the same article fields `GET_CONTENT_LIST_ITEMS` does so `mapStory`
  * can consume the rows unchanged — including `metadata` (jsonb) for the `Debunk`
  * verdict and `body` for `readTime`.
  *
- * Note: there is no server-side filter that cleanly isolates fact-checks from
- * other published content (homepage content-blocks, editorial test stubs) on
- * staging — they share `route`/`profile`. The caller (`getFactChecks`) narrows
- * to articles carrying a `Debunk` verdict, which IS the product's definition of
- * a fact-check. See `lib/data/stories.ts`.
+ * **Fact-check filter (server-side):** an article is a fact-check iff it carries
+ * a `Debunk` verdict. We match that via the normalized
+ * `swp_article_metadata.swp_article_metadata_subjects` relation rather than the
+ * jsonb `metadata` column — Hasura exposes `metadata` as an opaque `String`, so
+ * it has no jsonb operators and cannot be filtered or paginated server-side. The
+ * normalized relation is indexable, so it scales (production will hold tens of
+ * thousands of fact-checks; the grid must never fetch them all). It also cleanly
+ * excludes the other published content on the same routes (homepage
+ * content-blocks, editorial test stubs). See `getFactChecks` in
+ * `lib/data/stories.ts`.
+ *
+ * `$limit`/`$offset` page the listing; `total` returns the unpaged count so the
+ * caller can compute `totalPages` without over-fetching.
  */
 
-/** Published articles for a tenant, newest first. */
+const FACT_CHECK_WHERE = `{
+  tenant_code: { _eq: $tenant }
+  published_at: { _is_null: false }
+  swp_article_metadata: {
+    swp_article_metadata_subjects: { scheme: { _eq: "Debunk" } }
+  }
+}`;
+
+/** One page of published fact-checks (newest first) + the total count. */
 export const GET_FACT_CHECK_ARTICLES = /* GraphQL */ `
-  query GetFactCheckArticles($tenant: String!, $limit: Int = 60) {
-    items: swp_article(
-      where: {
-        tenant_code: { _eq: $tenant }
-        published_at: { _is_null: false }
+  query GetFactCheckArticles($tenant: String!, $limit: Int!, $offset: Int!) {
+    total: swp_article_aggregate(where: ${FACT_CHECK_WHERE}) {
+      aggregate {
+        totalCount: count
       }
+    }
+    items: swp_article(
+      where: ${FACT_CHECK_WHERE}
       order_by: { published_at: desc }
       limit: $limit
+      offset: $offset
     ) {
       id
       title
