@@ -6,7 +6,25 @@
  * Ported from `pesacheck-pwa-app-router/services/helpers.ts` where noted.
  */
 
+import type { Story } from "@/lib/home-content";
+
 const MEDIA_URL = process.env.NEXT_PUBLIC_MEDIA_URL ?? "";
+/**
+ * Preference order for the card image. Staging exposes
+ * `thumbnail|viewImage|baseImage|original|square`; prod/local may differ, so the
+ * picker just takes the first name that resolves and falls back to any rendition.
+ * `viewImage` (≈640px) is the best balance for cards; bigger crops are fallbacks.
+ */
+const STORY_RENDITIONS = [
+  "viewImage",
+  "baseImage",
+  "original",
+  "square",
+  "thumbnail",
+];
+
+/** Shown when an article has no resolvable rendition (keeps next/image happy). */
+const STORY_IMAGE_FALLBACK = "/images/spotlight/long-format3-2.png";
 
 // ── Media ───────────────────────────────────────────────────────────────────
 
@@ -41,7 +59,6 @@ export function findRendition(
 // ── Metadata / verdict / taxonomy ────────────────────────────────────────────
 // `swp_article.metadata` is jsonb but Hasura returns it as a JSON-encoded
 // STRING — it must be parsed. The verdict + taxonomy live in `subject[]`.
-// See docs/migration-plan.md Phase-1 notes.
 
 export type Subject = { scheme: string; code: string; name: string };
 export type ArticleMetadata = {
@@ -75,4 +92,100 @@ export function findSubject(
  */
 export function getVerdict(raw: string | null | undefined): string | undefined {
   return findSubject(parseMetadata(raw), "Debunk")?.name;
+}
+
+// ── Story (listing card) ─────────────────────────────────────────────────────
+// Maps a raw `swp_article` (as returned by the content-list query) to the Figma
+// `Story` card type. Keeps components on `Story`, not the backend shape.
+
+/**
+ * Raw article shape selected by `GET_CONTENT_LIST_ITEMS`. Every field is
+ * optional/nullable — staging data is sparse (missing body, image, verdict).
+ */
+export type RawArticle = {
+  id: number | string;
+  title: string;
+  slug: string;
+  lead?: string | null;
+  body?: string | null;
+  published_at?: string | null;
+  metadata?: string | null;
+  swp_route?: { slug?: string | null; staticprefix?: string | null } | null;
+  swp_article_feature_media?: {
+    description?: string | null;
+    renditions?: Rendition[] | null;
+  } | null;
+};
+
+function pickStoryImage(renditions: Rendition[] | undefined): string {
+  for (const name of STORY_RENDITIONS) {
+    const url = findRendition(renditions, name);
+    if (url) return url;
+  }
+  // Last resort: any rendition that resolves to a URL.
+  for (const r of renditions ?? []) {
+    const url = findRendition([r], r.name);
+    if (url) return url;
+  }
+  return STORY_IMAGE_FALLBACK;
+}
+
+/** Strip HTML tags and collapse whitespace — `lead`/`body` may carry markup. */
+function stripHtml(html: string): string {
+  return html
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/** Short month + day (e.g. "Jul 28"), in UTC for deterministic output. */
+export function formatStoryDate(
+  published: string | null | undefined,
+): string | undefined {
+  if (!published) return undefined;
+  const date = new Date(published);
+  if (Number.isNaN(date.getTime())) return undefined;
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  }).format(date);
+}
+
+/** Estimated read time from body word count (~200 wpm). Undefined if no body. */
+export function computeReadTime(
+  body: string | null | undefined,
+): string | undefined {
+  const words = stripHtml(body ?? "")
+    .split(" ")
+    .filter(Boolean).length;
+  if (words === 0) return undefined;
+  return `${Math.max(1, Math.round(words / 200))} min`;
+}
+
+/** Article link: `/fact-checks/<desk>/<slug>` (canonical [desk]/[slug] route). */
+function storyHref(article: RawArticle): string {
+  const desk = article.swp_route?.slug;
+  return desk
+    ? `/fact-checks/${desk}/${article.slug}`
+    : `/fact-checks/${article.slug}`;
+}
+
+/** Map a raw content-list article to the `Story` card type. Null-safe. */
+export function mapStory(article: RawArticle): Story {
+  const meta = parseMetadata(article.metadata);
+  const lead = article.lead ? stripHtml(article.lead) : "";
+  return {
+    image: pickStoryImage(
+      article.swp_article_feature_media?.renditions ?? undefined,
+    ),
+    alt:
+      article.swp_article_feature_media?.description?.trim() || article.title,
+    verdict: findSubject(meta, "Debunk")?.name,
+    title: article.title,
+    excerpt: lead || undefined,
+    date: formatStoryDate(article.published_at),
+    readTime: computeReadTime(article.body),
+    href: storyHref(article),
+  };
 }
