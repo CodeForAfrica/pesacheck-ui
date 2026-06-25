@@ -2,6 +2,12 @@ import type { Metadata } from "next";
 import { FactChecksContentDesks } from "@/components/fact-checks/FactChecksContentDesks";
 import { FactChecksExplorer } from "@/components/fact-checks/FactChecksExplorer";
 import {
+  clampPage,
+  pageOffset,
+  parsePageParam,
+  totalPages,
+} from "@/lib/data/pagination";
+import {
   FACT_CHECKS_PAGE_SIZE,
   type FactCheckListing,
   getFactChecks,
@@ -18,24 +24,14 @@ export const metadata: Metadata = {
 const STATIC_POOL = [FEATURE, FEATURE_SECONDARY, ...STORIES];
 
 function staticPage(page: number): FactCheckListing {
-  const totalPages = Math.max(
-    1,
-    Math.ceil(STATIC_POOL.length / FACT_CHECKS_PAGE_SIZE),
-  );
-  const current = Math.min(Math.max(1, page), totalPages);
-  const start = (current - 1) * FACT_CHECKS_PAGE_SIZE;
+  const pages = totalPages(STATIC_POOL.length, FACT_CHECKS_PAGE_SIZE);
+  const current = clampPage(page, pages);
+  const start = pageOffset(current, FACT_CHECKS_PAGE_SIZE);
   return {
     stories: STATIC_POOL.slice(start, start + FACT_CHECKS_PAGE_SIZE),
     page: current,
-    totalPages,
+    totalPages: pages,
   };
-}
-
-/** Parse a `?page=` value (1-based) */
-function parsePage(raw: string | string[] | undefined): number {
-  const value = Array.isArray(raw) ? raw[0] : raw;
-  const n = Number.parseInt(value ?? "", 10);
-  return Number.isFinite(n) && n > 0 ? n : 1;
 }
 
 export default async function FactChecksPage({
@@ -43,7 +39,7 @@ export default async function FactChecksPage({
 }: {
   searchParams: Promise<{ page?: string | string[] }>;
 }) {
-  const page = parsePage((await searchParams).page);
+  const page = parsePageParam((await searchParams).page);
 
   const listing =
     (await getFactChecks(page).catch(() => null)) ?? staticPage(page);

@@ -1,5 +1,6 @@
 import { gql, TENANT_CODE } from "@/lib/data/client";
 import { mapStory, type RawArticle } from "@/lib/data/map";
+import { clampPage, pageOffset, totalPages } from "@/lib/data/pagination";
 import { GET_CONTENT_LIST_ITEMS } from "@/lib/data/queries/content-lists";
 import { GET_FACT_CHECK_ARTICLES } from "@/lib/data/queries/fact-checks";
 import type { Story } from "@/lib/home-content";
@@ -89,23 +90,19 @@ export function getHeroPreview(): Promise<Story[]> {
  * `page` is 1-based and clamped to `[1, totalPages]`.
  */
 export async function getFactChecks(page = 1): Promise<FactCheckListing> {
-  const requested = Math.max(1, Math.floor(page));
   const { total, items } = await gql<FactCheckResponse>(
     GET_FACT_CHECK_ARTICLES,
     {
       tenant: TENANT_CODE,
       limit: FACT_CHECKS_PAGE_SIZE,
-      offset: (requested - 1) * FACT_CHECKS_PAGE_SIZE,
+      offset: pageOffset(page, FACT_CHECKS_PAGE_SIZE),
     },
   );
 
-  const totalPages = Math.max(
-    1,
-    Math.ceil(total.aggregate.totalCount / FACT_CHECKS_PAGE_SIZE),
-  );
+  const pages = totalPages(total.aggregate.totalCount, FACT_CHECKS_PAGE_SIZE);
   return {
     stories: items.map(mapStory),
-    page: Math.min(requested, totalPages),
-    totalPages,
+    page: clampPage(page, pages),
+    totalPages: pages,
   };
 }
