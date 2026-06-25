@@ -8,7 +8,12 @@ import { WhatsappBanner } from "@/components/home/WhatsappBanner";
 import { Impact } from "@/components/ui/Impact";
 import { CONTENT_DESKS } from "@/lib/content-desks";
 import { getContentDesks } from "@/lib/data/desks";
-import { getLatest, getSpotlight, getTrending } from "@/lib/data/stories";
+import {
+  getHeroPreview,
+  getLatest,
+  getSpotlight,
+  getTrending,
+} from "@/lib/data/stories";
 import {
   LATEST_FEATURE,
   LATEST_GRID,
@@ -21,8 +26,9 @@ import {
 export default async function Home() {
   // Pages own fetching; fall back to the static content when Hasura is
   // unreachable or unconfigured. Fetched in parallel — each falls back alone.
-  const [desks, spotlight, trending, latest] = await Promise.all([
+  const [desks, heroPreview, spotlight, trending, latest] = await Promise.all([
     getContentDesks().catch(() => null),
+    getHeroPreview().catch(() => null),
     getSpotlight().catch(() => null),
     getTrending().catch(() => null),
     getLatest().catch(() => null),
@@ -30,7 +36,7 @@ export default async function Home() {
 
   return (
     <>
-      <Hero />
+      <Hero stories={heroPreview ?? undefined} />
       <Impact />
       <Spotlight
         stories={

@@ -10,6 +10,10 @@ import { DateRow } from "@/components/ui/MetaRow";
 import { Container } from "@/components/ui/SectionHeading";
 import { HERO, HERO_PREVIEW, type Story } from "@/lib/home-content";
 
+interface HeroProps {
+  stories?: Story[];
+}
+
 const HERO_GRADIENT =
   "linear-gradient(100.768deg, rgba(4, 26, 109, 0.9) 45.439%, rgba(102, 102, 102, 0) 66.403%)";
 
@@ -49,7 +53,8 @@ function calcDotCount(s: SwiperType): number {
   return Math.max(1, s.slides.length - visible + 1);
 }
 
-export function Hero() {
+export function Hero({ stories }: HeroProps = {}) {
+  const preview = stories?.length ? stories : HERO_PREVIEW;
   const [swiperInstance, setSwiperInstance] = useState<SwiperType | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [dotCount, setDotCount] = useState(0);
@@ -110,7 +115,7 @@ export function Hero() {
             onRealIndexChange={(s: SwiperType) => setActiveIndex(s.realIndex)}
             onResize={(s: SwiperType) => setDotCount(calcDotCount(s))}
           >
-            {HERO_PREVIEW.map((story) => (
+            {preview.map((story) => (
               <SwiperSlide
                 key={`${story.image}-${story.date}`}
                 className="!w-auto"
@@ -122,7 +127,7 @@ export function Hero() {
         </div>
 
         <div className={`mt-4 flex items-center gap-2 ${INDENT}`}>
-          {HERO_PREVIEW.slice(0, dotCount).map((story, i) => (
+          {preview.slice(0, dotCount).map((story, i) => (
             <button
               key={`dot-${story.image}-${story.date}`}
               type="button"
