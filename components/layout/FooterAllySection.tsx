@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Icon } from "@/components/ui/Icon";
+import { FiArrowUpRight } from "react-icons/fi";
 import { Container } from "@/components/ui/SectionHeading";
 import { ABOUT_BLURB, ALLIES, type Logo, PARTNERS } from "@/lib/site";
 
@@ -47,7 +47,7 @@ function AllyColumn({ title, logos }: { title: string; logos: Logo[] }) {
         className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-neutral-900"
       >
         Learn More
-        <Icon name="arrow-up-right" size={20} />
+        <FiArrowUpRight size={20} aria-hidden />
       </a>
       <div className="mt-8">
         <LogoStrip logos={logos} />

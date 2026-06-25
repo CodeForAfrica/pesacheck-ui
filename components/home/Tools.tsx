@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Icon } from "@/components/ui/Icon";
+import { FiArrowUpRight } from "react-icons/fi";
 import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import { TOOLS, type Tool } from "@/lib/home-content";
 import { ABOUT_BLURB } from "@/lib/site";
@@ -28,10 +28,10 @@ function ToolCard({ tool }: { tool: Tool }) {
         <span className="my-1 h-0.5 w-10 rounded bg-white" />
         <span className="flex items-center gap-1 text-sm font-medium">
           {tool.cta}
-          <Icon
-            name="arrow-up-right"
+          <FiArrowUpRight
             size={10}
             className="brightness-0 invert"
+            aria-hidden
           />
         </span>
       </div>

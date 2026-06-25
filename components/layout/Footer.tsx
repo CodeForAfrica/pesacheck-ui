@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { FooterAllySection } from "@/components/layout/FooterAllySection";
-import { Icon } from "@/components/ui/Icon";
 import { Container } from "@/components/ui/SectionHeading";
 import { FOOTER_ABOUT, FOOTER_NAV, LEGAL, SOCIAL_ICONS } from "@/lib/site";
 
@@ -63,11 +62,14 @@ export function Footer() {
               Follow PesaCheck on:
             </span>
             <div className="flex items-center gap-4">
-              {SOCIAL_ICONS.map((s) => (
-                <a key={s.name} href="#" aria-label={s.label}>
-                  <Icon name={s.name} size={24} alt={s.label} />
-                </a>
-              ))}
+              {SOCIAL_ICONS.map((s) => {
+                const SocialIcon = s.icon;
+                return (
+                  <a key={s.label} href="#" aria-label={s.label}>
+                    <SocialIcon size={24} aria-hidden />
+                  </a>
+                );
+              })}
             </div>
           </div>
           <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm font-semibold text-neutral-900">

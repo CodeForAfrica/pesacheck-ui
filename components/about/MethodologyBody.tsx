@@ -1,5 +1,5 @@
+import { FiArrowUpRight } from "react-icons/fi";
 import { MethodologySectionNav } from "@/components/about/MethodologySectionNav";
-import { Icon } from "@/components/ui/Icon";
 import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import {
   type ImageSlot,
@@ -68,7 +68,7 @@ function Section({ section }: { section: MethodologySection }) {
             className="mt-5 inline-flex items-center gap-1 text-sm font-medium text-neutral-900 transition-colors hover:text-pesacheck-blue"
           >
             Learn More
-            <Icon name="arrow-up-right" size={20} />
+            <FiArrowUpRight size={20} aria-hidden />
           </button>
         )}
 

@@ -4,6 +4,7 @@
  * lives in `lib/site.ts`; the Allies/Partners and footer chrome at the bottom of
  * the design are rendered by the shared layout Footer, not this page.
  */
+import { FiMail, FiUser } from "react-icons/fi";
 
 export const CONTACT_HERO = {
   eyebrow: "Contact Pesacheck",
@@ -19,15 +20,26 @@ export const CONTACT_HQ = {
   phone: "+254 769 014382",
 };
 
-// "Follow Us" row in the HQ block. Names map to existing dark-stroke social
-// SVGs in /public/icons (the same set the footer reuses — social-icon2 is the
-// visible LinkedIn glyph; the standalone linkedin.svg is white-filled).
-export const CONTACT_SOCIALS = [
-  { name: "social-icon2", label: "LinkedIn", href: "#" },
-  { name: "social-icon1", label: "Instagram", href: "#" },
-  { name: "social-facebook", label: "Facebook", href: "#" },
-  { name: "social-layer13", label: "WhatsApp", href: "#" },
-  { name: "social-twitter-x", label: "Twitter / X", href: "#" },
+import type { ElementType } from "react";
+import {
+  FaFacebook,
+  FaInstagram,
+  FaLinkedinIn,
+  FaWhatsapp,
+} from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
+
+export const CONTACT_SOCIALS: {
+  icon: ElementType;
+  color: string;
+  label: string;
+  href: string;
+}[] = [
+  { icon: FaLinkedinIn, color: "#0A66C2", label: "LinkedIn", href: "#" },
+  { icon: FaInstagram, color: "#E1306C", label: "Instagram", href: "#" },
+  { icon: FaFacebook, color: "#0866FF", label: "Facebook", href: "#" },
+  { icon: FaWhatsapp, color: "#25D366", label: "WhatsApp", href: "#" },
+  { icon: FaXTwitter, color: "#000000", label: "Twitter / X", href: "#" },
 ];
 
 // "Send us a message" form fields. Static visual only — no submission backend.
@@ -39,8 +51,7 @@ export type ContactField = {
   /** Layout span within the form's 2-col grid. */
   span: "half" | "full";
   type: "text" | "email" | "select" | "textarea";
-  /** Leading icon (icon name in /public/icons), if any. */
-  icon?: string;
+  icon?: ElementType;
   options?: string[];
 };
 
@@ -55,7 +66,7 @@ export const CONTACT_FORM = {
       required: true,
       span: "half",
       type: "text",
-      icon: "user-03",
+      icon: FiUser,
     },
     {
       name: "email",
@@ -64,7 +75,7 @@ export const CONTACT_FORM = {
       required: true,
       span: "half",
       type: "email",
-      icon: "mail",
+      icon: FiMail,
     },
     {
       name: "subject",

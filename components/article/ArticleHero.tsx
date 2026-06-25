@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Icon } from "@/components/ui/Icon";
+import { FiCalendar, FiClock, FiUser } from "react-icons/fi";
 import { VerdictBadge } from "@/components/ui/VerdictBadge";
 import type { Article } from "@/lib/article-content";
 import { ShareButtons } from "./ShareButtons";
@@ -61,17 +61,21 @@ export function ArticleHero({ article }: { article: Article }) {
           {/* Date · read-time · author */}
           <div className="flex flex-wrap items-center gap-2 text-sm font-medium text-white">
             <span className="flex items-center gap-[5px]">
-              <Icon name="calendar" size={20} className="brightness-0 invert" />
+              <FiCalendar
+                size={20}
+                className="brightness-0 invert"
+                aria-hidden
+              />
               {article.date}
             </span>
             <span className="size-1.5 rounded-full bg-white/60" />
             <span className="flex items-center gap-[5px]">
-              <Icon name="clock" size={20} className="brightness-0 invert" />
+              <FiClock size={20} className="brightness-0 invert" aria-hidden />
               {article.readTime}
             </span>
             <span className="size-1.5 rounded-full bg-white/60" />
             <span className="flex items-center gap-[5px]">
-              <Icon name="user-03" size={20} className="brightness-0 invert" />
+              <FiUser size={20} className="brightness-0 invert" aria-hidden />
               {article.author}
             </span>
           </div>

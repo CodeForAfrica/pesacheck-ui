@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { Icon } from "@/components/ui/Icon";
+import { FiSearch } from "react-icons/fi";
 import { NAV_LINKS } from "@/lib/site";
 
 export function Header() {
@@ -71,7 +71,7 @@ export function Header() {
               searchFocused ? "border-neutral-900" : "border-neutral-300"
             }`}
           >
-            <Icon name="search" size={16} className="shrink-0 opacity-60" />
+            <FiSearch size={16} className="shrink-0 opacity-60" aria-hidden />
             <input
               type="search"
               name="q"
@@ -143,23 +143,26 @@ export function Header() {
                       <ul
                         className={`grid grow auto-cols-fr grid-flow-col gap-x-6 gap-y-[15px] ${l.menu.rows === 2 ? "grid-rows-2" : "grid-rows-3"}`}
                       >
-                        {l.menu.items.map((item) => (
-                          <li key={`${item.label}-${item.href}`}>
-                            <Link
-                              href={item.href}
-                              role="menuitem"
-                              onClick={() => setOpenMenu(null)}
-                              className="flex items-center gap-2 text-sm font-medium text-neutral-900 transition-colors hover:text-pesacheck-blue"
-                            >
-                              <Icon
-                                name={item.icon}
-                                size={20}
-                                className="shrink-0"
-                              />
-                              {item.label}
-                            </Link>
-                          </li>
-                        ))}
+                        {l.menu.items.map((item) => {
+                          const ItemIcon = item.icon;
+                          return (
+                            <li key={`${item.label}-${item.href}`}>
+                              <Link
+                                href={item.href}
+                                role="menuitem"
+                                onClick={() => setOpenMenu(null)}
+                                className="flex items-center gap-2 text-sm font-medium text-neutral-900 transition-colors hover:text-pesacheck-blue"
+                              >
+                                <ItemIcon
+                                  size={20}
+                                  className="shrink-0"
+                                  aria-hidden
+                                />
+                                {item.label}
+                              </Link>
+                            </li>
+                          );
+                        })}
                       </ul>
                     </div>
                   </div>
@@ -217,7 +220,7 @@ export function Header() {
               onSubmit={handleSearchSubmit}
               className="mb-4 flex h-12 items-center gap-2 rounded-[13px] border-[0.5px] border-neutral-300 bg-neutral-50 px-4 md:hidden"
             >
-              <Icon name="search" size={16} className="opacity-60" />
+              <FiSearch size={16} className="opacity-60" aria-hidden />
               <input
                 type="search"
                 name="q"
@@ -257,22 +260,25 @@ export function Header() {
                     </button>
                     {openMobile === l.label && (
                       <ul className="mt-2 mb-1 flex flex-col gap-3 border-l border-neutral-100 pl-4">
-                        {l.menu.items.map((item) => (
-                          <li key={`${item.label}-${item.href}`}>
-                            <Link
-                              href={item.href}
-                              onClick={() => setMenuOpen(false)}
-                              className="flex items-center gap-2 font-medium text-neutral-700"
-                            >
-                              <Icon
-                                name={item.icon}
-                                size={20}
-                                className="shrink-0"
-                              />
-                              {item.label}
-                            </Link>
-                          </li>
-                        ))}
+                        {l.menu.items.map((item) => {
+                          const ItemIcon = item.icon;
+                          return (
+                            <li key={`${item.label}-${item.href}`}>
+                              <Link
+                                href={item.href}
+                                onClick={() => setMenuOpen(false)}
+                                className="flex items-center gap-2 font-medium text-neutral-700"
+                              >
+                                <ItemIcon
+                                  size={20}
+                                  className="shrink-0"
+                                  aria-hidden
+                                />
+                                {item.label}
+                              </Link>
+                            </li>
+                          );
+                        })}
                       </ul>
                     )}
                   </div>

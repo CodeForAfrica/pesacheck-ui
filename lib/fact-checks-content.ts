@@ -6,6 +6,9 @@
  * filter the listing client-side.
  */
 
+import type { ElementType } from "react";
+import { FiGlobe } from "react-icons/fi";
+import { LuLanguages, LuMessageCircleWarning } from "react-icons/lu";
 import type { Story } from "@/lib/home-content";
 
 const PLACEHOLDER_TITLE =
@@ -49,22 +52,22 @@ export const TOPICS = [
 export const FILTERS: {
   dimension: FilterDimension;
   label: string;
-  icon: string;
+  icon: ElementType;
   options: string[];
 }[] = [
-  {
-    dimension: "region",
-    label: "Region",
-    icon: "about-globe",
-    options: REGIONS,
-  },
+  { dimension: "region", label: "Region", icon: FiGlobe, options: REGIONS },
   {
     dimension: "language",
     label: "Language",
-    icon: "factcheck-language",
+    icon: LuLanguages,
     options: LANGUAGES,
   },
-  { dimension: "topic", label: "Topic", icon: "about-grid", options: TOPICS },
+  {
+    dimension: "topic",
+    label: "Topic",
+    icon: LuMessageCircleWarning,
+    options: TOPICS,
+  },
 ];
 
 // Selections shown pre-applied in the Figma design.

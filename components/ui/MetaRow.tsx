@@ -1,4 +1,4 @@
-import { Icon } from "./Icon";
+import { FiCalendar, FiClock } from "react-icons/fi";
 
 /** Taxonomy row: Topic · Region · Language (text-xs, tiny 2px dot separators). */
 export function TaxonomyRow({
@@ -32,12 +32,12 @@ export function DateRow({
   return (
     <div className="flex items-center gap-2 text-sm font-medium text-neutral-900">
       <span className="flex items-center gap-[5px]">
-        <Icon name="calendar" size={20} />
+        <FiCalendar size={20} aria-hidden />
         {date}
       </span>
       <span className="size-1.5 shrink-0 rounded-full bg-neutral-300" />
       <span className="flex items-center gap-[5px]">
-        <Icon name="clock" size={20} />
+        <FiClock size={20} aria-hidden />
         {readTime}
       </span>
     </div>

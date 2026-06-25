@@ -1,36 +1,54 @@
 "use client";
 
-import Image from "next/image";
+import type { IconType } from "react-icons";
+import {
+  FaFacebook,
+  FaInstagram,
+  FaLinkedinIn,
+  FaWhatsapp,
+} from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
+import { FiMail } from "react-icons/fi";
 
-const SOCIAL_SHARE = [
+const SOCIAL_SHARE: {
+  name: string;
+  Icon: IconType;
+  color: string;
+  getUrl: (url: string, title: string) => string | null;
+}[] = [
   {
     name: "LinkedIn",
-    icon: "/icons/social-linkedin.svg",
-    getUrl: (url: string) =>
+    Icon: FaLinkedinIn,
+    color: "#0A66C2",
+    getUrl: (url) =>
       `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
   },
   {
     name: "Instagram",
-    icon: "/icons/social-instagram.svg",
+    Icon: FaInstagram,
+    color: "#E1306C",
     getUrl: () => null,
   },
   {
     name: "Facebook",
-    icon: "/icons/facebook.svg",
-    getUrl: (url: string) =>
+    Icon: FaFacebook,
+    color: "#0866FF",
+    getUrl: (url) =>
       `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
   },
   {
     name: "WhatsApp",
-    icon: "/icons/social-whatsapp.svg",
-    getUrl: (url: string, title: string) =>
+    Icon: FaWhatsapp,
+    color: "#25D366",
+    getUrl: (url, title) =>
       `https://wa.me/?text=${encodeURIComponent(`${title} ${url}`)}`,
   },
   {
-    name: "Email",
-    icon: "/icons/mail.svg",
-    getUrl: (url: string, title: string) =>
-      `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(url)}`,
+    name: "X",
+    Icon: FaXTwitter,
+    color: "#000000",
+    getUrl: (url, title) =>
+      `https://x.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`,
   },
 ];
 
@@ -60,7 +78,7 @@ export function ShareButtons({
           labelColor === "text-white" ? "bg-white/50" : "bg-neutral-300"
         }`}
       />
-      {SOCIAL_SHARE.map(({ name, icon, getUrl }) => (
+      {SOCIAL_SHARE.map(({ name, Icon, color, getUrl }) => (
         <button
           key={name}
           onClick={() => handleShare(getUrl)}
@@ -68,15 +86,25 @@ export function ShareButtons({
           type="button"
           className="shrink-0 cursor-pointer transition-opacity hover:opacity-70"
         >
-          <Image
-            src={icon}
-            alt={name}
-            width={20}
-            height={20}
-            className={iconClassName}
-          />
+          <Icon color={color} aria-hidden className={iconClassName} />
         </button>
       ))}
+      <button
+        onClick={() => {
+          const url = `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(window.location.href)}`;
+          window.open(url);
+        }}
+        aria-label="Share via Email"
+        type="button"
+        className="shrink-0 cursor-pointer transition-opacity hover:opacity-70"
+      >
+        <FiMail
+          size={20}
+          color={labelColor === "text-white" ? "white" : "#374151"}
+          aria-hidden
+          className={iconClassName}
+        />
+      </button>
     </div>
   );
 }

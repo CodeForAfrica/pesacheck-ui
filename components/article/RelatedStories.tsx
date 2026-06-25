@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Icon } from "@/components/ui/Icon";
+import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { StoryCard } from "@/components/ui/StoryCard";
 import type { Story } from "@/lib/home-content";
@@ -28,7 +28,7 @@ export function RelatedStories({ stories }: { stories: Story[] }) {
                 aria-label="Previous page"
                 className="flex size-[38px] items-center justify-center rounded-full bg-neutral-200 transition-colors hover:bg-neutral-300 disabled:opacity-40"
               >
-                <Icon name="chevron-left" size={18} />
+                <FiChevronLeft size={18} aria-hidden />
               </button>
               <button
                 type="button"
@@ -37,7 +37,7 @@ export function RelatedStories({ stories }: { stories: Story[] }) {
                 aria-label="Next page"
                 className="flex size-[38px] items-center justify-center rounded-full bg-neutral-200 transition-colors hover:bg-neutral-300 disabled:opacity-40"
               >
-                <Icon name="chevron-right" size={18} />
+                <FiChevronRight size={18} aria-hidden />
               </button>
             </div>
           )}

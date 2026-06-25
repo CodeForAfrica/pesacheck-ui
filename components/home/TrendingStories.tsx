@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { Icon } from "@/components/ui/Icon";
+import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import { StoryCard } from "@/components/ui/StoryCard";
 import { type Story, TRENDING } from "@/lib/home-content";
@@ -28,7 +28,7 @@ export function TrendingStories({ stories = TRENDING }: { stories?: Story[] }) {
                 onClick={() => scroll(-1)}
                 className="flex size-9 items-center justify-center rounded-full bg-neutral-300 text-white transition-colors hover:bg-neutral-400"
               >
-                <Icon name="chevron-left" size={18} />
+                <FiChevronLeft size={18} aria-hidden />
               </button>
               <button
                 type="button"
@@ -36,7 +36,7 @@ export function TrendingStories({ stories = TRENDING }: { stories?: Story[] }) {
                 onClick={() => scroll(1)}
                 className="flex size-9 items-center justify-center rounded-full bg-neutral-300 text-white transition-colors hover:bg-neutral-400"
               >
-                <Icon name="chevron-right" size={18} />
+                <FiChevronRight size={18} aria-hidden />
               </button>
             </div>
           }

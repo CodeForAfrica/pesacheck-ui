@@ -3,7 +3,34 @@
  * Header, Footer). Page-specific content lives in `lib/<page>-content.ts`.
  */
 
-export type NavMenuItem = { label: string; href: string; icon: string };
+import type { ElementType } from "react";
+import { FaWhatsapp } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
+import {
+  FiBookOpen,
+  FiFacebook,
+  FiGlobe,
+  FiGrid,
+  FiLinkedin,
+  FiPhone,
+  FiPlay,
+  FiRefreshCw,
+  FiServer,
+  FiSlack,
+  FiUsers,
+} from "react-icons/fi";
+import {
+  LuCoins,
+  LuHand,
+  LuLanguages,
+  LuMegaphone,
+  LuMessageCircleQuestion,
+  LuMessageCircleWarning,
+  LuScale,
+  LuSearch,
+} from "react-icons/lu";
+
+export type NavMenuItem = { label: string; href: string; icon: ElementType };
 
 export type NavLink = {
   label: string;
@@ -23,30 +50,18 @@ export type NavLink = {
  * (mirrors the Figma "Group 34738225" dropdown, node 2866:4472).
  */
 export const ABOUT_MENU_ITEMS: NavMenuItem[] = [
-  { label: "About Us", href: "/about", icon: "about-grid" },
-  { label: "Who We Are", href: "/about#our-team", icon: "about-users" },
-  { label: "Our Partners", href: "/about/partners", icon: "about-hand" },
-  { label: "Funding", href: "/about/funding", icon: "about-coins-hand" },
-  { label: "Our Impact", href: "/about#our-impact", icon: "about-globe" },
-  { label: "FAQs", href: "/about/faqs", icon: "about-faq" },
-  { label: "Methodology", href: "/about/methodology", icon: "about-refresh" },
-  { label: "Contact Us", href: "/about/contact-us", icon: "about-phone" },
-  {
-    label: "Our Ecosystem",
-    href: "/about/our-ecosystem",
-    icon: "about-server",
-  },
-  { label: "Principles", href: "/about/principles", icon: "about-scales" },
-  {
-    label: "Our Staff + Expertise",
-    href: "/about#our-team",
-    icon: "about-users",
-  },
-  {
-    label: "Media Centre",
-    href: "/about/media-centre",
-    icon: "about-announcement",
-  },
+  { label: "About Us", href: "/about", icon: FiGrid },
+  { label: "Who We Are", href: "/about#our-team", icon: FiUsers },
+  { label: "Our Partners", href: "/about/partners", icon: LuHand },
+  { label: "Funding", href: "/about/funding", icon: LuCoins },
+  { label: "Our Impact", href: "/about#our-impact", icon: FiGlobe },
+  { label: "FAQs", href: "/about/faqs", icon: LuMessageCircleQuestion },
+  { label: "Methodology", href: "/about/methodology", icon: FiRefreshCw },
+  { label: "Contact Us", href: "/about/contact-us", icon: FiPhone },
+  { label: "Our Ecosystem", href: "/about/our-ecosystem", icon: FiServer },
+  { label: "Principles", href: "/about/principles", icon: LuScale },
+  { label: "Our Staff + Expertise", href: "/about#our-team", icon: FiUsers },
+  { label: "Media Centre", href: "/about/media-centre", icon: LuMegaphone },
 ];
 
 /**
@@ -55,24 +70,16 @@ export const ABOUT_MENU_ITEMS: NavMenuItem[] = [
  * 4–5 column 3 (mirrors the Figma "Fact Checks" dropdown, node 2866:7355).
  */
 export const FACT_CHECKS_MENU_ITEMS: NavMenuItem[] = [
-  { label: "All fact-checks", href: "/fact-checks", icon: "about-grid" },
+  { label: "All fact-checks", href: "/fact-checks", icon: FiGrid },
+  { label: "By Language", href: "/fact-checks/by-language", icon: LuLanguages },
   {
-    label: "By Language",
-    href: "/fact-checks/by-language",
-    icon: "factcheck-language",
+    label: "By Topic",
+    href: "/fact-checks/by-topic",
+    icon: LuMessageCircleWarning,
   },
-  { label: "By Topic", href: "/fact-checks/by-topic", icon: "factcheck-topic" },
-  {
-    label: "Quick Reads",
-    href: "/fact-checks/quick-reads",
-    icon: "factcheck-reads",
-  },
-  {
-    label: "Explainers",
-    href: "/fact-checks/explainers",
-    icon: "factcheck-play",
-  },
-  { label: "By Country", href: "/fact-checks/by-country", icon: "about-globe" },
+  { label: "Quick Reads", href: "/fact-checks/quick-reads", icon: FiBookOpen },
+  { label: "Explainers", href: "/fact-checks/explainers", icon: FiPlay },
+  { label: "By Country", href: "/fact-checks/by-country", icon: FiGlobe },
 ];
 
 export const NAV_LINKS: NavLink[] = [
@@ -174,35 +181,27 @@ export const PARTNERS: Logo[] = [
   },
 ];
 
-export const SOCIAL_ICONS = [
-  { name: "social-twitter-x", label: "Twitter / X" },
-  { name: "social-facebook", label: "Facebook" },
-  { name: "social-icon1", label: "Instagram" },
-  { name: "social-icon2", label: "LinkedIn" },
-  { name: "social-layer13", label: "YouTube" },
+export const SOCIAL_ICONS: { icon: ElementType; label: string }[] = [
+  { icon: FaXTwitter, label: "Twitter / X" },
+  { icon: FiFacebook, label: "Facebook" },
+  { icon: FaWhatsapp, label: "WhatsApp" },
+  { icon: FiSlack, label: "Slack" },
+  { icon: FiLinkedin, label: "LinkedIn" },
 ];
 
 const STAT_BLURB =
   "Pesacheck has lorem ipsum dolor sit amet consectetur adipiscing";
 
 export type ImpactStat = {
-  icon: string;
+  icon: ElementType;
   value: string;
   label: string;
 };
 
 // Row-major order matching the 2x2 Figma grid.
 export const IMPACT_STATS: ImpactStat[] = [
-  { icon: "translate", value: "6 Publishing Languages", label: STAT_BLURB },
-  {
-    icon: "search-refraction",
-    value: "10,000+ Fact-checks",
-    label: STAT_BLURB,
-  },
-  {
-    icon: "calendar-impact",
-    value: "8+ Years in operation",
-    label: STAT_BLURB,
-  },
-  { icon: "globe", value: "18+ Countries we operate in", label: STAT_BLURB },
+  { icon: LuLanguages, value: "6 Publishing Languages", label: STAT_BLURB },
+  { icon: LuSearch, value: "10,000+ Fact-checks", label: STAT_BLURB },
+  { icon: FiRefreshCw, value: "8+ Years in operation", label: STAT_BLURB },
+  { icon: FiGlobe, value: "18+ Countries we operate in", label: STAT_BLURB },
 ];
