@@ -6,8 +6,12 @@ import { Tools } from "@/components/home/Tools";
 import { TrendingStories } from "@/components/home/TrendingStories";
 import { WhatsappBanner } from "@/components/home/WhatsappBanner";
 import { Impact } from "@/components/ui/Impact";
+import { CONTENT_DESKS } from "@/lib/content-desks";
+import { getContentDesks } from "@/lib/data/desks";
 
-export default function Home() {
+export default async function Home() {
+  const desks = (await getContentDesks().catch(() => null)) ?? CONTENT_DESKS;
+
   return (
     <>
       <Hero />
@@ -15,7 +19,7 @@ export default function Home() {
       <Spotlight />
       <WhatsappBanner />
       <TrendingStories />
-      <ContentDesks />
+      <ContentDesks desks={desks} />
       <LatestStories />
       <Tools />
     </>

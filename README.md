@@ -10,8 +10,6 @@ Marketing and fact-check website for **PesaCheck** — Africa's largest indigeno
 - **ESLint 9** (`eslint-config-next`)
 - **Inter** via `next/font/google`
 
-> ⚠️ **This is not the Next.js you may know.** This project tracks a Next.js version with breaking changes from older releases. Before writing code, read the relevant guide in `node_modules/next/dist/docs/` and heed deprecation notices. See [`AGENTS.md`](AGENTS.md).
-
 ## Getting started
 
 ```bash
