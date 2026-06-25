@@ -8,13 +8,16 @@
  * DASH (—, U+2014) and must match exactly.
  */
 import { gql, TENANT_CODE } from "@/lib/data/client";
-import { mapStory, type RawArticle } from "@/lib/data/map";
+import { getVerdict, mapStory, type RawArticle } from "@/lib/data/map";
 import { GET_CONTENT_LIST_ITEMS } from "@/lib/data/queries/content-lists";
+import { GET_FACT_CHECK_ARTICLES } from "@/lib/data/queries/fact-checks";
 import type { Story } from "@/lib/home-content";
 
 type ContentListResponse = {
   list: { items: { article: RawArticle | null }[] }[];
 };
+
+type FactCheckResponse = { items: RawArticle[] };
 
 /**
  * Routes for PesaCheck's publishing languages. Curated home lists mix real
@@ -62,4 +65,26 @@ export function getLatest(): Promise<Story[]> {
 
 export function getHeroPreview(): Promise<Story[]> {
   return getContentListStories("Homepage — Hero");
+}
+
+/**
+ * All published fact-checks as `Story[]`, newest first — backs the
+ * `/fact-checks` grid. Queries `swp_article` directly (not a curated list).
+ *
+ * A "fact-check" is defined by carrying a `Debunk` verdict tag, so we filter to
+ * articles where `getVerdict` resolves. This is the only signal that cleanly
+ * separates fact-checks from the other published content on the same routes —
+ * homepage content-blocks and editorial test stubs share `route`/`profile` and
+ * would otherwise leak into the grid. Verdict-presence is also route-agnostic,
+ * so it keeps working once fact-checks are published under topic desks (the
+ * staging desks are currently empty; everything sits on `english`).
+ *
+ * Caveat (staging data): an article with a title verdict prefix but no
+ * structured `Debunk` tag is dropped (the contract treats verdict as optional
+ */
+export async function getFactChecks(): Promise<Story[]> {
+  const { items } = await gql<FactCheckResponse>(GET_FACT_CHECK_ARTICLES, {
+    tenant: TENANT_CODE,
+  });
+  return items.filter((a) => getVerdict(a.metadata) != null).map(mapStory);
 }

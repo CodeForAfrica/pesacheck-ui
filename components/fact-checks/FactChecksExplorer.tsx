@@ -15,9 +15,10 @@ import {
 import type { Story } from "@/lib/home-content";
 import { FilterBar, type Selection } from "./FilterBar";
 
-// Featured story leads the pool, so filtering can promote any matching story
-// into the large feature slot.
-const POOL: Story[] = [FEATURE, FEATURE_SECONDARY, ...STORIES];
+// Static fallback pool when the page passes no live data (Hasura unreachable or
+// unconfigured). The featured story leads the pool, so filtering can promote any
+// matching story into the large feature slot.
+const STATIC_POOL: Story[] = [FEATURE, FEATURE_SECONDARY, ...STORIES];
 
 const EMPTY: Selection = { region: [], language: [], topic: [] };
 
@@ -41,7 +42,10 @@ function matches(story: Story, applied: Selection): boolean {
   });
 }
 
-export function FactChecksExplorer() {
+export function FactChecksExplorer({ stories }: { stories?: Story[] }) {
+  // Live grid data from the server page, or the static design pool as fallback.
+  const pool = stories ?? STATIC_POOL;
+
   // `selected` is the staged set reflected by the dropdowns + chips; `applied`
   // is what actually filters the listing (committed via "Apply Filters"). The
   // page loads showing the design's chips staged but the full listing visible —
@@ -64,8 +68,8 @@ export function FactChecksExplorer() {
   );
 
   const results = useMemo(
-    () => POOL.filter((s) => matches(s, applied)),
-    [applied],
+    () => pool.filter((s) => matches(s, applied)),
+    [pool, applied],
   );
 
   const toggleOption = (dimension: FilterDimension, value: string) => {

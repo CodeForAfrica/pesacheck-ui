@@ -116,14 +116,41 @@ Lowest-risk vertical slice: stand up the data layer and convert the one 1:1 row.
   distinguishes language routes from other collections, so the set is editorial
   (mirrors migration-plan; PR4 reuses it for the language filter).
 
-## PR 2b — Fact-checks grid — Phase 2
+## PR 2b — Fact-checks grid — Phase 2 ✅
 Heavier: client-component data lifting.
-- [ ] `lib/data/stories.ts` — `getFactChecks(): Story[]` (published articles)
-- [ ] Make `app/fact-checks/page.tsx` async, fetch grid data
-- [ ] Refactor `FactChecksExplorer` (client) to receive `stories` as a prop
-      instead of importing `lib/fact-checks-content`
-- [ ] Keep static `GRID` as `?? fallback`
-- [ ] Verify grid renders against staging (filters still static for now)
+- [x] `lib/data/queries/fact-checks.ts` — `GET_FACT_CHECK_ARTICLES`: published
+      articles for the tenant, newest first, selecting the same fields as
+      `GET_CONTENT_LIST_ITEMS` so `mapStory` consumes the rows unchanged.
+- [x] `lib/data/stories.ts` — `getFactChecks(): Story[]`. **A fact-check is
+      defined by carrying a `Debunk` verdict** (filtered via the verified jsonb
+      path `getVerdict`). This is the only signal that separates fact-checks
+      from the other published content on the same routes — homepage
+      content-blocks + editorial test stubs share `route`/`profile` and would
+      otherwise leak. Verdict-presence is route-agnostic, so it keeps working
+      once fact-checks land on topic desks (staging desks are empty; everything
+      sits on `english`).
+- [x] `app/fact-checks/page.tsx` made async; fetches with the `?? fallback`
+      pattern (static `[FEATURE, FEATURE_SECONDARY, ...STORIES]` pool).
+- [x] `FactChecksExplorer` (client) now takes an optional `stories?: Story[]`
+      prop; static pool kept as the in-component default.
+- [x] Verify against staging: grid renders **6 live fact-checks** (verdict
+      badges, dates, readTime, real media) in the feature+secondary+4-col
+      layout. tsc + biome clean; 27 Vitest tests pass.
+
+**Notes:**
+- The verified jsonb verdict path is **more complete** than the normalized
+  `swp_article_metadata_subjects` relation — the relation drops `altered-yvonne`
+  (a real fact-check). `getFactChecks` filters in JS via `getVerdict` to match
+  the path `mapStory`/the contract already use.
+- **Dropped on staging:** a French article with a "FAUX" title prefix but **no
+  structured `Debunk` tag** — the contract treats verdict as optional, but
+  verdict-presence is the only clean selector available. One test stub ("Full
+  Article Test") leaks because it carries a real `Hoax` tag. Both are staging
+  artifacts; PR4 wires the real taxonomy + filters.
+- Filters remain **static** (region/language/topic from `fact-checks-content`):
+  staged chips show but `applied` starts empty, so the full live grid is visible
+  on load. Live `Story`s carry no `topic`/`region`/`language` yet (PR4), so
+  clicking "Apply Filters" with the default chips narrows to empty — expected.
 
 ## PR 3 — Single article — Phase 3
 - [ ] `lib/data/queries/` — single-article query (`articleService.queries.js`):
