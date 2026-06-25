@@ -100,6 +100,12 @@ const RELATED_STORIES: Story[] = [
 
 // ── Sample article ───────────────────────────────────────────────────────────
 
+const PESACHECK_FOOTNOTES: string[] = [
+  "This post is part of an ongoing series of PesaCheck fact-checks examining content marked as potential misinformation on Facebook and other social media platforms. By partnering with Facebook and similar social media platforms, third-party fact-checking organisations like PesaCheck are helping to sort fact from fiction. We do this by giving the public deeper insight and context to posts they see in their social media feeds. Have you spotted what you think is fake news or false information on Facebook? Here's how you can report. And, here's more information on PesaCheck's methodology for fact-checking questionable content.",
+  "This fact-check was written by a PesaCheck fact-checker based in Ethiopia (name withheld for security reasons) and edited by PesaCheck senior copy editor Mary Mutisya. The article was approved for publication by PesaCheck chief copy editor Stephen Ndegwa.",
+  "PesaCheck is East Africa's first public finance fact-checking initiative. It was co-founded by Catherine Gicheru and Justin Arenstein, and is being incubated by the continent's largest civic technology and data journalism accelerator: Code for Africa. It seeks to help the public separate fact from fiction in public pronouncements about the numbers that shape our world, with a special emphasis on pronouncements about public finances that shape government's delivery of Sustainable Development Goals (SDG) public services, such as healthcare, rural development and access to water / sanitation. PesaCheck also tests the accuracy of media reportage. To find out more about the project, visit pesacheck.org. PesaCheck is an initiative of Code for Africa, through its innovateAFRICA fund, with support from Deutsche Welle Akademie, in partnership with a coalition of local African media and other civic watchdog organisations.",
+];
+
 export const SAMPLE_ARTICLE: Article = {
   slug: "south-africas-manufacturing-surge",
   format: "long",
@@ -129,21 +135,11 @@ export const SAMPLE_ARTICLE: Article = {
     "Government support has been a critical component of this manufacturing revival. Tax incentives, infrastructure investments, and streamlined regulatory processes have created a business-friendly environment that encourages local and foreign investment. These policies are not only boosting industrial output but are also establishing South Africa as a competitive hub for global manufacturing.",
     "As South Africa’s manufacturing sector surges forward, the positive impact on citizens and international trade becomes increasingly evident. The Made in Africa initiative is a testament to the power of innovation, collaboration, and strategic policy-making—a model for how nations can revitalize traditional industries, empower local communities, and succeed in a global economy. With its renewed focus on manufacturing excellence, South Africa is paving the way for a future of sustained economic growth and shared prosperity.",
   ],
-  footnotes: [
-    "This post is part of an ongoing series of PesaCheck fact-checks examining content marked as potential misinformation on Facebook and other social media platforms. By partnering with Facebook and similar social media platforms, third-party fact-checking organisations like PesaCheck are helping to sort fact from fiction. We do this by giving the public deeper insight and context to posts they see in their social media feeds. Have you spotted what you think is fake news or false information on Facebook? Here's how you can report. And, here's more information on PesaCheck's methodology for fact-checking questionable content.",
-    "This fact-check was written by a PesaCheck fact-checker based in Ethiopia (name withheld for security reasons) and edited by PesaCheck senior copy editor Mary Mutisya. The article was approved for publication by PesaCheck chief copy editor Stephen Ndegwa.",
-    "PesaCheck is East Africa's first public finance fact-checking initiative. It was co-founded by Catherine Gicheru and Justin Arenstein, and is being incubated by the continent's largest civic technology and data journalism accelerator: Code for Africa. It seeks to help the public separate fact from fiction in public pronouncements about the numbers that shape our world, with a special emphasis on pronouncements about public finances that shape government's delivery of Sustainable Development Goals (SDG) public services, such as healthcare, rural development and access to water / sanitation. PesaCheck also tests the accuracy of media reportage. To find out more about the project, visit pesacheck.org. PesaCheck is an initiative of Code for Africa, through its innovateAFRICA fund, with support from Deutsche Welle Akademie, in partnership with a coalition of local African media and other civic watchdog organisations.",
-  ],
+  footnotes: PESACHECK_FOOTNOTES,
   relatedStories: RELATED_STORIES,
 };
 
 // ── Sample short-form debunk (the default debunk layout) ─────────────────────
-
-const PESACHECK_FOOTNOTES: string[] = [
-  "This post is part of an ongoing series of PesaCheck fact-checks examining content marked as potential misinformation on Facebook and other social media platforms. By partnering with Facebook and similar social media platforms, third-party fact-checking organisations like PesaCheck are helping to sort fact from fiction. We do this by giving the public deeper insight and context to posts they see in their social media feeds. Have you spotted what you think is fake news or false information on Facebook? Here's how you can report. And, here's more information on PesaCheck's methodology for fact-checking questionable content.",
-  "This fact-check was written by a PesaCheck fact-checker based in Ethiopia (name withheld for security reasons) and edited by PesaCheck senior copy editor Mary Mutisya. The article was approved for publication by PesaCheck chief copy editor Stephen Ndegwa.",
-  "PesaCheck is East Africa's first public finance fact-checking initiative. It was co-founded by Catherine Gicheru and Justin Arenstein, and is being incubated by the continent's largest civic technology and data journalism accelerator: Code for Africa. It seeks to help the public separate fact from fiction in public pronouncements about the numbers that shape our world, with a special emphasis on pronouncements about public finances that shape government's delivery of Sustainable Development Goals (SDG) public services, such as healthcare, rural development and access to water / sanitation. PesaCheck also tests the accuracy of media reportage. To find out more about the project, visit pesacheck.org. PesaCheck is an initiative of Code for Africa, through its innovateAFRICA fund, with support from Deutsche Welle Akademie, in partnership with a coalition of local African media and other civic watchdog organisations.",
-];
 
 export const SAMPLE_DEBUNK: Article = {
   slug: "flooding-not-from-limpopo",

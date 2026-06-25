@@ -13,20 +13,6 @@ function ArticleTag({ label }: { label: string }) {
   );
 }
 
-/** Italic footnote block with top divider. */
-function Footnote({ text, index }: { text: string; index: number }) {
-  return (
-    <div>
-      {index > 0 && (
-        <div className="my-5 h-px w-full rounded-full bg-neutral-100" />
-      )}
-      <p className="text-xs font-medium italic leading-5 text-neutral-700">
-        {text}
-      </p>
-    </div>
-  );
-}
-
 export function ArticleBody({ article }: { article: Article }) {
   return (
     <div className="w-full min-w-0 lg:w-[610px]">
@@ -72,18 +58,6 @@ export function ArticleBody({ article }: { article: Article }) {
           {article.tags.map((tag) => (
             <ArticleTag key={tag} label={tag} />
           ))}
-        </div>
-      )}
-
-      {/* Footnotes */}
-      {article.footnotes.length > 0 && (
-        <div className="mt-10">
-          <div className="h-px w-full rounded-full bg-neutral-100" />
-          <div className="mt-5 flex flex-col gap-0">
-            {article.footnotes.map((footnote, i) => (
-              <Footnote key={footnote} text={footnote} index={i} />
-            ))}
-          </div>
         </div>
       )}
     </div>
