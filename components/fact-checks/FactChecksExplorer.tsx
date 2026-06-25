@@ -32,12 +32,6 @@ function matches(story: Story, applied: Selection): boolean {
   });
 }
 
-/**
- * The `/fact-checks` listing. Pagination is **server-driven**: the parent server
- * page fetches one DB page (`stories`) plus `page`/`totalPages`, and the
- * Pagination bar navigates by `?page=N`, which re-runs the server fetch. The
- * corpus is never loaded into the client.
- */
 export function FactChecksExplorer({
   stories,
   page,

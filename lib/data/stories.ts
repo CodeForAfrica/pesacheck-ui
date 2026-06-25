@@ -14,7 +14,6 @@ type FactCheckResponse = {
   items: RawArticle[];
 };
 
-/** One page of the fact-checks listing: the mapped cards + paging metadata. */
 export type FactCheckListing = {
   stories: Story[];
   page: number;
@@ -27,9 +26,10 @@ export type FactCheckListing = {
  * team-member profiles on the `team` route — so we scope listings to language
  * routes. No column distinguishes a language route from any other collection
  * (`team`, `climate-change`, … are all `type: "collection"`), so this set is
- * editorial knowledge, not derivable from the schema. Confirmed on staging;
- * mirrors the language collections in docs/migration-plan.md. PR4 reuses these
- * for the language filter.
+ * editorial knowledge, not derivable from the schema.
+ *
+ * These should ideally not be hard-coded here and should be revisited once
+ * we have cleaner data on staging.
  */
 export const LANGUAGE_ROUTE_SLUGS = [
   "english",
@@ -38,10 +38,6 @@ export const LANGUAGE_ROUTE_SLUGS = [
   "african-languages",
 ];
 
-/**
- * Fact-checks per listing page. One large feature + one secondary + an 8-card
- * grid fill a page (mirrors the Figma layout). Pages are fetched from the DB by offset
- */
 export const FACT_CHECKS_PAGE_SIZE = 10;
 
 /** Fetch a content list's language articles, in curated order, as `Story[]`. */
@@ -84,10 +80,7 @@ export function getHeroPreview(): Promise<Story[]> {
  * that server-side (see `GET_FACT_CHECK_ARTICLES`), which also excludes the
  * other published content sharing these routes (homepage content-blocks,
  * editorial test stubs). The filter is route-agnostic, so it keeps working once
- * fact-checks are published under topic desks (staging desks are empty;
- * everything currently sits on `english`).
- *
- * `page` is 1-based and clamped to `[1, totalPages]`.
+ * fact-checks are published under topic desks.
  */
 export async function getFactChecks(page = 1): Promise<FactCheckListing> {
   const { total, items } = await gql<FactCheckResponse>(

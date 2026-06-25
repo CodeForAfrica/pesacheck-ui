@@ -1,10 +1,7 @@
 /**
  * Fact-check listing query. Unlike the home sections (curated content lists),
  * the `/fact-checks` grid is the full body of published fact-checks, so this
- * queries `swp_article` directly. Adapted from
- * `pesacheck-pwa-app-router/services/collectionService.queries.js`
- * (`GET_COLLECTION_BY_METADATA_QUERY` — same `Debunk`-subject filter + offset
- * pagination + `_aggregate` count).
+ * queries `swp_article` directly.
  *
  * It selects the same article fields `GET_CONTENT_LIST_ITEMS` does so `mapStory`
  * can consume the rows unchanged — including `metadata` (jsonb) for the `Debunk`
