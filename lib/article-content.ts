@@ -96,6 +96,18 @@ const RELATED_STORIES: Story[] = [
     readTime: "3 min",
     href: "/fact-checks/south-africas-manufacturing-surge",
   },
+  {
+    image: "/images/spotlight/long-format6-5.png",
+    alt: "Related story",
+    verdict: "Partly False",
+    title: PLACEHOLDER_TITLE,
+    topic: "Topic",
+    region: "Region",
+    language: "Language",
+    date: "Jun 25",
+    readTime: "5 min",
+    href: "/fact-checks/south-africas-manufacturing-surge",
+  },
 ];
 
 // ── Sample article ───────────────────────────────────────────────────────────

@@ -14,7 +14,7 @@ export function RelatedStories({ stories }: { stories: Story[] }) {
   const visible = stories.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
   return (
-    <section className="bg-neutral-50 py-14">
+    <section className="py-14">
       <div className="mx-auto w-full max-w-[1440px] px-5 sm:px-8 lg:px-[100px]">
         {/* Heading + nav arrows */}
         <div className="mb-8 flex items-start justify-between gap-4">
