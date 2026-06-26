@@ -178,7 +178,8 @@ Heavier: client-component data lifting.
       jsonb/relation byline, then "PesaCheck"), keywords→`tags`, related→`Story[]`
       (reuses `mapStory`), verdict via `getVerdict`, `readTime`/`date` reuse PR2a
       helpers. Live articles are `format:"short"` with structured paragraph fields
-      empty and the rendered HTML in the new `Article.bodyHtml`.
+      empty and the rendered HTML in the new `Article.bodyHtml`. The appended
+      footer boilerplate is split out of the body into `footnotes[]` (see notes).
 - [x] `ArticleBodyShort` renders `bodyHtml` (sanitized) via `dangerouslySetInnerHTML`
       in a prose container when present, else the static slots/paragraphs path.
       New `ArticleView` component holds the long/short dispatch, shared by both
@@ -197,6 +198,19 @@ Heavier: client-component data lifting.
       `mapArticle`/`renderBody`).
 
 **Notes / carry-overs:**
+- **Footnotes — there is NO `body_footer` field.** Verified: the whole Hasura
+  schema has zero `footer`/`footnote` fields, `swp_article` has no such column,
+  and the complete `swp_article_extra` vocabulary tenant-wide carries none
+  (`archiveurl, banner, columns, drafturl, firstsource, firstsourcesocial,
+  heading, hero_*, intro, items, originator, stats`). `body_footer` is a
+  **Superdesk core** field, but the Publisher→Hasura pipeline doesn't expose it
+  (Publisher REST is JWT-gated and isn't the frontend's data source). The footer
+  boilerplate is **appended into `body`** on publish, always opening with "This
+  post is part of an ongoing series of PesaCheck…". `lib/data/body.ts:
+  renderArticleBody` splits the body at that marker → `bodyHtml` (main) +
+  `footnotes[]` (boilerplate paragraphs, rendered in the grey band). **English
+  marker only**; translated/markerless bodies keep the footer inline (graceful
+  fallback). Staging footers carry no links, so the `string[]` band is lossless.
 - **Staging sparsity:** no real staging fact-check carries feature media, authors,
   or keywords — only the rich HTML body + verdict. So live articles render with no
   hero image (short layout shows none anyway), author "PesaCheck", no tags, no

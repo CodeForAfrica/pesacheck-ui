@@ -39,3 +39,44 @@ export function renderBody(
   const clean = sanitizeHtml(html, OPTIONS).trim();
   return clean || undefined;
 }
+
+/** Opener of PesaCheck's standard footer boilerplate. */
+const FOOTER_MARKER = "This post is part of an ongoing series of PesaCheck";
+
+/** Pull the visible text out of each `<p>` in an HTML fragment. */
+function paragraphText(html: string): string[] {
+  const out: string[] = [];
+  for (const match of html.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/g)) {
+    const text = match[1]
+      .replace(/<[^>]*>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+    if (text) out.push(text);
+  }
+  return out;
+}
+
+export type RenderedBody = { bodyHtml?: string; footnotes: string[] };
+
+/**
+ * Render a body and split the trailing PesaCheck boilerplate into footnotes.
+ * `bodyHtml` is the main article (footer removed); `footnotes` are the boilerplate
+ * paragraphs as plain text (the band renders `string[]`; staging footers carry no
+ * links). When the marker is absent, the whole body stays in `bodyHtml`.
+ */
+export function renderArticleBody(
+  html: string | null | undefined,
+): RenderedBody {
+  const clean = renderBody(html);
+  if (!clean) return { footnotes: [] };
+
+  const markerAt = clean.indexOf(FOOTER_MARKER);
+  if (markerAt === -1) return { bodyHtml: clean, footnotes: [] };
+
+  // Cut at the <p> that opens the boilerplate so the band gets whole paragraphs.
+  const footerStart = clean.lastIndexOf("<p", markerAt);
+  if (footerStart === -1) return { bodyHtml: clean, footnotes: [] };
+
+  const bodyHtml = clean.slice(0, footerStart).trim() || undefined;
+  return { bodyHtml, footnotes: paragraphText(clean.slice(footerStart)) };
+}

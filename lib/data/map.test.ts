@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { renderBody } from "@/lib/data/body";
+import { renderArticleBody, renderBody } from "@/lib/data/body";
 import {
   computeReadTime,
   findRendition,
@@ -282,6 +282,39 @@ describe("renderBody", () => {
   });
 });
 
+describe("renderArticleBody", () => {
+  // Mirrors staging: the footer boilerplate is appended into the body (there is
+  // no body_footer field), always starting with the standard PesaCheck sentence.
+  const withFooter = [
+    "<p>The claim is <b>FALSE</b>.</p>",
+    "<p>PesaCheck examined the post and found it to be FALSE.</p>",
+    "<p>This post is part of an ongoing series of PesaCheck fact-checks examining misinformation.</p>",
+    "<p>PesaCheck is East Africa’s first public finance fact-checking initiative.</p>",
+  ].join("\n");
+
+  it("splits the boilerplate out of the body into footnotes", () => {
+    const { bodyHtml, footnotes } = renderArticleBody(withFooter);
+    expect(bodyHtml).toContain("found it to be FALSE");
+    expect(bodyHtml).not.toContain("This post is part");
+    expect(bodyHtml).not.toContain("public finance fact-checking");
+    expect(footnotes).toEqual([
+      "This post is part of an ongoing series of PesaCheck fact-checks examining misinformation.",
+      "PesaCheck is East Africa’s first public finance fact-checking initiative.",
+    ]);
+  });
+
+  it("keeps the whole body when the marker is absent", () => {
+    const { bodyHtml, footnotes } = renderArticleBody("<p>No boilerplate.</p>");
+    expect(bodyHtml).toContain("No boilerplate.");
+    expect(footnotes).toEqual([]);
+  });
+
+  it("is empty for null/empty input", () => {
+    expect(renderArticleBody(null)).toEqual({ footnotes: [] });
+    expect(renderArticleBody("")).toEqual({ footnotes: [] });
+  });
+});
+
 describe("mapArticle", () => {
   // Mirrors a fully-populated single-article row from GET_ARTICLE_BY_SLUG.
   const full: RawFullArticle = {
@@ -372,6 +405,21 @@ describe("mapArticle", () => {
     expect(article.verdict).toBe("False");
     expect(article.image).toBe("/images/spotlight/long-format3-2.png");
     expect(article.bodyHtml).toContain("<b>claim</b>");
+  });
+
+  it("moves the appended footer boilerplate into footnotes", () => {
+    const article = mapArticle({
+      ...full,
+      body: [
+        "<p>The claim is false.</p>",
+        "<p>This post is part of an ongoing series of PesaCheck fact-checks examining misinformation.</p>",
+      ].join("\n"),
+    });
+    expect(article.bodyHtml).toContain("The claim is false.");
+    expect(article.bodyHtml).not.toContain("This post is part");
+    expect(article.footnotes).toEqual([
+      "This post is part of an ongoing series of PesaCheck fact-checks examining misinformation.",
+    ]);
   });
 
   it("falls back to the jsonb byline when there are no authors", () => {

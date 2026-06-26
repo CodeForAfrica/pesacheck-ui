@@ -1,5 +1,5 @@
 import type { Article } from "@/lib/article-content";
-import { renderBody } from "@/lib/data/body";
+import { renderArticleBody } from "@/lib/data/body";
 import type { Story } from "@/lib/home-content";
 
 const MEDIA_URL = process.env.NEXT_PUBLIC_MEDIA_URL ?? "";
@@ -198,6 +198,8 @@ export function mapArticle(raw: RawFullArticle): Article {
     .filter((article): article is RawArticle => article != null)
     .map(mapStory);
 
+  const { bodyHtml, footnotes } = renderArticleBody(raw.body);
+
   return {
     slug: raw.slug,
     format: "short",
@@ -219,8 +221,8 @@ export function mapArticle(raw: RawFullArticle): Article {
     // The body is rendered as HTML; the structured paragraph fields are unused.
     leadParagraphs: [],
     bodyParagraphs: [],
-    bodyHtml: renderBody(raw.body),
-    footnotes: [],
+    bodyHtml,
+    footnotes,
     relatedStories,
   };
 }
