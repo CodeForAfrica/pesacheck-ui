@@ -32,12 +32,12 @@ export type Article = {
   images?: { src?: string; alt: string; ratio?: string }[];
   /** Body paragraphs after the inline image. */
   bodyParagraphs: string[];
+  bodyHtml?: string;
   /**
    * The one-line verdict summary shown just before the footnote band on the
    * short-form layout (e.g. "PesaCheck … finds it to be FALSE").
    */
   verdictSummary?: string;
-  /** Smaller italic footnotes at the bottom of the article body. */
   footnotes: string[];
   relatedStories: Story[];
 };

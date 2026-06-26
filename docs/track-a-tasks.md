@@ -163,17 +163,71 @@ Heavier: client-component data lifting.
   PR4 makes filtering server-side, layering filter params onto the same `?page=`
   URL the pagination already uses.
 
-## PR 3 — Single article — Phase 3
-- [ ] `lib/data/queries/` — single-article query (`articleService.queries.js`):
-      body, authors, tags, related, renditions
-- [ ] `lib/data/article.ts` — `getArticle(slug): Article`
-- [ ] Port `articleBodyService.js:convertBodyImages` (rewrite `<img>` src → MEDIA_URL)
-- [ ] Map authors (`swp_article_authors`), tags (`swp_article_keywords`),
-      related (`swp_article_related`), verdict, `readTime`
-- [ ] Wire `app/fact-checks/[desk]/[slug]/page.tsx` to `getArticle` with fallback
-- [ ] **Handle the overloaded `[desk]` route**: keep article-or-desk dispatch
-      working when fetching live (article lookup by slug vs desk lookup)
-- [ ] Verify a real fact-check (e.g. `false-equating-somalia-and-al-shabab-is-untrue`)
+## PR 3 — Single article — Phase 3 ✅
+- [x] `lib/data/queries/article.ts` — `GET_ARTICLE_BY_SLUG` (port of
+      `articleService.queries.js`, **by slug** not id): body, metadata, route,
+      `swp_article_metadata{byline}`, feature-media renditions, authors, keywords,
+      related (selecting the same fields `mapStory` consumes).
+- [x] `lib/data/article.ts` — `getArticle(slug): Article` (throws when absent so
+      the page's `?? fallback` fires).
+- [x] Port `convertBodyImages` into `lib/data/body.ts:renderBody` — rewrites
+      `<img>` src → `MEDIA_URL` **inside a `sanitize-html` `transformTags` pass**
+      (no `jsdom`), then sanitizes. Hardened vs the reference: **drops `<script>`**.
+      New deps: `sanitize-html` + `@types/sanitize-html`.
+- [x] `lib/data/map.ts` — `mapArticle`: authors→`author` (join names, fallback
+      jsonb/relation byline, then "PesaCheck"), keywords→`tags`, related→`Story[]`
+      (reuses `mapStory`), verdict via `getVerdict`, `readTime`/`date` reuse PR2a
+      helpers. Live articles are `format:"short"` with structured paragraph fields
+      empty and the rendered HTML in the new `Article.bodyHtml`. The appended
+      footer boilerplate is split out of the body into `footnotes[]` (see notes).
+- [x] `ArticleBodyShort` renders `bodyHtml` (sanitized) via `dangerouslySetInnerHTML`
+      in a prose container when present, else the static slots/paragraphs path.
+      New `ArticleView` component holds the long/short dispatch, shared by both
+      article routes; it hides Related Stories / footnotes when empty.
+- [x] Wired `app/fact-checks/[desk]/[slug]/page.tsx` **and** the article branch of
+      the overloaded `app/fact-checks/[desk]/page.tsx` to `getArticle` with static
+      fallback. Article lookup by slug is canonical — the `[desk]` segment is **not**
+      validated against curated desks (live articles sit on language routes like
+      `english`). `dynamicParams` default (true) renders live slugs not in
+      `generateStaticParams` on demand.
+- [x] Verified against staging: `false-equating-somalia-and-al-shabab-is-untrue`
+      renders the short layout with verdict badge, date/readTime, "PesaCheck"
+      author, and the live body with **working evidence links**. Static slug
+      (`flooding-not-from-limpopo`) still renders from the fallback (structured
+      slots + related). tsc + biome clean; 50 Vitest tests (12 new for
+      `mapArticle`/`renderBody`).
+
+**Notes / carry-overs:**
+- **Footnotes — there is NO `body_footer` field.** Verified: the whole Hasura
+  schema has zero `footer`/`footnote` fields, `swp_article` has no such column,
+  and the complete `swp_article_extra` vocabulary tenant-wide carries none
+  (`archiveurl, banner, columns, drafturl, firstsource, firstsourcesocial,
+  heading, hero_*, intro, items, originator, stats`). `body_footer` is a
+  **Superdesk core** field, but the Publisher→Hasura pipeline doesn't expose it
+  (Publisher REST is JWT-gated and isn't the frontend's data source). The footer
+  boilerplate is **appended into `body`** on publish, always opening with "This
+  post is part of an ongoing series of PesaCheck…". `lib/data/body.ts:
+  renderArticleBody` splits the body at that marker → `bodyHtml` (main) +
+  `footnotes[]` (boilerplate paragraphs, rendered in the grey band). **English
+  marker only**; translated/markerless bodies keep the footer inline (graceful
+  fallback). Footnotes carry **sanitized inline HTML** (production footers
+  hyperlink "report"/"methodology"), rendered via `dangerouslySetInnerHTML` in
+  `ArticleFootnotes` — the same path as the body; static footnotes are plain text
+  (valid HTML).
+- **Staging sparsity:** no real staging fact-check carries feature media, authors,
+  or keywords — only the rich HTML body + verdict. So live articles render with no
+  hero image (short layout shows none anyway), author "PesaCheck", no tags, no
+  related. Mapper + pages are fully null-safe; PR 5/data backfill will populate these.
+- **Sanitizer allowlist** (`lib/data/body.ts`): defaults + `img`/`iframe`, default
+  URL schemes (so http local-stack media works post-convergence), `<script>`
+  dropped. Twitter/embed scripts therefore degrade to text/links — revisit if
+  interactive embeds are needed.
+- **Short-form feature image not shown:** per the chosen layout, `ArticleHeroShort`
+  has no hero image; `Article.image` is still mapped (used for metadata/related).
+  Inline body images come through the rendered HTML.
+- **Pre-existing duplicate-React-key warning** still fires from static placeholder
+  story cards in a global component (documented since PR1) — unrelated to PR3;
+  fix when that placeholder content gets real data.
 
 ## PR 4 — Filters — Phase 4 (depends on 2b)
 > Offset pagination already shipped in PR 2b (server-side `limit`/`offset` +

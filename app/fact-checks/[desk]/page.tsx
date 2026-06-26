@@ -1,15 +1,12 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { ArticleBody } from "@/components/article/ArticleBody";
-import { ArticleFootnotes } from "@/components/article/ArticleFootnotes";
-import { ArticleHero } from "@/components/article/ArticleHero";
-import { ArticleSidebar } from "@/components/article/ArticleSidebar";
-import { RelatedStories } from "@/components/article/RelatedStories";
+import { ArticleView } from "@/components/article/ArticleView";
 import { FactChecksContentDesks } from "@/components/fact-checks/FactChecksContentDesks";
 import { FactChecksExplorer } from "@/components/fact-checks/FactChecksExplorer";
 import { FactChecksHero } from "@/components/fact-checks/FactChecksHero";
 import { ARTICLES, getArticleBySlug } from "@/lib/article-content";
 import { CONTENT_DESKS, deskBySlug } from "@/lib/content-desks";
+import { getArticle } from "@/lib/data/article";
 import { FEATURE, FEATURE_SECONDARY, STORIES } from "@/lib/fact-checks-content";
 
 type Params = Promise<{ desk: string }>;
@@ -21,6 +18,10 @@ export function generateStaticParams() {
   return [...deskParams, ...articleParams];
 }
 
+async function resolveArticle(slug: string) {
+  return (await getArticle(slug).catch(() => null)) ?? getArticleBySlug(slug);
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -28,7 +29,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { desk: slug } = await params;
 
-  const article = getArticleBySlug(slug);
+  const article = await resolveArticle(slug);
   if (article) {
     return {
       title: `${article.title} — PesaCheck`,
@@ -55,24 +56,11 @@ export default async function ContentDeskOrArticlePage({
   const { desk: slug } = await params;
 
   // Article slug takes precedence over desk slug.
-  const article = getArticleBySlug(slug);
+  const article = await resolveArticle(slug);
   if (article) {
-    return (
-      <>
-        <ArticleHero article={article} />
-        <div className="mx-auto w-full max-w-[1440px]">
-          <div className="flex gap-5 px-5 pb-16 pt-16 sm:px-8 lg:pl-[100px] lg:pr-[100px]">
-            <ArticleSidebar article={article} />
-            <ArticleBody article={article} />
-          </div>
-        </div>
-        <ArticleFootnotes footnotes={article.footnotes} />
-        <RelatedStories stories={article.relatedStories} />
-      </>
-    );
+    return <ArticleView article={article} />;
   }
 
-  // Fall back to content desk listing.
   const desk = deskBySlug(slug);
   if (!desk) notFound();
 
