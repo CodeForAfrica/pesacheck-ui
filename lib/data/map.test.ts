@@ -204,6 +204,38 @@ describe("mapStory", () => {
     });
   });
 
+  it("populates region/topic/language display labels from the jsonb", () => {
+    const story = mapStory({
+      ...article,
+      metadata: JSON.stringify({
+        language: "en",
+        subject: [
+          { scheme: "Debunk", code: "false", name: "False" },
+          { scheme: "countries", code: "UGA", name: "Uganda" },
+          { scheme: "01harm", code: "polit_harm", name: "Political" },
+        ],
+      }),
+    });
+    expect(story.region).toBe("Uganda");
+    expect(story.topic).toBe("Political");
+    expect(story.language).toBe("English");
+  });
+
+  it("leaves taxonomy undefined when the jsonb carries none", () => {
+    const story = mapStory(article);
+    expect(story.region).toBeUndefined();
+    expect(story.topic).toBeUndefined();
+    expect(story.language).toBeUndefined();
+  });
+
+  it("falls back to the raw language code when not a known label", () => {
+    const story = mapStory({
+      ...article,
+      metadata: JSON.stringify({ language: "zz", subject: [] }),
+    });
+    expect(story.language).toBe("zz");
+  });
+
   it("falls back to the title for alt when no media description", () => {
     const story = mapStory({
       ...article,

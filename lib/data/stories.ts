@@ -1,4 +1,9 @@
 import { gql, TENANT_CODE } from "@/lib/data/client";
+import {
+  buildFactCheckWhere,
+  EMPTY_FILTERS,
+  type FilterSelection,
+} from "@/lib/data/fact-check-filters";
 import { mapStory, type RawArticle } from "@/lib/data/map";
 import { clampPage, pageOffset, totalPages } from "@/lib/data/pagination";
 import { GET_CONTENT_LIST_ITEMS } from "@/lib/data/queries/content-lists";
@@ -81,12 +86,19 @@ export function getHeroPreview(): Promise<Story[]> {
  * other published content sharing these routes (homepage content-blocks,
  * editorial test stubs). The filter is route-agnostic, so it keeps working once
  * fact-checks are published under topic desks.
+ *
+ * `filters` (region/topic/language) narrow the listing **server-side** — they're
+ * folded into the same `where` and aggregate, so `totalPages` reflects them. See
+ * `buildFactCheckWhere` in `lib/data/fact-check-filters.ts`.
  */
-export async function getFactChecks(page = 1): Promise<FactCheckListing> {
+export async function getFactChecks(
+  page = 1,
+  filters: FilterSelection = EMPTY_FILTERS,
+): Promise<FactCheckListing> {
   const { total, items } = await gql<FactCheckResponse>(
     GET_FACT_CHECK_ARTICLES,
     {
-      tenant: TENANT_CODE,
+      where: buildFactCheckWhere(filters, TENANT_CODE),
       limit: FACT_CHECKS_PAGE_SIZE,
       offset: pageOffset(page, FACT_CHECKS_PAGE_SIZE),
     },

@@ -7,6 +7,7 @@ import { FactChecksHero } from "@/components/fact-checks/FactChecksHero";
 import { ARTICLES, getArticleBySlug } from "@/lib/article-content";
 import { CONTENT_DESKS, deskBySlug } from "@/lib/content-desks";
 import { getArticle } from "@/lib/data/article";
+import { EMPTY_FILTERS } from "@/lib/data/fact-check-filters";
 import { FEATURE, FEATURE_SECONDARY, STORIES } from "@/lib/fact-checks-content";
 
 type Params = Promise<{ desk: string }>;
@@ -71,6 +72,7 @@ export default async function ContentDeskOrArticlePage({
         stories={[FEATURE, FEATURE_SECONDARY, ...STORIES]}
         page={1}
         totalPages={1}
+        filters={EMPTY_FILTERS}
       />
       <FactChecksContentDesks activeSlug={desk.slug} />
     </>

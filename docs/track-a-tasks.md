@@ -229,18 +229,49 @@ Heavier: client-component data lifting.
   story cards in a global component (documented since PR1) — unrelated to PR3;
   fix when that placeholder content gets real data.
 
-## PR 4 — Filters — Phase 4 (depends on 2b)
+## PR 4 — Filters — Phase 4 (depends on 2b) ✅
 > Offset pagination already shipped in PR 2b (server-side `limit`/`offset` +
 > `_aggregate`, driven by `?page=`). PR 4 makes **filtering** server-side and
 > wires it onto that same URL mechanism.
-- [ ] Map filter dimensions to real taxonomy: `region` → `subject[countries]`,
-      `topic` → `subject[01harm]`/route, `language` → article language/route
-      (extend `mapStory` to populate `topic`/`region`/`language` on `Story`)
-- [ ] Derive filter option lists from live data (replace hardcoded `REGIONS`/
-      `LANGUAGES`/`TOPICS` in `fact-checks-content`)
-- [ ] Push selected filters into the query `where` (server-side) + reflect them
-      in the URL alongside `?page=`; reset to page 1 on filter change. Replace
-      the interim client-side, current-page-only filtering in `FactChecksExplorer`.
+- [x] Map filter dimensions to real taxonomy: `region` → `subject[countries]`
+      (ISO3), `topic` → `subject[01harm]`, `language` →
+      `swp_article_metadata.language` (ISO code, route-agnostic). `mapStory` now
+      populates `topic`/`region`/`language` display labels on `Story` from jsonb.
+- [x] `lib/data/fact-check-filters.ts` (NEW) — `buildFactCheckWhere` (typed
+      `swp_article_bool_exp`), `parseFilterParams`/`filtersToQuery` URL helpers,
+      `FilterSelection`/`FilterDimension` types. Unit-tested (Vitest).
+- [x] Editorial `{code,label}` option lists in `fact-checks-content` (replaced
+      the `string[]` REGIONS/LANGUAGES/TOPICS); `DEFAULT_FILTERS` retired so the
+      page loads showing the full grid. `filterLabel(dim, code)` resolves chips.
+- [x] `getFactChecks(page, filters)` folds filters into the same `where` +
+      aggregate (so `totalPages` reflects them). `GET_FACT_CHECK_ARTICLES` now
+      takes a `$where` variable instead of an interpolated string.
+- [x] `FactChecksExplorer` is now **URL-driven**: client-side `matches()` removed;
+      Apply/Clear/pagination navigate by `?region=…&topic=…&language=…&page=N`
+      (codes, comma-separated). Page re-keys the explorer on applied filters so
+      navigation resets the staged selection.
+- [x] Verified against staging: full grid = 5; `topic=polit_harm` → 2;
+      `region=ZAF` → 1; `region=ZAF ∧ topic=polit_harm` → 0 (AND); `language=en`
+      → 5, `fr` → 0. Interactive Apply + Clear + URL state restoration all work.
+      `pnpm test` (60), tsc, biome clean.
+
+**Notes:**
+- **Why editorial options (not live-derived, contra the original plan item):** the
+  normalized subject relation exposes only `scheme`/`code` — no display `name`
+  (jsonb-only), no reverse relation to article, no tenant scope — so a scoped,
+  labeled option list can't be queried. Codes/labels are curated like
+  `LANGUAGE_ROUTE_SLUGS`. Filtering itself is fully server-side & scalable.
+- **`_and` semantics:** AND across dimensions = separate `swp_article_metadata`
+  clauses in `_and`; OR within a dimension = `code: { _in }`. Never emit an empty
+  `_in: []` (Hasura matches nothing) → inactive dimensions are omitted.
+- **`TaxonomyRow` (`components/ui/MetaRow.tsx`)** made null-safe: it now renders
+  only the dimensions present (live articles may carry just some), falling back to
+  the Figma placeholders only when nothing is supplied. Previously every live card
+  showed `Topic · Region · Language` literals; populating real taxonomy exposed a
+  placeholder leak for articles missing a dimension (e.g. no country tag).
+- **`SearchExplorer`** (static `/search`, out of scope) adapted to compile: it
+  resolves option codes→labels when filtering the label-tagged static pool.
+- Fallback (`staticPage`) **ignores filters** by design — degraded mode only.
 
 ## PR 5 — Desk pages — Phase 5 (depends on 3 for route dispatch)
 - [ ] `lib/data/stories.ts` — `getByDesk(slug): Story[]` (by route collection)
