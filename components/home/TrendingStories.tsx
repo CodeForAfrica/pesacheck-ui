@@ -16,7 +16,11 @@ export function TrendingStories({ stories = TRENDING }: { stories?: Story[] }) {
   };
 
   return (
-    <section id="trending" className="py-14 lg:py-20">
+    <section
+      id="trending"
+      className="py-14 lg:py-20"
+      style={{ background: "var(--Neutral-50, #F6F7F8)" }}
+    >
       <Container>
         <SectionHeading
           title="Trending Stories"

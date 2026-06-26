@@ -13,7 +13,10 @@ export function LatestStories({
   const [feature, secondary, ...grid] = stories;
 
   return (
-    <section className="py-14 lg:py-20">
+    <section
+      className="py-14 lg:py-20"
+      style={{ background: "var(--Neutral-50, #F6F7F8)" }}
+    >
       <Container>
         <SectionHeading title="Latest Stories" />
 

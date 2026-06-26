@@ -5,11 +5,11 @@ import { FOOTER_ABOUT, FOOTER_NAV, LEGAL, SOCIAL_ICONS } from "@/lib/site";
 
 export function Footer() {
   return (
-    <footer className="bg-neutral-50">
+    <footer className="bg-white">
       <FooterAllySection />
 
       <Container className="pb-16">
-        <div className="flex flex-wrap items-center justify-between gap-6 border-t border-neutral-100 pt-10">
+        <div className="flex flex-wrap items-center justify-between gap-6 pt-10">
           <div className="flex items-end gap-4">
             <Image
               src="/pesacheck-logo.png"
