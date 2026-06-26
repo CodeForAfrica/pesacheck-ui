@@ -309,6 +309,17 @@ describe("renderArticleBody", () => {
     expect(footnotes).toEqual([]);
   });
 
+  it("preserves links inside footnotes (not just plain text)", () => {
+    const html = [
+      "<p>The claim is false.</p>",
+      '<p>This post is part of an ongoing series of PesaCheck fact-checks. Here’s how you can <a href="https://pesacheck.org/report">report</a>.</p>',
+    ].join("\n");
+    const { footnotes } = renderArticleBody(html);
+    expect(footnotes).toHaveLength(1);
+    expect(footnotes[0]).toContain('<a href="https://pesacheck.org/report">');
+    expect(footnotes[0]).toContain("report</a>");
+  });
+
   it("is empty for null/empty input", () => {
     expect(renderArticleBody(null)).toEqual({ footnotes: [] });
     expect(renderArticleBody("")).toEqual({ footnotes: [] });

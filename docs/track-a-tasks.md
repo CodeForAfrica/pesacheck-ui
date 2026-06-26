@@ -210,7 +210,10 @@ Heavier: client-component data lifting.
   renderArticleBody` splits the body at that marker → `bodyHtml` (main) +
   `footnotes[]` (boilerplate paragraphs, rendered in the grey band). **English
   marker only**; translated/markerless bodies keep the footer inline (graceful
-  fallback). Staging footers carry no links, so the `string[]` band is lossless.
+  fallback). Footnotes carry **sanitized inline HTML** (production footers
+  hyperlink "report"/"methodology"), rendered via `dangerouslySetInnerHTML` in
+  `ArticleFootnotes` — the same path as the body; static footnotes are plain text
+  (valid HTML).
 - **Staging sparsity:** no real staging fact-check carries feature media, authors,
   or keywords — only the rich HTML body + verdict. So live articles render with no
   hero image (short layout shows none anyway), author "PesaCheck", no tags, no

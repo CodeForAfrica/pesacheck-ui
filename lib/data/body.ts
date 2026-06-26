@@ -43,15 +43,16 @@ export function renderBody(
 /** Opener of PesaCheck's standard footer boilerplate. */
 const FOOTER_MARKER = "This post is part of an ongoing series of PesaCheck";
 
-/** Pull the visible text out of each `<p>` in an HTML fragment. */
-function paragraphText(html: string): string[] {
+/**
+ * Inner HTML of each `<p>` in an (already-sanitized) fragment, whitespace
+ * collapsed. Tags are kept so footnote links (`<a href>`, `<br>`, `<b>`) survive
+ * — footers often hyperlink "report" / "methodology".
+ */
+function paragraphHtml(html: string): string[] {
   const out: string[] = [];
   for (const match of html.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/g)) {
-    const text = match[1]
-      .replace(/<[^>]*>/g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
-    if (text) out.push(text);
+    const inner = match[1].replace(/\s+/g, " ").trim();
+    if (inner) out.push(inner);
   }
   return out;
 }
@@ -61,8 +62,9 @@ export type RenderedBody = { bodyHtml?: string; footnotes: string[] };
 /**
  * Render a body and split the trailing PesaCheck boilerplate into footnotes.
  * `bodyHtml` is the main article (footer removed); `footnotes` are the boilerplate
- * paragraphs as plain text (the band renders `string[]`; staging footers carry no
- * links). When the marker is absent, the whole body stays in `bodyHtml`.
+ * paragraphs as **sanitized HTML** (links preserved — rendered via
+ * `dangerouslySetInnerHTML` in `ArticleFootnotes`). When the marker is absent, the
+ * whole body stays in `bodyHtml`.
  */
 export function renderArticleBody(
   html: string | null | undefined,
@@ -78,5 +80,5 @@ export function renderArticleBody(
   if (footerStart === -1) return { bodyHtml: clean, footnotes: [] };
 
   const bodyHtml = clean.slice(0, footerStart).trim() || undefined;
-  return { bodyHtml, footnotes: paragraphText(clean.slice(footerStart)) };
+  return { bodyHtml, footnotes: paragraphHtml(clean.slice(footerStart)) };
 }
