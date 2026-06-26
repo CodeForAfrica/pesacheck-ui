@@ -199,46 +199,53 @@ export function FilterBar({
         ))}
       </div>
 
-      {chips.length > 0 && (
-        <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
-          {chips.map((chip) => {
-            const label = filterLabel(chip.dimension, chip.value);
-            return (
-              <span
-                key={`${chip.dimension}-${chip.value}`}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-pesacheck-blue py-[5px] pl-3 pr-2.5 text-sm font-medium text-white"
-              >
-                {label}
-                <button
-                  type="button"
-                  aria-label={`Remove ${label} filter`}
-                  onClick={() => onRemoveChip(chip.dimension, chip.value)}
-                  className="text-white/80 transition-colors hover:text-white"
+      {/*
+        Always render this row so its height is reserved up-front: selecting the
+        first filter then reveals chips/actions in place instead of growing the
+        card and shoving the listing down (`min-h` holds one row's worth of space).
+      */}
+      <div className="mt-5 flex min-h-[34px] flex-wrap items-center justify-center gap-3">
+        {chips.length > 0 && (
+          <>
+            {chips.map((chip) => {
+              const label = filterLabel(chip.dimension, chip.value);
+              return (
+                <span
+                  key={`${chip.dimension}-${chip.value}`}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-pesacheck-blue py-[5px] pl-3 pr-2.5 text-sm font-medium text-white"
                 >
-                  <Close />
-                </button>
-              </span>
-            );
-          })}
+                  {label}
+                  <button
+                    type="button"
+                    aria-label={`Remove ${label} filter`}
+                    onClick={() => onRemoveChip(chip.dimension, chip.value)}
+                    className="text-white/80 transition-colors hover:text-white"
+                  >
+                    <Close />
+                  </button>
+                </span>
+              );
+            })}
 
-          <button
-            type="button"
-            onClick={onApply}
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-pesacheck-blue"
-          >
-            <Check />
-            Apply Filters
-          </button>
-          <button
-            type="button"
-            onClick={onClear}
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#fc0d18] transition-colors hover:text-[#d00b15]"
-          >
-            <Close />
-            Clear Filters
-          </button>
-        </div>
-      )}
+            <button
+              type="button"
+              onClick={onApply}
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-pesacheck-blue"
+            >
+              <Check />
+              Apply Filters
+            </button>
+            <button
+              type="button"
+              onClick={onClear}
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#fc0d18] transition-colors hover:text-[#d00b15]"
+            >
+              <Close />
+              Clear Filters
+            </button>
+          </>
+        )}
+      </div>
     </div>
   );
 }
