@@ -165,7 +165,6 @@ export function FilterBar({
   onToggleDropdown,
   onToggleOption,
   onRemoveChip,
-  onApply,
   onClear,
 }: {
   selected: Selection;
@@ -174,7 +173,6 @@ export function FilterBar({
   onToggleDropdown: (dimension: FilterDimension) => void;
   onToggleOption: (dimension: FilterDimension, value: string) => void;
   onRemoveChip: (dimension: FilterDimension, value: string) => void;
-  onApply: () => void;
   onClear: () => void;
 }) {
   return (
@@ -227,14 +225,6 @@ export function FilterBar({
               );
             })}
 
-            <button
-              type="button"
-              onClick={onApply}
-              className="inline-flex items-center gap-1.5 text-sm font-semibold text-pesacheck-blue"
-            >
-              <Check />
-              Apply Filters
-            </button>
             <button
               type="button"
               onClick={onClear}

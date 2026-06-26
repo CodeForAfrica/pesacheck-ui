@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
 import { FactChecksContentDesks } from "@/components/fact-checks/FactChecksContentDesks";
 import { FactChecksExplorer } from "@/components/fact-checks/FactChecksExplorer";
-import {
-  filtersToQuery,
-  parseFilterParams,
-} from "@/lib/data/fact-check-filters";
+import { parseFilterParams } from "@/lib/data/fact-check-filters";
 import {
   clampPage,
   pageOffset,
@@ -55,8 +52,6 @@ export default async function FactChecksPage({
   return (
     <>
       <FactChecksExplorer
-        // Re-key on the applied filters so navigation resets the staged selection.
-        key={JSON.stringify(filtersToQuery(filters))}
         stories={listing.stories}
         page={listing.page}
         totalPages={listing.totalPages}

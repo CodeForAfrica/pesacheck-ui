@@ -92,8 +92,9 @@ function SearchIllustration() {
 }
 
 export function SearchExplorer({ query }: { query: string }) {
+  // Filters auto-apply: `selected` is the live filter set (no separate "Apply"
+  // step), so results recompute as the reader toggles options or removes chips.
   const [selected, setSelected] = useState<Selection>(() => clone(EMPTY));
-  const [applied, setApplied] = useState<Selection>(() => clone(EMPTY));
   const [openDropdown, setOpenDropdown] = useState<FilterDimension | null>(
     null,
   );
@@ -108,8 +109,8 @@ export function SearchExplorer({ query }: { query: string }) {
 
   const results = useMemo(
     () =>
-      POOL.filter((s) => matchesQuery(s, query) && matchesFilters(s, applied)),
-    [query, applied],
+      POOL.filter((s) => matchesQuery(s, query) && matchesFilters(s, selected)),
+    [query, selected],
   );
 
   const toggleOption = (dimension: FilterDimension, value: string) => {
@@ -133,14 +134,8 @@ export function SearchExplorer({ query }: { query: string }) {
   const toggleDropdown = (dimension: FilterDimension) =>
     setOpenDropdown((cur) => (cur === dimension ? null : dimension));
 
-  const apply = () => {
-    setApplied(clone(selected));
-    setOpenDropdown(null);
-  };
-
   const clear = () => {
     setSelected(clone(EMPTY));
-    setApplied(clone(EMPTY));
     setOpenDropdown(null);
   };
 
@@ -209,7 +204,6 @@ export function SearchExplorer({ query }: { query: string }) {
             onToggleDropdown={toggleDropdown}
             onToggleOption={toggleOption}
             onRemoveChip={removeChip}
-            onApply={apply}
             onClear={clear}
           />
         </Container>
