@@ -1,28 +1,19 @@
 "use client";
 
+import { usePathname, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Pagination } from "@/components/ui/Pagination";
 import { Container } from "@/components/ui/SectionHeading";
 import { StoryCard } from "@/components/ui/StoryCard";
 import {
   DEFAULT_FILTERS,
-  FEATURE,
-  FEATURE_SECONDARY,
   FILTERS,
   type FilterDimension,
-  STORIES,
 } from "@/lib/fact-checks-content";
 import type { Story } from "@/lib/home-content";
 import { FilterBar, type Selection } from "./FilterBar";
 
-// Featured story leads the pool, so filtering can promote any matching story
-// into the large feature slot.
-const POOL: Story[] = [FEATURE, FEATURE_SECONDARY, ...STORIES];
-
 const EMPTY: Selection = { region: [], language: [], topic: [] };
-
-// Grid cards per page (the lead feature + secondary always head the listing).
-const GRID_PAGE_SIZE = 8;
 
 function clone(sel: Selection): Selection {
   return {
@@ -41,7 +32,18 @@ function matches(story: Story, applied: Selection): boolean {
   });
 }
 
-export function FactChecksExplorer() {
+export function FactChecksExplorer({
+  stories,
+  page,
+  totalPages,
+}: {
+  stories: Story[];
+  page: number;
+  totalPages: number;
+}) {
+  const router = useRouter();
+  const pathname = usePathname();
+
   // `selected` is the staged set reflected by the dropdowns + chips; `applied`
   // is what actually filters the listing (committed via "Apply Filters"). The
   // page loads showing the design's chips staged but the full listing visible —
@@ -53,7 +55,6 @@ export function FactChecksExplorer() {
   const [openDropdown, setOpenDropdown] = useState<FilterDimension | null>(
     null,
   );
-  const [page, setPage] = useState(1);
 
   const chips = useMemo(
     () =>
@@ -64,8 +65,8 @@ export function FactChecksExplorer() {
   );
 
   const results = useMemo(
-    () => POOL.filter((s) => matches(s, applied)),
-    [applied],
+    () => stories.filter((s) => matches(s, applied)),
+    [stories, applied],
   );
 
   const toggleOption = (dimension: FilterDimension, value: string) => {
@@ -89,27 +90,24 @@ export function FactChecksExplorer() {
   const toggleDropdown = (dimension: FilterDimension) =>
     setOpenDropdown((cur) => (cur === dimension ? null : dimension));
 
+  const goToPage = (next: number) => {
+    router.push(next <= 1 ? pathname : `${pathname}?page=${next}`);
+  };
+
   const apply = () => {
     setApplied(clone(selected));
     setOpenDropdown(null);
-    setPage(1);
+    goToPage(1);
   };
 
   const clear = () => {
     setSelected(clone(EMPTY));
     setApplied(clone(EMPTY));
     setOpenDropdown(null);
-    setPage(1);
+    goToPage(1);
   };
 
   const [feature, secondary, ...grid] = results;
-
-  const totalPages = Math.max(1, Math.ceil(grid.length / GRID_PAGE_SIZE));
-  const currentPage = Math.min(page, totalPages);
-  const gridPage = grid.slice(
-    (currentPage - 1) * GRID_PAGE_SIZE,
-    currentPage * GRID_PAGE_SIZE,
-  );
 
   return (
     <>
@@ -160,7 +158,7 @@ export function FactChecksExplorer() {
 
               {grid.length > 0 && (
                 <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-                  {gridPage.map((story) => (
+                  {grid.map((story) => (
                     <StoryCard key={story.href ?? story.title} story={story} />
                   ))}
                 </div>
@@ -168,9 +166,9 @@ export function FactChecksExplorer() {
 
               <div className="mt-12">
                 <Pagination
-                  page={currentPage}
+                  page={page}
                   totalPages={totalPages}
-                  onPageChange={setPage}
+                  onPageChange={goToPage}
                 />
               </div>
             </>
