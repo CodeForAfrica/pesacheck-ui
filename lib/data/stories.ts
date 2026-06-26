@@ -90,24 +90,37 @@ export function getHeroPreview(): Promise<Story[]> {
  * `filters` (region/topic/language) narrow the listing **server-side** — they're
  * folded into the same `where` and aggregate, so `totalPages` reflects them. See
  * `buildFactCheckWhere` in `lib/data/fact-check-filters.ts`.
+ *
+ * A page beyond the (filtered) result set is clamped to the last valid page and
+ * re-fetched, so an out-of-range `?page=` shows the last page rather than an
+ * empty grid that reads as "no matches". A genuinely empty result set
+ * (`total === 0`) still returns no stories — the correct empty state.
  */
 export async function getFactChecks(
   page = 1,
   filters: FilterSelection = EMPTY_FILTERS,
 ): Promise<FactCheckListing> {
-  const { total, items } = await gql<FactCheckResponse>(
-    GET_FACT_CHECK_ARTICLES,
-    {
-      where: buildFactCheckWhere(filters, TENANT_CODE),
-      limit: FACT_CHECKS_PAGE_SIZE,
-      offset: pageOffset(page, FACT_CHECKS_PAGE_SIZE),
-    },
-  );
+  const where = buildFactCheckWhere(filters, TENANT_CODE);
 
+  const fetchPage = (p: number) =>
+    gql<FactCheckResponse>(GET_FACT_CHECK_ARTICLES, {
+      where,
+      limit: FACT_CHECKS_PAGE_SIZE,
+      offset: pageOffset(p, FACT_CHECKS_PAGE_SIZE),
+    });
+
+  let { total, items } = await fetchPage(page);
   const pages = totalPages(total.aggregate.totalCount, FACT_CHECKS_PAGE_SIZE);
+  const current = clampPage(page, pages);
+
+  // Requested page overran a non-empty result set → re-fetch the last real page.
+  if (current !== page && total.aggregate.totalCount > 0) {
+    ({ items } = await fetchPage(current));
+  }
+
   return {
     stories: items.map(mapStory),
-    page: clampPage(page, pages),
+    page: current,
     totalPages: pages,
   };
 }
