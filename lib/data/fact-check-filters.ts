@@ -9,21 +9,28 @@ export const FILTER_DIMENSIONS: FilterDimension[] = [
   "topic",
 ];
 
-export const EMPTY_FILTERS: FilterSelection = {
+/**
+ * The "no filters" selection. Deep-frozen because it's shared as the default
+ * argument / fallback prop across call sites — freezing turns an accidental
+ * in-place mutation (e.g. `filters.region.push(…)`) into a throw rather than
+ * silent corruption of the singleton. Callers that need to mutate clone first.
+ */
+export const EMPTY_FILTERS: FilterSelection = freezeFilters({
   region: [],
   language: [],
   topic: [],
-};
+});
+
+function freezeFilters(filters: FilterSelection): FilterSelection {
+  for (const dim of FILTER_DIMENSIONS) Object.freeze(filters[dim]);
+  return Object.freeze(filters);
+}
 
 /** Subject schemes backing the relation-based dimensions. */
 const SUBJECT_SCHEME: Record<"region" | "topic", string> = {
   region: "countries",
   topic: "01harm",
 };
-
-export function hasActiveFilters(filters: FilterSelection): boolean {
-  return FILTER_DIMENSIONS.some((dim) => filters[dim].length > 0);
-}
 
 type SubjectClause = {
   swp_article_metadata: {

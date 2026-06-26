@@ -4,8 +4,9 @@ import { FiCalendar, FiClock } from "react-icons/fi";
 /**
  * Taxonomy row: Topic · Region · Language (text-xs, tiny 2px dot separators).
  * Renders only the dimensions that are present — live articles may carry just
- * some of them — so a missing value never leaks a placeholder label. Falls back
- * to the design's placeholders only when nothing is supplied (static scaffolding).
+ * some of them — so a missing value never leaks a placeholder label. Renders
+ * nothing when an article carries no taxonomy at all (the "Topic · Region ·
+ * Language" placeholders are design scaffolding, never shown to readers).
  */
 export function TaxonomyRow({
   topic,
@@ -16,8 +17,8 @@ export function TaxonomyRow({
   region?: string;
   language?: string;
 }) {
-  let parts = [topic, region, language].filter(Boolean) as string[];
-  if (parts.length === 0) parts = ["Topic", "Region", "Language"];
+  const parts = [topic, region, language].filter(Boolean) as string[];
+  if (parts.length === 0) return null;
   return (
     <div className="flex items-center gap-1 text-xs font-medium text-neutral-900">
       {parts.map((part, i) => (

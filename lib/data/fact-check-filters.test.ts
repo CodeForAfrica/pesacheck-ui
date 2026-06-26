@@ -4,7 +4,6 @@ import {
   EMPTY_FILTERS,
   type FilterSelection,
   filtersToQuery,
-  hasActiveFilters,
   parseFilterParams,
 } from "@/lib/data/fact-check-filters";
 
@@ -73,15 +72,6 @@ describe("buildFactCheckWhere", () => {
     const serialized = JSON.stringify(where);
     expect(serialized).not.toContain('"_in":[]');
     expect(where._and).toHaveLength(1);
-  });
-});
-
-describe("hasActiveFilters", () => {
-  it("is false for the empty selection", () => {
-    expect(hasActiveFilters(EMPTY_FILTERS)).toBe(false);
-  });
-  it("is true when any dimension has a code", () => {
-    expect(hasActiveFilters(sel({ topic: ["phys_harm"] }))).toBe(true);
   });
 });
 
