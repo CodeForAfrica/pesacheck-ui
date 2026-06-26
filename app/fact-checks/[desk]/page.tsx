@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ArticleBody } from "@/components/article/ArticleBody";
+import { ArticleFootnotes } from "@/components/article/ArticleFootnotes";
 import { ArticleHero } from "@/components/article/ArticleHero";
 import { ArticleSidebar } from "@/components/article/ArticleSidebar";
 import { RelatedStories } from "@/components/article/RelatedStories";
@@ -65,6 +66,7 @@ export default async function ContentDeskOrArticlePage({
             <ArticleBody article={article} />
           </div>
         </div>
+        <ArticleFootnotes footnotes={article.footnotes} />
         <RelatedStories stories={article.relatedStories} />
       </>
     );
