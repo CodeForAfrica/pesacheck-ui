@@ -69,12 +69,15 @@ export function FactChecksExplorer({
     });
   };
 
+  // Removing a chip commits immediately (like Clear, but for one value) rather
+  // than only un-staging it — the listing re-queries on the spot. `setSelected`
+  // gives instant visual feedback; `navigate` re-fetches and the remount then
+  // re-syncs `selected` from the new URL.
   const removeChip = (dimension: FilterDimension, value: string) => {
-    setSelected((prev) => {
-      const next = clone(prev);
-      next[dimension] = next[dimension].filter((v) => v !== value);
-      return next;
-    });
+    const next = clone(selected);
+    next[dimension] = next[dimension].filter((v) => v !== value);
+    setSelected(next);
+    navigate(next, 1);
   };
 
   const toggleDropdown = (dimension: FilterDimension) =>
