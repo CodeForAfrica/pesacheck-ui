@@ -22,7 +22,11 @@ export function Spotlight({
   const [feature, secondary, ...grid] = stories;
 
   return (
-    <section id="fact-checks" className="py-14 lg:py-20">
+    <section
+      id="fact-checks"
+      className="py-14 lg:py-20"
+      style={{ background: "var(--Neutral-50, #F6F7F8)" }}
+    >
       <Container>
         <SectionHeading title="Spotlight" />
 
