@@ -85,8 +85,25 @@ function Dropdown({
   onToggleOpen: () => void;
   onToggleOption: (dimension: FilterDimension, value: string) => void;
 }) {
+  const ref = useRef<HTMLDivElement | null>(null);
+
+  // Close this dropdown on any mousedown outside its button + options panel —
+  // clicking elsewhere in the filter bar (chips, another dropdown, the heading)
+  // or anywhere on the page dismisses it. Clicks on the button/options are
+  // inside `ref` and handled by their own onClick.
+  useEffect(() => {
+    if (!open) return;
+    const onDocMouseDown = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        onToggleOpen();
+      }
+    };
+    document.addEventListener("mousedown", onDocMouseDown);
+    return () => document.removeEventListener("mousedown", onDocMouseDown);
+  }, [open, onToggleOpen]);
+
   return (
-    <div className="relative">
+    <div ref={ref} className="relative">
       <button
         type="button"
         aria-haspopup="listbox"
@@ -160,25 +177,8 @@ export function FilterBar({
   onApply: () => void;
   onClear: () => void;
 }) {
-  const ref = useRef<HTMLDivElement | null>(null);
-
-  // Close any open dropdown when clicking outside the bar.
-  useEffect(() => {
-    if (!openDropdown) return;
-    const onDocClick = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        onToggleDropdown(openDropdown);
-      }
-    };
-    document.addEventListener("mousedown", onDocClick);
-    return () => document.removeEventListener("mousedown", onDocClick);
-  }, [openDropdown, onToggleDropdown]);
-
   return (
-    <div
-      ref={ref}
-      className="mx-auto w-full max-w-[1030px] rounded-[20px] border-[0.5px] border-neutral-200 bg-white p-6 shadow-[0px_10px_30px_0px_rgba(2,29,51,0.08)] sm:p-8"
-    >
+    <div className="mx-auto w-full max-w-[1030px] rounded-[20px] border-[0.5px] border-neutral-200 bg-white p-6 shadow-[0px_10px_30px_0px_rgba(2,29,51,0.08)] sm:p-8">
       <p className="text-center text-base font-bold text-gray-800">
         Filter By:
       </p>
