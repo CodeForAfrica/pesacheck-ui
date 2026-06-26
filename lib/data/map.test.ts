@@ -1,13 +1,16 @@
 import { describe, expect, it } from "vitest";
+import { renderBody } from "@/lib/data/body";
 import {
   computeReadTime,
   findRendition,
   findSubject,
   formatStoryDate,
   getVerdict,
+  mapArticle,
   mapStory,
   parseMetadata,
   type RawArticle,
+  type RawFullArticle,
   type Rendition,
 } from "@/lib/data/map";
 
@@ -248,5 +251,136 @@ describe("mapStory", () => {
     expect(story.date).toBeUndefined();
     expect(story.readTime).toBeUndefined();
     expect(story.href).toBe("/fact-checks/bare");
+  });
+});
+
+describe("renderBody", () => {
+  it("rewrites publisher <img> src to MEDIA_URL + filename", () => {
+    const html =
+      '<p><img src="https://cdn.example.com/path/to/photo.jpg"/></p>';
+    expect(renderBody(html)).toContain('src="https://media.test/photo.jpg"');
+  });
+
+  it("preserves evidence links (the point of a fact-check)", () => {
+    const html = '<p>see <a href="https://archive.ph/PJG67">here</a></p>';
+    const out = renderBody(html);
+    expect(out).toContain('href="https://archive.ph/PJG67"');
+    expect(out).toContain("here");
+  });
+
+  it("strips disallowed tags like <script>", () => {
+    const out = renderBody("<p>ok</p><script>alert(1)</script>");
+    expect(out).toContain("<p>ok</p>");
+    expect(out).not.toContain("<script>");
+    expect(out).not.toContain("alert(1)");
+  });
+
+  it("returns undefined for empty/null input", () => {
+    expect(renderBody(null)).toBeUndefined();
+    expect(renderBody(undefined)).toBeUndefined();
+    expect(renderBody("")).toBeUndefined();
+  });
+});
+
+describe("mapArticle", () => {
+  // Mirrors a fully-populated single-article row from GET_ARTICLE_BY_SLUG.
+  const full: RawFullArticle = {
+    id: 8,
+    title: "Equating Somalia and Al-Shabaab is untrue",
+    slug: "false-equating-somalia-and-al-shabab-is-untrue",
+    lead: "<p>The claim...</p>",
+    body: `<p><a href="https://archive.ph/x">${"word ".repeat(200)}</a></p>`,
+    published_at: "2024-04-02T14:40:08",
+    metadata: JSON.stringify({
+      subject: [{ scheme: "Debunk", code: "false", name: "False" }],
+    }),
+    swp_route: { slug: "english", staticprefix: "/english" },
+    swp_article_metadata: { byline: "Desk byline" },
+    swp_article_feature_media: {
+      description: "A caption",
+      renditions: [
+        {
+          name: "viewImage",
+          image: { asset_id: "abc", file_extension: "jpg", variants: ["webp"] },
+        },
+      ],
+    },
+    swp_article_authors: [
+      { swp_author: { name: "Jane Doe" } },
+      { swp_author: { name: "John Roe" } },
+    ],
+    swp_article_keywords: [
+      { swp_keyword: { name: "Somalia" } },
+      { swp_keyword: { name: "Security" } },
+    ],
+    swp_article_related: [
+      {
+        swp_article: {
+          id: 9,
+          title: "Related one",
+          slug: "related-one",
+          swp_route: { slug: "english" },
+        },
+      },
+    ],
+  };
+
+  it("maps a fully-populated article", () => {
+    const article = mapArticle(full);
+    expect(article.slug).toBe("false-equating-somalia-and-al-shabab-is-untrue");
+    expect(article.format).toBe("short");
+    expect(article.verdict).toBe("False");
+    expect(article.tags).toEqual(["Somalia", "Security"]);
+    expect(article.author).toBe("Jane Doe, John Roe");
+    expect(article.date).toBe("Apr 2");
+    expect(article.readTime).toBe("1 min");
+    expect(article.image).toBe("https://media.test/abc.webp");
+    expect(article.alt).toBe("A caption");
+    expect(article.desk).toBe("english");
+    // Body is rendered HTML, not structured paragraphs.
+    expect(article.leadParagraphs).toEqual([]);
+    expect(article.bodyParagraphs).toEqual([]);
+    expect(article.bodyHtml).toContain('href="https://archive.ph/x"');
+    expect(article.relatedStories).toHaveLength(1);
+    expect(article.relatedStories[0].href).toBe(
+      "/fact-checks/english/related-one",
+    );
+  });
+
+  it("is null-safe for sparse staging data (no media, authors, keywords, related)", () => {
+    // Mirrors real staging fact-check id 8: rich body, everything else empty.
+    const article = mapArticle({
+      id: 8,
+      title: "FALSE: Equating Somalia and Al Shabab is untrue",
+      slug: "false-equating-somalia-and-al-shabab-is-untrue",
+      lead: null,
+      body: "<p>Some <b>claim</b>.</p>",
+      published_at: "2024-04-02T14:40:08",
+      metadata: JSON.stringify({
+        subject: [{ scheme: "Debunk", code: "false", name: "False" }],
+      }),
+      swp_route: { slug: "english", staticprefix: "/english" },
+      swp_article_metadata: { byline: null },
+      swp_article_feature_media: null,
+      swp_article_authors: [],
+      swp_article_keywords: [],
+      swp_article_related: [],
+    });
+    expect(article.tags).toEqual([]);
+    expect(article.relatedStories).toEqual([]);
+    expect(article.author).toBe("PesaCheck");
+    expect(article.verdict).toBe("False");
+    expect(article.image).toBe("/images/spotlight/long-format3-2.png");
+    expect(article.bodyHtml).toContain("<b>claim</b>");
+  });
+
+  it("falls back to the jsonb byline when there are no authors", () => {
+    const article = mapArticle({
+      ...full,
+      swp_article_authors: [],
+      metadata: JSON.stringify({ byline: "Metadata Byline", subject: [] }),
+      swp_article_metadata: { byline: "Relation Byline" },
+    });
+    expect(article.author).toBe("Metadata Byline");
   });
 });

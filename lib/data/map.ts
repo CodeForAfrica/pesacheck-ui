@@ -1,11 +1,5 @@
-/**
- * Mappers from raw Superdesk `swp_*` shapes to the Figma UI types
- * (`Story`, `Article`, `ContentDesk`). Keep these the single place that knows
- * the backend shape — pages and components stay on the existing typed contract.
- *
- * Ported from `pesacheck-pwa-app-router/services/helpers.ts` where noted.
- */
-
+import type { Article } from "@/lib/article-content";
+import { renderBody } from "@/lib/data/body";
 import type { Story } from "@/lib/home-content";
 
 const MEDIA_URL = process.env.NEXT_PUBLIC_MEDIA_URL ?? "";
@@ -169,6 +163,66 @@ function storyHref(article: RawArticle): string {
   return desk
     ? `/fact-checks/${desk}/${article.slug}`
     : `/fact-checks/${article.slug}`;
+}
+
+// ── Article (single fact-check) ──────────────────────────────────────────────
+
+/** Extra relations selected only by the single-article query. */
+export type RawFullArticle = RawArticle & {
+  swp_article_metadata?: { byline?: string | null } | null;
+  swp_article_authors?:
+    | { swp_author?: { name?: string | null } | null }[]
+    | null;
+  swp_article_keywords?:
+    | {
+        swp_keyword?: { name?: string | null } | null;
+      }[]
+    | null;
+  swp_article_related?: { swp_article?: RawArticle | null }[] | null;
+};
+
+/** Map a raw single article to the `Article` type. Null-safe (staging is sparse). */
+export function mapArticle(raw: RawFullArticle): Article {
+  const meta = parseMetadata(raw.metadata);
+
+  const authors = (raw.swp_article_authors ?? [])
+    .map((a) => a.swp_author?.name?.trim())
+    .filter((name): name is string => Boolean(name));
+
+  const tags = (raw.swp_article_keywords ?? [])
+    .map((k) => k.swp_keyword?.name?.trim())
+    .filter((name): name is string => Boolean(name));
+
+  const relatedStories = (raw.swp_article_related ?? [])
+    .map((r) => r.swp_article)
+    .filter((article): article is RawArticle => article != null)
+    .map(mapStory);
+
+  return {
+    slug: raw.slug,
+    format: "short",
+    image: pickStoryImage(
+      raw.swp_article_feature_media?.renditions ?? undefined,
+    ),
+    alt: raw.swp_article_feature_media?.description?.trim() || raw.title,
+    title: raw.title,
+    verdict: findSubject(meta, "Debunk")?.name,
+    tags,
+    date: formatStoryDate(raw.published_at) ?? "",
+    readTime: computeReadTime(raw.body) ?? "",
+    author:
+      authors.join(", ") ||
+      meta.byline?.trim() ||
+      raw.swp_article_metadata?.byline?.trim() ||
+      "PesaCheck",
+    desk: raw.swp_route?.slug ?? undefined,
+    // The body is rendered as HTML; the structured paragraph fields are unused.
+    leadParagraphs: [],
+    bodyParagraphs: [],
+    bodyHtml: renderBody(raw.body),
+    footnotes: [],
+    relatedStories,
+  };
 }
 
 /** Map a raw content-list article to the `Story` card type. Null-safe. */

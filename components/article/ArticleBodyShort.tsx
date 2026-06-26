@@ -36,7 +36,40 @@ function Paragraphs({ items }: { items: string[] }) {
   );
 }
 
+/**
+ * Prose styling for rendered (live) body HTML. Scoped child selectors stand in
+ * for a typography plugin (not installed): paragraph spacing, underlined
+ * evidence links in PesaCheck blue, and rounded inline images.
+ */
+const PROSE_CLASS = [
+  "flex flex-col gap-5 text-sm font-medium leading-5 text-neutral-900",
+  "[&_a]:font-semibold [&_a]:text-pesacheck-blue [&_a]:underline",
+  "[&_img]:my-2 [&_img]:h-auto [&_img]:w-full [&_img]:rounded-lg",
+  "[&_b]:font-semibold [&_strong]:font-semibold",
+].join(" ");
+
 export function ArticleBodyShort({ article }: { article: Article }) {
+  if (article.bodyHtml) {
+    return (
+      <div className="w-full min-w-0 lg:w-[610px]">
+        {/* Body HTML is sanitized server-side in lib/data/body.ts:renderBody. */}
+        <div
+          className={PROSE_CLASS}
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: sanitized in renderBody
+          dangerouslySetInnerHTML={{ __html: article.bodyHtml }}
+        />
+
+        {article.tags.length > 0 && (
+          <div className="mt-8 flex flex-wrap gap-2.5">
+            {article.tags.map((tag) => (
+              <ArticleTag key={tag} label={tag} />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
   const [img0, img1, img2] = article.images ?? [];
 
   return (
