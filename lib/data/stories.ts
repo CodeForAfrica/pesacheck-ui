@@ -59,3 +59,7 @@ export function getTrending(): Promise<Story[]> {
 export function getLatest(): Promise<Story[]> {
   return getContentListStories("Top news");
 }
+
+export function getHeroPreview(): Promise<Story[]> {
+  return getContentListStories("Homepage — Hero");
+}
