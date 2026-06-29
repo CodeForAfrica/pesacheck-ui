@@ -115,9 +115,9 @@ export function Hero({ stories }: HeroProps = {}) {
             onRealIndexChange={(s: SwiperType) => setActiveIndex(s.realIndex)}
             onResize={(s: SwiperType) => setDotCount(calcDotCount(s))}
           >
-            {preview.map((story) => (
+            {preview.map((story, i) => (
               <SwiperSlide
-                key={`${story.image}-${story.date}`}
+                key={story.href ?? `${story.image}-${i}`}
                 className="!w-auto"
               >
                 <PreviewCard story={story} />
@@ -129,7 +129,7 @@ export function Hero({ stories }: HeroProps = {}) {
         <div className={`mt-4 flex items-center gap-2 ${INDENT}`}>
           {preview.slice(0, dotCount).map((story, i) => (
             <button
-              key={`dot-${story.image}-${story.date}`}
+              key={`dot-${story.href ?? `${story.image}-${i}`}`}
               type="button"
               aria-label={`Go to slide ${i + 1}`}
               onClick={() => swiperInstance?.slideTo(i)}
