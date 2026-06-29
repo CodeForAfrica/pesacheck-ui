@@ -1,9 +1,15 @@
 "use client";
 
 import { type ElementType, useEffect, useRef } from "react";
-import { FILTERS, type FilterDimension } from "@/lib/fact-checks-content";
+import type { FilterSelection } from "@/lib/data/fact-check-filters";
+import {
+  FILTERS,
+  type FilterDimension,
+  type FilterOption,
+  filterLabel,
+} from "@/lib/fact-checks-content";
 
-export type Selection = Record<FilterDimension, string[]>;
+export type Selection = FilterSelection;
 
 function Chevron({ open }: { open: boolean }) {
   return (
@@ -73,14 +79,31 @@ function Dropdown({
   dimension: FilterDimension;
   label: string;
   icon: ElementType;
-  options: string[];
+  options: FilterOption[];
   selected: string[];
   open: boolean;
   onToggleOpen: () => void;
   onToggleOption: (dimension: FilterDimension, value: string) => void;
 }) {
+  const ref = useRef<HTMLDivElement | null>(null);
+
+  // Close this dropdown on any mousedown outside its button + options panel —
+  // clicking elsewhere in the filter bar (chips, another dropdown, the heading)
+  // or anywhere on the page dismisses it. Clicks on the button/options are
+  // inside `ref` and handled by their own onClick.
+  useEffect(() => {
+    if (!open) return;
+    const onDocMouseDown = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        onToggleOpen();
+      }
+    };
+    document.addEventListener("mousedown", onDocMouseDown);
+    return () => document.removeEventListener("mousedown", onDocMouseDown);
+  }, [open, onToggleOpen]);
+
   return (
-    <div className="relative">
+    <div ref={ref} className="relative">
       <button
         type="button"
         aria-haspopup="listbox"
@@ -105,14 +128,14 @@ function Dropdown({
           className="absolute left-0 top-full z-30 mt-2 max-h-72 w-56 overflow-auto rounded-[10px] border-[0.5px] border-neutral-200 bg-white p-1.5 shadow-[0px_10px_20px_0px_rgba(0,0,0,0.1)]"
         >
           {options.map((opt) => {
-            const checked = selected.includes(opt);
+            const checked = selected.includes(opt.code);
             return (
-              <li key={opt}>
+              <li key={opt.code}>
                 <button
                   type="button"
                   role="option"
                   aria-selected={checked}
-                  onClick={() => onToggleOption(dimension, opt)}
+                  onClick={() => onToggleOption(dimension, opt.code)}
                   className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm font-medium text-neutral-900 transition-colors hover:bg-neutral-50"
                 >
                   <span
@@ -124,7 +147,7 @@ function Dropdown({
                   >
                     {checked && <Check />}
                   </span>
-                  {opt}
+                  {opt.label}
                 </button>
               </li>
             );
@@ -142,7 +165,6 @@ export function FilterBar({
   onToggleDropdown,
   onToggleOption,
   onRemoveChip,
-  onApply,
   onClear,
 }: {
   selected: Selection;
@@ -151,28 +173,10 @@ export function FilterBar({
   onToggleDropdown: (dimension: FilterDimension) => void;
   onToggleOption: (dimension: FilterDimension, value: string) => void;
   onRemoveChip: (dimension: FilterDimension, value: string) => void;
-  onApply: () => void;
   onClear: () => void;
 }) {
-  const ref = useRef<HTMLDivElement | null>(null);
-
-  // Close any open dropdown when clicking outside the bar.
-  useEffect(() => {
-    if (!openDropdown) return;
-    const onDocClick = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        onToggleDropdown(openDropdown);
-      }
-    };
-    document.addEventListener("mousedown", onDocClick);
-    return () => document.removeEventListener("mousedown", onDocClick);
-  }, [openDropdown, onToggleDropdown]);
-
   return (
-    <div
-      ref={ref}
-      className="mx-auto w-full max-w-[1030px] rounded-[20px] border-[0.5px] border-neutral-200 bg-white p-6 shadow-[0px_10px_30px_0px_rgba(2,29,51,0.08)] sm:p-8"
-    >
+    <div className="mx-auto w-full max-w-[1030px] rounded-[20px] border-[0.5px] border-neutral-200 bg-white p-6 shadow-[0px_10px_30px_0px_rgba(2,29,51,0.08)] sm:p-8">
       <p className="text-center text-base font-bold text-gray-800">
         Filter By:
       </p>
@@ -193,43 +197,45 @@ export function FilterBar({
         ))}
       </div>
 
-      {chips.length > 0 && (
-        <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
-          {chips.map((chip) => (
-            <span
-              key={`${chip.dimension}-${chip.value}`}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-pesacheck-blue py-[5px] pl-3 pr-2.5 text-sm font-medium text-white"
-            >
-              {chip.value}
-              <button
-                type="button"
-                aria-label={`Remove ${chip.value} filter`}
-                onClick={() => onRemoveChip(chip.dimension, chip.value)}
-                className="text-white/80 transition-colors hover:text-white"
-              >
-                <Close />
-              </button>
-            </span>
-          ))}
+      {/*
+        Always render this row so its height is reserved up-front: selecting the
+        first filter then reveals chips/actions in place instead of growing the
+        card and shoving the listing down (`min-h` holds one row's worth of space).
+      */}
+      <div className="mt-5 flex min-h-[34px] flex-wrap items-center justify-center gap-3">
+        {chips.length > 0 && (
+          <>
+            {chips.map((chip) => {
+              const label = filterLabel(chip.dimension, chip.value);
+              return (
+                <span
+                  key={`${chip.dimension}-${chip.value}`}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-pesacheck-blue py-[5px] pl-3 pr-2.5 text-sm font-medium text-white"
+                >
+                  {label}
+                  <button
+                    type="button"
+                    aria-label={`Remove ${label} filter`}
+                    onClick={() => onRemoveChip(chip.dimension, chip.value)}
+                    className="text-white/80 transition-colors hover:text-white"
+                  >
+                    <Close />
+                  </button>
+                </span>
+              );
+            })}
 
-          <button
-            type="button"
-            onClick={onApply}
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-pesacheck-blue"
-          >
-            <Check />
-            Apply Filters
-          </button>
-          <button
-            type="button"
-            onClick={onClear}
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#fc0d18] transition-colors hover:text-[#d00b15]"
-          >
-            <Close />
-            Clear Filters
-          </button>
-        </div>
-      )}
+            <button
+              type="button"
+              onClick={onClear}
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#fc0d18] transition-colors hover:text-[#d00b15]"
+            >
+              <Close />
+              Clear Filters
+            </button>
+          </>
+        )}
+      </div>
     </div>
   );
 }

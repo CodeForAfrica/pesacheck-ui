@@ -88,6 +88,26 @@ export function getVerdict(raw: string | null | undefined): string | undefined {
   return findSubject(parseMetadata(raw), "Debunk")?.name;
 }
 
+/**
+ * Display labels for the ISO language codes PesaCheck publishes in. The card's
+ * `Story.language` is a human label (parity with the static design data), while
+ * the server-side language *filter* keys off the raw `swp_article_metadata.language`
+ * code — see `lib/data/fact-check-filters.ts`.
+ */
+const LANGUAGE_LABELS: Record<string, string> = {
+  en: "English",
+  fr: "French",
+  sw: "Swahili",
+  am: "Amharic",
+  ar: "Arabic",
+  pt: "Portuguese",
+};
+
+function languageLabel(code: string | null | undefined): string | undefined {
+  if (!code) return undefined;
+  return LANGUAGE_LABELS[code] ?? code;
+}
+
 // ── Story (listing card) ─────────────────────────────────────────────────────
 // Maps a raw `swp_article` (as returned by the content-list query) to the Figma
 // `Story` card type. Keeps components on `Story`, not the backend shape.
@@ -240,6 +260,11 @@ export function mapStory(article: RawArticle): Story {
     verdict: findSubject(meta, "Debunk")?.name,
     title: article.title,
     excerpt: lead || undefined,
+    // Display taxonomy from the jsonb `subject[]` / `language` (the server-side
+    // filters key off the normalized relation, but the labels live in jsonb).
+    region: findSubject(meta, "countries")?.name,
+    topic: findSubject(meta, "01harm")?.name,
+    language: languageLabel(meta.language),
     date: formatStoryDate(article.published_at),
     readTime: computeReadTime(article.body),
     href: storyHref(article),

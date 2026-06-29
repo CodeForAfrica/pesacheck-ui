@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { FactChecksContentDesks } from "@/components/fact-checks/FactChecksContentDesks";
 import { FactChecksExplorer } from "@/components/fact-checks/FactChecksExplorer";
+import { parseFilterParams } from "@/lib/data/fact-check-filters";
 import {
   clampPage,
   pageOffset,
@@ -37,12 +38,16 @@ function staticPage(page: number): FactCheckListing {
 export default async function FactChecksPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string | string[] }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const page = parsePageParam((await searchParams).page);
+  const params = await searchParams;
+  const page = parsePageParam(params.page);
+  const filters = parseFilterParams(params);
 
+  // Filters narrow the grid server-side; the static fallback ignores them (it's
+  // a degraded mode for when Hasura is unreachable) and just pages the design pool.
   const listing =
-    (await getFactChecks(page).catch(() => null)) ?? staticPage(page);
+    (await getFactChecks(page, filters).catch(() => null)) ?? staticPage(page);
 
   return (
     <>
@@ -50,6 +55,7 @@ export default async function FactChecksPage({
         stories={listing.stories}
         page={listing.page}
         totalPages={listing.totalPages}
+        filters={filters}
       />
       <FactChecksContentDesks />
     </>

@@ -1,21 +1,20 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useOptimistic, useState, useTransition } from "react";
 import { Pagination } from "@/components/ui/Pagination";
 import { Container } from "@/components/ui/SectionHeading";
 import { StoryCard } from "@/components/ui/StoryCard";
 import {
-  DEFAULT_FILTERS,
-  FILTERS,
-  type FilterDimension,
-} from "@/lib/fact-checks-content";
+  EMPTY_FILTERS,
+  type FilterSelection,
+  filtersToQuery,
+} from "@/lib/data/fact-check-filters";
+import { FILTERS, type FilterDimension } from "@/lib/fact-checks-content";
 import type { Story } from "@/lib/home-content";
-import { FilterBar, type Selection } from "./FilterBar";
+import { FilterBar } from "./FilterBar";
 
-const EMPTY: Selection = { region: [], language: [], topic: [] };
-
-function clone(sel: Selection): Selection {
+function clone(sel: FilterSelection): FilterSelection {
   return {
     region: [...sel.region],
     language: [...sel.language],
@@ -23,91 +22,90 @@ function clone(sel: Selection): Selection {
   };
 }
 
-function matches(story: Story, applied: Selection): boolean {
-  return FILTERS.every(({ dimension }) => {
-    const wanted = applied[dimension];
-    if (wanted.length === 0) return true;
-    const value = story[dimension];
-    return value != null && wanted.includes(value);
-  });
-}
-
+/**
+ * The fact-checks grid + filter bar. Filtering and pagination are both
+ * **server-side and URL-driven**: `stories` arrive already filtered/paged, and
+ * every control navigates by mutating the query string (`?region=…&topic=…&page=N`),
+ * which re-runs the server fetch.
+ *
+ * Filters **auto-apply** — there's no "Apply" step. The URL (`filters` prop) is
+ * the single source of truth; toggling an option, removing a chip, or clearing
+ * navigates straight away. `useOptimistic` mirrors the change so the checkboxes
+ * and chips update instantly while the server re-fetches the grid in a
+ * transition. Filter changes use `replace` (so a burst of toggles doesn't spam
+ * history); pagination uses `push`.
+ */
 export function FactChecksExplorer({
   stories,
   page,
   totalPages,
+  filters,
 }: {
   stories: Story[];
   page: number;
   totalPages: number;
+  filters: FilterSelection;
 }) {
   const router = useRouter();
   const pathname = usePathname();
+  const [, startTransition] = useTransition();
 
-  // `selected` is the staged set reflected by the dropdowns + chips; `applied`
-  // is what actually filters the listing (committed via "Apply Filters"). The
-  // page loads showing the design's chips staged but the full listing visible —
-  // filtering kicks in once the reader clicks "Apply Filters".
-  const [selected, setSelected] = useState<Selection>(() =>
-    clone(DEFAULT_FILTERS),
-  );
-  const [applied, setApplied] = useState<Selection>(() => clone(EMPTY));
+  // Optimistic mirror of the applied (URL) filters — instant checkbox/chip
+  // feedback; rebases to `filters` once the navigation transition resolves.
+  const [optimistic, setOptimistic] = useOptimistic(filters);
   const [openDropdown, setOpenDropdown] = useState<FilterDimension | null>(
     null,
   );
 
-  const chips = useMemo(
-    () =>
-      FILTERS.flatMap(({ dimension }) =>
-        selected[dimension].map((value) => ({ dimension, value })),
-      ),
-    [selected],
+  const chips = FILTERS.flatMap(({ dimension }) =>
+    optimistic[dimension].map((value) => ({ dimension, value })),
   );
 
-  const results = useMemo(
-    () => stories.filter((s) => matches(s, applied)),
-    [stories, applied],
-  );
-
-  const toggleOption = (dimension: FilterDimension, value: string) => {
-    setSelected((prev) => {
-      const next = clone(prev);
-      next[dimension] = next[dimension].includes(value)
-        ? next[dimension].filter((v) => v !== value)
-        : [...next[dimension], value];
-      return next;
+  // Commit a filter/page change to the URL; the server re-fetches that slice.
+  const navigate = (
+    next: FilterSelection,
+    nextPage: number,
+    mode: "push" | "replace",
+  ) => {
+    const params = new URLSearchParams(filtersToQuery(next));
+    if (nextPage > 1) params.set("page", String(nextPage));
+    const qs = params.toString();
+    const url = qs ? `${pathname}?${qs}` : pathname;
+    startTransition(() => {
+      setOptimistic(next);
+      router[mode](url);
     });
   };
 
+  // Any filter change auto-applies and resets to page 1.
+  const commitFilters = (next: FilterSelection) => navigate(next, 1, "replace");
+
+  const toggleOption = (dimension: FilterDimension, value: string) => {
+    const next = clone(optimistic);
+    next[dimension] = next[dimension].includes(value)
+      ? next[dimension].filter((v) => v !== value)
+      : [...next[dimension], value];
+    commitFilters(next);
+  };
+
   const removeChip = (dimension: FilterDimension, value: string) => {
-    setSelected((prev) => {
-      const next = clone(prev);
-      next[dimension] = next[dimension].filter((v) => v !== value);
-      return next;
-    });
+    const next = clone(optimistic);
+    next[dimension] = next[dimension].filter((v) => v !== value);
+    commitFilters(next);
+  };
+
+  const clear = () => {
+    setOpenDropdown(null);
+    commitFilters(EMPTY_FILTERS);
   };
 
   const toggleDropdown = (dimension: FilterDimension) =>
     setOpenDropdown((cur) => (cur === dimension ? null : dimension));
 
-  const goToPage = (next: number) => {
-    router.push(next <= 1 ? pathname : `${pathname}?page=${next}`);
-  };
+  // Pagination keeps the applied filters; only the page changes.
+  const goToPage = (next: number) => navigate(filters, next, "push");
 
-  const apply = () => {
-    setApplied(clone(selected));
-    setOpenDropdown(null);
-    goToPage(1);
-  };
-
-  const clear = () => {
-    setSelected(clone(EMPTY));
-    setApplied(clone(EMPTY));
-    setOpenDropdown(null);
-    goToPage(1);
-  };
-
-  const [feature, secondary, ...grid] = results;
+  const [feature, secondary, ...grid] = stories;
 
   return (
     <>
@@ -115,13 +113,12 @@ export function FactChecksExplorer({
       <section className="bg-neutral-50">
         <Container className="py-14 lg:py-16">
           <FilterBar
-            selected={selected}
+            selected={optimistic}
             openDropdown={openDropdown}
             chips={chips}
             onToggleDropdown={toggleDropdown}
             onToggleOption={toggleOption}
             onRemoveChip={removeChip}
-            onApply={apply}
             onClear={clear}
           />
         </Container>
@@ -130,7 +127,7 @@ export function FactChecksExplorer({
       {/* Listing */}
       <section className="py-14 lg:py-20">
         <Container>
-          {results.length === 0 ? (
+          {stories.length === 0 ? (
             <p className="py-16 text-center text-base font-medium text-neutral-500">
               No fact-checks match your filters. Try removing some.
             </p>

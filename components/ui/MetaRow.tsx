@@ -1,22 +1,32 @@
+import { Fragment } from "react";
 import { FiCalendar, FiClock } from "react-icons/fi";
 
-/** Taxonomy row: Topic · Region · Language (text-xs, tiny 2px dot separators). */
+/**
+ * Taxonomy row: Topic · Region · Language (text-xs, tiny 2px dot separators).
+ * Renders only the dimensions that are present — live articles may carry just
+ * some of them — so a missing value never leaks a placeholder label. Renders
+ * nothing when an article carries no taxonomy at all (the "Topic · Region ·
+ * Language" placeholders are design scaffolding, never shown to readers).
+ */
 export function TaxonomyRow({
-  topic = "Topic",
-  region = "Region",
-  language = "Language",
+  topic,
+  region,
+  language,
 }: {
   topic?: string;
   region?: string;
   language?: string;
 }) {
+  const parts = [topic, region, language].filter(Boolean) as string[];
+  if (parts.length === 0) return null;
   return (
     <div className="flex items-center gap-1 text-xs font-medium text-neutral-900">
-      <span>{topic}</span>
-      <Dot />
-      <span>{region}</span>
-      <Dot />
-      <span>{language}</span>
+      {parts.map((part, i) => (
+        <Fragment key={part}>
+          {i > 0 && <Dot />}
+          <span>{part}</span>
+        </Fragment>
+      ))}
     </div>
   );
 }

@@ -18,28 +18,31 @@
  * content-blocks, editorial test stubs). See `getFactChecks` in
  * `lib/data/stories.ts`.
  *
- * `$limit`/`$offset` page the listing; `total` returns the unpaged count so the
- * caller can compute `totalPages` without over-fetching.
+ * **Filtering (server-side):** the `where` is passed as a typed
+ * `swp_article_bool_exp` variable built in JS (`buildFactCheckWhere` in
+ * `lib/data/fact-check-filters.ts`) — it always carries the `Debunk` clause and
+ * adds region/topic/language clauses for whichever filters are active. The same
+ * `$where` backs both `items` and the `total` aggregate so `totalPages` reflects
+ * the active filters.
+ *
+ * `$limit`/`$offset` page the listing; `total` returns the (filtered) unpaged
+ * count so the caller can compute `totalPages` without over-fetching.
  */
-
-const FACT_CHECK_WHERE = `{
-  tenant_code: { _eq: $tenant }
-  published_at: { _is_null: false }
-  swp_article_metadata: {
-    swp_article_metadata_subjects: { scheme: { _eq: "Debunk" } }
-  }
-}`;
 
 /** One page of published fact-checks (newest first) + the total count. */
 export const GET_FACT_CHECK_ARTICLES = /* GraphQL */ `
-  query GetFactCheckArticles($tenant: String!, $limit: Int!, $offset: Int!) {
-    total: swp_article_aggregate(where: ${FACT_CHECK_WHERE}) {
+  query GetFactCheckArticles(
+    $where: swp_article_bool_exp!
+    $limit: Int!
+    $offset: Int!
+  ) {
+    total: swp_article_aggregate(where: $where) {
       aggregate {
         totalCount: count
       }
     }
     items: swp_article(
-      where: ${FACT_CHECK_WHERE}
+      where: $where
       order_by: { published_at: desc }
       limit: $limit
       offset: $offset

@@ -5,11 +5,11 @@ import { FilterBar, type Selection } from "@/components/fact-checks/FilterBar";
 import { Container } from "@/components/ui/SectionHeading";
 import { StoryCard } from "@/components/ui/StoryCard";
 import {
-  DEFAULT_FILTERS,
   FEATURE,
   FEATURE_SECONDARY,
   FILTERS,
   type FilterDimension,
+  filterLabel,
   STORIES,
 } from "@/lib/fact-checks-content";
 import type { Story } from "@/lib/home-content";
@@ -27,11 +27,16 @@ function clone(sel: Selection): Selection {
 }
 
 function matchesFilters(story: Story, applied: Selection): boolean {
+  // The static search pool is tagged with display labels, while the filter bar
+  // emits taxonomy codes — resolve codes to labels before comparing.
   return FILTERS.every(({ dimension }) => {
     const wanted = applied[dimension];
     if (wanted.length === 0) return true;
     const value = story[dimension];
-    return value != null && wanted.includes(value);
+    return (
+      value != null &&
+      wanted.some((code) => filterLabel(dimension, code) === value)
+    );
   });
 }
 
@@ -87,10 +92,9 @@ function SearchIllustration() {
 }
 
 export function SearchExplorer({ query }: { query: string }) {
-  const [selected, setSelected] = useState<Selection>(() =>
-    clone(DEFAULT_FILTERS),
-  );
-  const [applied, setApplied] = useState<Selection>(() => clone(EMPTY));
+  // Filters auto-apply: `selected` is the live filter set (no separate "Apply"
+  // step), so results recompute as the reader toggles options or removes chips.
+  const [selected, setSelected] = useState<Selection>(() => clone(EMPTY));
   const [openDropdown, setOpenDropdown] = useState<FilterDimension | null>(
     null,
   );
@@ -105,8 +109,8 @@ export function SearchExplorer({ query }: { query: string }) {
 
   const results = useMemo(
     () =>
-      POOL.filter((s) => matchesQuery(s, query) && matchesFilters(s, applied)),
-    [query, applied],
+      POOL.filter((s) => matchesQuery(s, query) && matchesFilters(s, selected)),
+    [query, selected],
   );
 
   const toggleOption = (dimension: FilterDimension, value: string) => {
@@ -130,14 +134,8 @@ export function SearchExplorer({ query }: { query: string }) {
   const toggleDropdown = (dimension: FilterDimension) =>
     setOpenDropdown((cur) => (cur === dimension ? null : dimension));
 
-  const apply = () => {
-    setApplied(clone(selected));
-    setOpenDropdown(null);
-  };
-
   const clear = () => {
     setSelected(clone(EMPTY));
-    setApplied(clone(EMPTY));
     setOpenDropdown(null);
   };
 
@@ -206,7 +204,6 @@ export function SearchExplorer({ query }: { query: string }) {
             onToggleDropdown={toggleDropdown}
             onToggleOption={toggleOption}
             onRemoveChip={removeChip}
-            onApply={apply}
             onClear={clear}
           />
         </Container>
