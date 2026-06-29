@@ -43,7 +43,10 @@ type SubjectClause = {
 type LanguageClause = {
   swp_article_metadata: { language: { _in: string[] } };
 };
-type WhereClause = SubjectClause | LanguageClause;
+type RouteClause = {
+  swp_route: { slug: { _eq: string } };
+};
+type WhereClause = SubjectClause | LanguageClause | RouteClause;
 type SearchParams = Record<string, string | string[] | undefined>;
 
 export type FactCheckWhere = {
@@ -58,10 +61,16 @@ export type FactCheckWhere = {
  * an article a fact-check); each active dimension adds one more `_and` clause.
  * Inactive dimensions are omitted entirely — an empty `_in: []` would match
  * nothing in Hasura, so we never emit one.
+ *
+ * `routeSlug` (optional) scopes the listing to a single content-desk route
+ * (`swp_route.slug`) — this is what powers the desk pages (`getByDesk`). Desks
+ * are still fact-check listings, so the `Debunk` clause stays; the route is just
+ * one more `_and` clause on top.
  */
 export function buildFactCheckWhere(
   filters: FilterSelection,
   tenantCode: string,
+  routeSlug?: string,
 ): FactCheckWhere {
   const and: WhereClause[] = [
     {
@@ -70,6 +79,10 @@ export function buildFactCheckWhere(
       },
     },
   ];
+
+  if (routeSlug) {
+    and.push({ swp_route: { slug: { _eq: routeSlug } } });
+  }
 
   for (const dim of ["region", "topic"] as const) {
     const codes = filters[dim];
