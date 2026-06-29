@@ -2,14 +2,14 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { DateRow } from "@/components/ui/MetaRow";
+import { Container } from "@/components/ui/SectionHeading";
+import { HERO } from "@/lib/fact-checks-content";
+import type { Story } from "@/lib/home-content";
+import "swiper/css";
 import { FreeMode } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import type { Swiper as SwiperType } from "swiper/types";
-import "swiper/css";
-import { DateRow } from "@/components/ui/MetaRow";
-import { Container } from "@/components/ui/SectionHeading";
-import { HERO, HERO_PREVIEW } from "@/lib/fact-checks-content";
-import type { Story } from "@/lib/home-content";
 
 const HERO_GRADIENT =
   "linear-gradient(100.768deg, rgba(4, 26, 109, 0.92) 40%, rgba(4, 26, 109, 0) 70%)";
@@ -49,7 +49,13 @@ function calcDotCount(s: SwiperType): number {
   return Math.max(1, s.slides.length - visible + 1);
 }
 
-export function FactChecksHero({ topic = HERO.topic }: { topic?: string }) {
+export function FactChecksHero({
+  topic = HERO.topic,
+  stories,
+}: {
+  topic?: string;
+  stories?: Story[];
+}) {
   const [swiperInstance, setSwiperInstance] = useState<SwiperType | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [dotCount, setDotCount] = useState(0);
@@ -58,6 +64,11 @@ export function FactChecksHero({ topic = HERO.topic }: { topic?: string }) {
     setSwiperInstance(s);
     setDotCount(calcDotCount(s));
   };
+
+  // No curated hero list for this desk (missing, empty, or unreachable) → show
+  // the masthead alone with a quiet note, never an empty carousel or static
+  // placeholder cards.
+  const hasStories = !!stories?.length;
 
   return (
     <section className="relative overflow-hidden bg-pesacheck-black">
@@ -83,47 +94,55 @@ export function FactChecksHero({ topic = HERO.topic }: { topic?: string }) {
         </div>
       </Container>
 
-      <div className="relative mt-12 pb-10 lg:pb-[88px]">
-        <div className={INDENT}>
-          <Swiper
-            modules={[FreeMode]}
-            slidesPerView="auto"
-            spaceBetween={20}
-            freeMode
-            grabCursor
-            className="!overflow-visible [&_.swiper-slide]:mr-5"
-            slidesOffsetAfter={20}
-            onSwiper={handleSwiper}
-            onRealIndexChange={(s: SwiperType) => setActiveIndex(s.realIndex)}
-            onResize={(s: SwiperType) => setDotCount(calcDotCount(s))}
-          >
-            {HERO_PREVIEW.map((story) => (
-              <SwiperSlide
-                key={`${story.image}-${story.date}`}
-                className="!w-auto"
-              >
-                <PreviewCard story={story} />
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        </div>
+      {hasStories ? (
+        <div className="relative mt-12 pb-10 lg:pb-[88px]">
+          <div className={INDENT}>
+            <Swiper
+              modules={[FreeMode]}
+              slidesPerView="auto"
+              spaceBetween={20}
+              freeMode
+              grabCursor
+              className="!overflow-visible [&_.swiper-slide]:mr-5"
+              slidesOffsetAfter={20}
+              onSwiper={handleSwiper}
+              onRealIndexChange={(s: SwiperType) => setActiveIndex(s.realIndex)}
+              onResize={(s: SwiperType) => setDotCount(calcDotCount(s))}
+            >
+              {stories.map((story, i) => (
+                <SwiperSlide
+                  key={story.href ?? `${story.image}-${i}`}
+                  className="!w-auto"
+                >
+                  <PreviewCard story={story} />
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </div>
 
-        <div className={`mt-4 flex items-center gap-2 ${INDENT}`}>
-          {HERO_PREVIEW.slice(0, dotCount).map((story, i) => (
-            <button
-              key={`dot-${story.image}-${story.date}`}
-              type="button"
-              aria-label={`Go to slide ${i + 1}`}
-              onClick={() => swiperInstance?.slideTo(i)}
-              className={`h-2 rounded-full transition-all duration-300 ${
-                i === activeIndex
-                  ? "w-6 bg-white"
-                  : "w-2 bg-white/40 hover:bg-white/60"
-              }`}
-            />
-          ))}
+          <div className={`mt-4 flex items-center gap-2 ${INDENT}`}>
+            {stories.slice(0, dotCount).map((story, i) => (
+              <button
+                key={`dot-${story.href ?? `${story.image}-${i}`}`}
+                type="button"
+                aria-label={`Go to slide ${i + 1}`}
+                onClick={() => swiperInstance?.slideTo(i)}
+                className={`h-2 rounded-full transition-all duration-300 ${
+                  i === activeIndex
+                    ? "w-6 bg-white"
+                    : "w-2 bg-white/40 hover:bg-white/60"
+                }`}
+              />
+            ))}
+          </div>
         </div>
-      </div>
+      ) : (
+        <Container className="relative pb-16 pt-8 lg:pb-[88px]">
+          <p className="text-base text-white/70">
+            No featured fact-checks for this desk yet.
+          </p>
+        </Container>
+      )}
     </section>
   );
 }

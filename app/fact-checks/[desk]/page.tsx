@@ -18,6 +18,7 @@ import {
   FACT_CHECKS_PAGE_SIZE,
   type FactCheckListing,
   getByDesk,
+  getDeskHero,
 } from "@/lib/data/stories";
 import { FEATURE, FEATURE_SECONDARY, STORIES } from "@/lib/fact-checks-content";
 
@@ -96,13 +97,16 @@ export default async function ContentDeskOrArticlePage({
   const sp = await searchParams;
   const page = parsePageParam(sp.page);
   const filters = parseFilterParams(sp);
-  const listing =
-    (await getByDesk(desk.slug, page, filters).catch(() => null)) ??
-    staticPage(page);
+
+  const [listingResult, heroStories] = await Promise.all([
+    getByDesk(desk.slug, page, filters).catch(() => null),
+    getDeskHero(desk.name).catch(() => null),
+  ]);
+  const listing = listingResult ?? staticPage(page);
 
   return (
     <>
-      <FactChecksHero topic={desk.name} />
+      <FactChecksHero topic={desk.name} stories={heroStories ?? undefined} />
       <FactChecksExplorer
         stories={listing.stories}
         page={listing.page}

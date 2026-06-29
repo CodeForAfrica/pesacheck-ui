@@ -78,6 +78,24 @@ export function getHeroPreview(): Promise<Story[]> {
 }
 
 /**
+ * Hero carousel stories for a single content desk — backs the desk landing
+ * page's `FactChecksHero`. Each desk is expected to have its own curated content
+ * list named `"<Desk Name> — Hero"` (e.g. `"Climate Change — Hero"`), mirroring
+ * the homepage's `"Homepage — Hero"` list.
+ *
+ * When the per-desk lists don't exist, this returns `[]` for both
+ * cases `getContentListStories` collapses together: the list is **missing**
+ * (`swp_content_list` matches nothing) and the list **exists but has no
+ * (article) items**.
+ * The component treats an empty result as "no featured fact-checks yet" and renders
+ * its empty state. A thrown network/GraphQL error is caught by the page and also
+ * yields the empty state.
+ */
+export function getDeskHero(deskName: string): Promise<Story[]> {
+  return getContentListStories(`${deskName} — Hero`);
+}
+
+/**
  * A page of published fact-checks as `Story[]`, newest first — backs the
  * `/fact-checks` grid. Queries `swp_article` directly (not a curated list) and
  * paginates server-side via `limit`/`offset` + an `_aggregate` count.

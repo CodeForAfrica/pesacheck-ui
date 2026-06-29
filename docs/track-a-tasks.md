@@ -319,6 +319,29 @@ Heavier: client-component data lifting.
 - Pre-existing duplicate-React-key warning still fires from the static
   `HERO_PREVIEW` carousel (documented since PR1) — unrelated to this PR.
 
+### PR 5 follow-up — desk hero carousel ✅
+- [x] `lib/data/stories.ts` — `getDeskHero(deskName): Story[]`, reusing the
+      `getContentListStories` machinery against a per-desk curated list named
+      `"<Desk Name> — Hero"` (e.g. `"Climate Change — Hero"`), mirroring the
+      homepage's `"Homepage — Hero"`. These lists don't exist on staging yet.
+- [x] `FactChecksHero` now accepts `stories?: Story[]` and renders the live Swiper
+      carousel (same component as the homepage hero) when populated. Slide/dot keys
+      use `story.href` (unique) instead of `image-date`, dodging the staging
+      duplicate-key warning when articles share the placeholder image.
+- [x] **Empty state (the ask):** missing list, present-but-empty list, and a
+      fetch error all collapse to "no stories" → the hero shows the masthead
+      (accent bar + desk title) plus a quiet "No featured fact-checks for this desk
+      yet." line, and **omits the carousel entirely** — no empty strip, no static
+      placeholder cards. (`getContentListStories` already maps both data cases to
+      `[]` via `list[0]?.items ?? []`; the page's `.catch` covers the error case.)
+- [x] Desk page fetches the hero alongside the listing (`Promise.all`); each
+      degrades independently.
+- [x] Verify: curl confirms `"Climate Change — Hero"` → `list: []` (missing) while
+      `"Homepage — Hero"` → 6 items (the populated path, already live on the home
+      hero). Rendered `/fact-checks/climate-change` shows the title + empty-state
+      line with **zero** `swiper-wrapper`/`swiper-slide` DOM nodes. tsc, biome, 73
+      tests clean.
+
 ## PR 6 — Marketing pages (optional) — Phase 6
 - [ ] Fetch `type:"content"` routes (About, Methodology, Principles, Contact)
 - [ ] Wire `app/about/*` pages with static fallback
