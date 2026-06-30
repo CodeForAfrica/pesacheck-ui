@@ -47,7 +47,7 @@ export function Header() {
         />
       )}
       <header className="sticky top-0 z-50 h-[90px] w-full border-b border-white/40 bg-white/80 backdrop-blur-md">
-        <div className="mx-auto flex h-full max-w-[1440px] items-center gap-4 px-5 sm:px-8 lg:px-[100px]">
+        <div className="mx-auto flex h-full max-w-[1240px] items-center gap-4 px-5 sm:px-8 lg:px-10 [@media(min-width:1320px)]:px-0">
           {/* Logo */}
           <Link
             href="/"
@@ -131,7 +131,7 @@ export function Header() {
                         : "pointer-events-none invisible opacity-0"
                     }`}
                   >
-                    <div className="mx-auto flex max-w-[1440px] gap-10 px-5 py-[30px] sm:px-8 lg:px-[100px]">
+                    <div className="mx-auto flex max-w-[1240px] gap-10 px-5 py-[30px] sm:px-8 lg:px-10 [@media(min-width:1320px)]:px-0">
                       <div className="w-[340px] shrink-0">
                         <h3 className="text-md font-bold text-neutral-800">
                           {l.label}
