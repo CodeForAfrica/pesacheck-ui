@@ -60,7 +60,7 @@ export function Header() {
               width={190}
               height={39}
               priority
-              className="h-auto w-auto grayscale"
+              className="-ml-4 h-auto w-auto grayscale"
             />
           </Link>
 

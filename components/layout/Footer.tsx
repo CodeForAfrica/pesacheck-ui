@@ -16,7 +16,7 @@ export function Footer() {
               alt="PesaCheck"
               width={190}
               height={52}
-              className="h-auto w-auto grayscale"
+              className="-ml-4 h-auto w-auto grayscale"
             />
             <span className="text-xs font-medium text-neutral-500">
               An intitative of:
