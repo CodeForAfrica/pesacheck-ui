@@ -73,6 +73,40 @@ describe("buildFactCheckWhere", () => {
     expect(serialized).not.toContain('"_in":[]');
     expect(where._and).toHaveLength(1);
   });
+
+  it("scopes to a desk route when routeSlug is given (still Debunk)", () => {
+    const where = buildFactCheckWhere(EMPTY_FILTERS, "t", "climate-change");
+    expect(where._and).toContainEqual({
+      swp_route: { slug: { _eq: "climate-change" } },
+    });
+    // Debunk clause kept; route is an additional AND clause.
+    expect(where._and).toHaveLength(2);
+  });
+
+  it("omits the route clause when routeSlug is absent", () => {
+    const where = buildFactCheckWhere(EMPTY_FILTERS, "t");
+    expect(JSON.stringify(where)).not.toContain("swp_route");
+  });
+
+  it("ANDs a desk route together with active filters", () => {
+    const where = buildFactCheckWhere(
+      sel({ topic: ["polit_harm"] }),
+      "t",
+      "elections",
+    );
+    expect(where._and).toContainEqual({
+      swp_route: { slug: { _eq: "elections" } },
+    });
+    expect(where._and).toContainEqual({
+      swp_article_metadata: {
+        swp_article_metadata_subjects: {
+          scheme: { _eq: "01harm" },
+          code: { _in: ["polit_harm"] },
+        },
+      },
+    });
+    expect(where._and).toHaveLength(3);
+  });
 });
 
 describe("parseFilterParams", () => {

@@ -2,6 +2,7 @@ import { gql, TENANT_CODE } from "@/lib/data/client";
 import {
   buildFactCheckWhere,
   EMPTY_FILTERS,
+  type FactCheckWhere,
   type FilterSelection,
 } from "@/lib/data/fact-check-filters";
 import { mapStory, type RawArticle } from "@/lib/data/map";
@@ -77,6 +78,24 @@ export function getHeroPreview(): Promise<Story[]> {
 }
 
 /**
+ * Hero carousel stories for a single content desk — backs the desk landing
+ * page's `FactChecksHero`. Each desk is expected to have its own curated content
+ * list named `"<Desk Name> — Hero"` (e.g. `"Climate Change — Hero"`), mirroring
+ * the homepage's `"Homepage — Hero"` list.
+ *
+ * When the per-desk lists don't exist, this returns `[]` for both
+ * cases `getContentListStories` collapses together: the list is **missing**
+ * (`swp_content_list` matches nothing) and the list **exists but has no
+ * (article) items**.
+ * The component treats an empty result as "no featured fact-checks yet" and renders
+ * its empty state. A thrown network/GraphQL error is caught by the page and also
+ * yields the empty state.
+ */
+export function getDeskHero(deskName: string): Promise<Story[]> {
+  return getContentListStories(`${deskName} — Hero`);
+}
+
+/**
  * A page of published fact-checks as `Story[]`, newest first — backs the
  * `/fact-checks` grid. Queries `swp_article` directly (not a curated list) and
  * paginates server-side via `limit`/`offset` + an `_aggregate` count.
@@ -96,12 +115,41 @@ export function getHeroPreview(): Promise<Story[]> {
  * empty grid that reads as "no matches". A genuinely empty result set
  * (`total === 0`) still returns no stories — the correct empty state.
  */
-export async function getFactChecks(
+export function getFactChecks(
   page = 1,
   filters: FilterSelection = EMPTY_FILTERS,
 ): Promise<FactCheckListing> {
-  const where = buildFactCheckWhere(filters, TENANT_CODE);
+  return getFactCheckListing(buildFactCheckWhere(filters, TENANT_CODE), page);
+}
 
+/**
+ * Fact-checks for a single content desk as a `FactCheckListing` — backs the desk
+ * landing pages (`/fact-checks/<slug>`). A desk is a `swp_route` collection, so
+ * this is `getFactChecks` scoped to that route via `buildFactCheckWhere`'s
+ * `routeSlug` argument: same `Debunk` definition, same server-side pagination and
+ * filtering, just narrowed to articles published on `slug`'s route.
+ */
+export function getByDesk(
+  slug: string,
+  page = 1,
+  filters: FilterSelection = EMPTY_FILTERS,
+): Promise<FactCheckListing> {
+  return getFactCheckListing(
+    buildFactCheckWhere(filters, TENANT_CODE, slug),
+    page,
+  );
+}
+
+/**
+ * Shared paged fetch behind `getFactChecks`/`getByDesk`: runs `where` for the
+ * requested page, clamps an over-range `?page=` to the last real page (so it
+ * shows the last slice rather than an empty grid that reads as "no matches"),
+ * and re-fetches only when the clamp actually moved the page.
+ */
+async function getFactCheckListing(
+  where: FactCheckWhere,
+  page: number,
+): Promise<FactCheckListing> {
   const fetchPage = (p: number) =>
     gql<FactCheckResponse>(GET_FACT_CHECK_ARTICLES, {
       where,

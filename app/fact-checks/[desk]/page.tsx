@@ -7,10 +7,37 @@ import { FactChecksHero } from "@/components/fact-checks/FactChecksHero";
 import { ARTICLES, getArticleBySlug } from "@/lib/article-content";
 import { CONTENT_DESKS, deskBySlug } from "@/lib/content-desks";
 import { getArticle } from "@/lib/data/article";
-import { EMPTY_FILTERS } from "@/lib/data/fact-check-filters";
+import { parseFilterParams } from "@/lib/data/fact-check-filters";
+import {
+  clampPage,
+  pageOffset,
+  parsePageParam,
+  totalPages,
+} from "@/lib/data/pagination";
+import {
+  FACT_CHECKS_PAGE_SIZE,
+  type FactCheckListing,
+  getByDesk,
+  getDeskHero,
+} from "@/lib/data/stories";
 import { FEATURE, FEATURE_SECONDARY, STORIES } from "@/lib/fact-checks-content";
 
 type Params = Promise<{ desk: string }>;
+type SearchParams = Promise<Record<string, string | string[] | undefined>>;
+
+/** Static design pool, paged like the live query, for the desk fallback. */
+const STATIC_POOL = [FEATURE, FEATURE_SECONDARY, ...STORIES];
+
+function staticPage(page: number): FactCheckListing {
+  const pages = totalPages(STATIC_POOL.length, FACT_CHECKS_PAGE_SIZE);
+  const current = clampPage(page, pages);
+  const start = pageOffset(current, FACT_CHECKS_PAGE_SIZE);
+  return {
+    stories: STATIC_POOL.slice(start, start + FACT_CHECKS_PAGE_SIZE),
+    page: current,
+    totalPages: pages,
+  };
+}
 
 // Prerender all known content desks + all known article slugs.
 export function generateStaticParams() {
@@ -51,8 +78,10 @@ export async function generateMetadata({
 
 export default async function ContentDeskOrArticlePage({
   params,
+  searchParams,
 }: {
   params: Params;
+  searchParams: SearchParams;
 }) {
   const { desk: slug } = await params;
 
@@ -65,14 +94,24 @@ export default async function ContentDeskOrArticlePage({
   const desk = deskBySlug(slug);
   if (!desk) notFound();
 
+  const sp = await searchParams;
+  const page = parsePageParam(sp.page);
+  const filters = parseFilterParams(sp);
+
+  const [listingResult, heroStories] = await Promise.all([
+    getByDesk(desk.slug, page, filters).catch(() => null),
+    getDeskHero(desk.name).catch(() => null),
+  ]);
+  const listing = listingResult ?? staticPage(page);
+
   return (
     <>
-      <FactChecksHero topic={desk.name} />
+      <FactChecksHero topic={desk.name} stories={heroStories ?? undefined} />
       <FactChecksExplorer
-        stories={[FEATURE, FEATURE_SECONDARY, ...STORIES]}
-        page={1}
-        totalPages={1}
-        filters={EMPTY_FILTERS}
+        stories={listing.stories}
+        page={listing.page}
+        totalPages={listing.totalPages}
+        filters={filters}
       />
       <FactChecksContentDesks activeSlug={desk.slug} />
     </>
