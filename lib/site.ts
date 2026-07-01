@@ -199,7 +199,7 @@ export const SOCIAL_ICONS: {
   {
     icon: FaWhatsapp,
     label: "WhatsApp",
-    href: "https://wa.me/254769014382",
+    href: "https://www.whatsapp.com/channel/0029Va0d3VACcW4wD5Woh01P",
   },
   { icon: FiSlack, label: "Slack", href: "https://code4africa.slack.com/" },
   {
