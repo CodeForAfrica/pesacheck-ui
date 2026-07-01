@@ -205,7 +205,7 @@ export const SOCIAL_ICONS: {
   {
     icon: FiLinkedin,
     label: "LinkedIn",
-    href: "https://www.linkedin.com/company/pesacheck",
+    href: "https://www.linkedin.com/company/code-for-africa",
   },
 ];
 
