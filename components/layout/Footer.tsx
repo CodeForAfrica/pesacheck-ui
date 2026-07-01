@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { FooterAllySection } from "@/components/layout/FooterAllySection";
 import { Container } from "@/components/ui/SectionHeading";
 import { FOOTER_ABOUT, FOOTER_NAV, LEGAL, SOCIAL_ICONS } from "@/lib/site";
@@ -16,7 +17,7 @@ export function Footer() {
               alt="PesaCheck"
               width={190}
               height={52}
-              className="h-auto w-auto grayscale"
+              className="-ml-4 h-auto w-auto grayscale"
             />
             <span className="text-xs font-medium text-neutral-500">
               An intitative of:
@@ -44,13 +45,13 @@ export function Footer() {
 
         <nav className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold text-neutral-900">
           {FOOTER_NAV.map((l) => (
-            <a
-              key={l}
-              href="#"
+            <Link
+              key={l.label}
+              href={l.href}
               className="transition-colors hover:text-pesacheck-blue"
             >
-              {l}
-            </a>
+              {l.label}
+            </Link>
           ))}
         </nav>
 
@@ -65,7 +66,13 @@ export function Footer() {
               {SOCIAL_ICONS.map((s) => {
                 const SocialIcon = s.icon;
                 return (
-                  <a key={s.label} href="#" aria-label={s.label}>
+                  <a
+                    key={s.label}
+                    href={s.href}
+                    aria-label={s.label}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <SocialIcon size={24} aria-hidden />
                   </a>
                 );
