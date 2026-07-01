@@ -38,7 +38,12 @@ export const CONTACT_SOCIALS: {
   { icon: FaLinkedinIn, color: "#0A66C2", label: "LinkedIn", href: "#" },
   { icon: FaInstagram, color: "#E1306C", label: "Instagram", href: "#" },
   { icon: FaFacebook, color: "#0866FF", label: "Facebook", href: "#" },
-  { icon: FaWhatsapp, color: "#25D366", label: "WhatsApp", href: "#" },
+  {
+    icon: FaWhatsapp,
+    color: "#25D366",
+    label: "WhatsApp",
+    href: "https://www.whatsapp.com/channel/0029Va0d3VACcW4wD5Woh01P",
+  },
   { icon: FaXTwitter, color: "#000000", label: "Twitter / X", href: "#" },
 ];
 
