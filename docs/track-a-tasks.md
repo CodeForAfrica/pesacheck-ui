@@ -273,10 +273,74 @@ Heavier: client-component data lifting.
   resolves option codes→labels when filtering the label-tagged static pool.
 - Fallback (`staticPage`) **ignores filters** by design — degraded mode only.
 
-## PR 5 — Desk pages — Phase 5 (depends on 3 for route dispatch)
-- [ ] `lib/data/stories.ts` — `getByDesk(slug): Story[]` (by route collection)
-- [ ] Wire desk branch of `app/fact-checks/[desk]/page.tsx` to live data + fallback
-- [ ] Verify each desk slug lists its articles
+## PR 5 — Desk pages — Phase 5 (depends on 3 for route dispatch) ✅
+- [x] `lib/data/stories.ts` — `getByDesk(slug, page, filters): FactCheckListing`
+      (by route collection). Rather than the bare `Story[]` the plan sketched, it
+      returns the same `FactCheckListing` as `getFactChecks` so the desk page
+      reuses the **server-side pagination + filtering** already shipped in PR2b/PR4
+      — the desk's `FactChecksExplorer` (FilterBar + Pagination) is now live, not
+      dead UI. Both functions delegate to a shared `getFactCheckListing(where, page)`
+      (extracted from the old `getFactChecks` body — clamp/re-fetch logic unchanged).
+- [x] `lib/data/fact-check-filters.ts` — `buildFactCheckWhere` gains an optional
+      `routeSlug` → adds a `swp_route: { slug: { _eq } }` clause to `_and`. A desk
+      is still a fact-check listing, so the `Debunk` clause stays; the route is one
+      more AND clause, composing with region/topic/language filters.
+- [x] Wire desk branch of `app/fact-checks/[desk]/page.tsx` to `getByDesk` with the
+      static-pool fallback. Page now reads `searchParams` (page + filters) exactly
+      like `/fact-checks/page.tsx`; the URL-driven explorer works on the desk
+      pathname for free. Article-slug precedence on the overloaded route preserved.
+- [x] `FactChecksExplorer` empty state is now filter-aware: "No fact-checks have
+      been published here yet." (no filters) vs "…match your filters. Try removing
+      some." (filters active). PR5 makes *empty-with-no-filters* a common real state
+      (every topic desk is empty on staging), so the old filters-only copy misled.
+- [x] Verify: route+`Debunk` `where` returns 5 on `english` via curl (the only
+      populated route). In-browser, `/fact-checks/climate-change` renders the
+      **live empty listing** (the new no-filter message — proves `getByDesk` ran
+      and returned 0, *not* the error fallback's static cards), correct metadata
+      title, hero, and Content Desks nav (Climate Change active). Article branch
+      (`false-equating-somalia-and-al-shabab-is-untrue`) still renders live.
+      `pnpm test` (73; 3 new for the route clause), tsc, biome clean.
+
+**Notes:**
+- **Staging sparsity (expected empty desks):** all 16 published articles sit on the
+  `english` route; every topic-desk route (`climate-change`, `gender`, `elections`,
+  `public-finances`, `scams`, `health`) has **0**. So desk pages legitimately show
+  the empty state today. The design is route-agnostic and populates the moment
+  fact-checks are published under topic desks (production / Track B) — no code
+  change needed. `migration` has no route at all (consistent with `getContentDesks`).
+- **Why `Debunk` is kept on desks (not all route articles):** desk pages render
+  `FactChecksExplorer`, i.e. they're fact-check listings scoped to a desk — same
+  definition as `/fact-checks`. The reference repo's `GET_COLLECTION_QUERY` lists
+  *all* route articles, but that's a general news frontend; here a desk = "this
+  desk's fact-checks."
+- **Empty ≠ fallback:** the `?? staticPage(page)` fallback fires only on a
+  network/GraphQL *error* (null). A successful empty result (an empty desk) is real
+  data and renders the empty state — it does **not** trip the static fallback.
+- Pre-existing duplicate-React-key warning still fires from the static
+  `HERO_PREVIEW` carousel (documented since PR1) — unrelated to this PR.
+
+### PR 5 follow-up — desk hero carousel ✅
+- [x] `lib/data/stories.ts` — `getDeskHero(deskName): Story[]`, reusing the
+      `getContentListStories` machinery against a per-desk curated list named
+      `"<Desk Name> — Hero"` (e.g. `"Climate Change — Hero"`), mirroring the
+      homepage's `"Homepage — Hero"`. These lists don't exist on staging yet.
+- [x] `FactChecksHero` now accepts `stories?: Story[]` and renders the live Swiper
+      carousel (same component as the homepage hero) when populated. Slide/dot keys
+      use `story.href` (unique) instead of `image-date`, dodging the staging
+      duplicate-key warning when articles share the placeholder image.
+- [x] **Empty state (the ask):** missing list, present-but-empty list, and a
+      fetch error all collapse to "no stories" → the hero shows the masthead
+      (accent bar + desk title) plus a quiet "No featured fact-checks for this desk
+      yet." line, and **omits the carousel entirely** — no empty strip, no static
+      placeholder cards. (`getContentListStories` already maps both data cases to
+      `[]` via `list[0]?.items ?? []`; the page's `.catch` covers the error case.)
+- [x] Desk page fetches the hero alongside the listing (`Promise.all`); each
+      degrades independently.
+- [x] Verify: curl confirms `"Climate Change — Hero"` → `list: []` (missing) while
+      `"Homepage — Hero"` → 6 items (the populated path, already live on the home
+      hero). Rendered `/fact-checks/climate-change` shows the title + empty-state
+      line with **zero** `swiper-wrapper`/`swiper-slide` DOM nodes. tsc, biome, 73
+      tests clean.
 
 ## PR 6 — Marketing pages (optional) — Phase 6
 - [ ] Fetch `type:"content"` routes (About, Methodology, Principles, Contact)

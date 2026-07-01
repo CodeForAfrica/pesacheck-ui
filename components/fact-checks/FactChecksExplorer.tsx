@@ -129,7 +129,9 @@ export function FactChecksExplorer({
         <Container>
           {stories.length === 0 ? (
             <p className="py-16 text-center text-base font-medium text-neutral-500">
-              No fact-checks match your filters. Try removing some.
+              {chips.length > 0
+                ? "No fact-checks match your filters. Try removing some."
+                : "No fact-checks have been published here yet."}
             </p>
           ) : (
             <>
