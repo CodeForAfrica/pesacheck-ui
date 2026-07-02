@@ -35,16 +35,36 @@ export const CONTACT_SOCIALS: {
   label: string;
   href: string;
 }[] = [
-  { icon: FaLinkedinIn, color: "#0A66C2", label: "LinkedIn", href: "#" },
-  { icon: FaInstagram, color: "#E1306C", label: "Instagram", href: "#" },
-  { icon: FaFacebook, color: "#0866FF", label: "Facebook", href: "#" },
+  {
+    icon: FaLinkedinIn,
+    color: "#0A66C2",
+    label: "LinkedIn",
+    href: "https://www.linkedin.com/company/code-for-africa",
+  },
+  {
+    icon: FaInstagram,
+    color: "#E1306C",
+    label: "Instagram",
+    href: "https://www.instagram.com/pesacheck",
+  },
+  {
+    icon: FaFacebook,
+    color: "#0866FF",
+    label: "Facebook",
+    href: "https://www.facebook.com/PesaCheck",
+  },
   {
     icon: FaWhatsapp,
     color: "#25D366",
     label: "WhatsApp",
     href: "https://www.whatsapp.com/channel/0029Va0d3VACcW4wD5Woh01P",
   },
-  { icon: FaXTwitter, color: "#000000", label: "Twitter / X", href: "#" },
+  {
+    icon: FaXTwitter,
+    color: "#000000",
+    label: "Twitter / X",
+    href: "https://x.com/PesaCheck",
+  },
 ];
 
 // "Send us a message" form fields. Static visual only — no submission backend.
