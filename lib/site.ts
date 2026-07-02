@@ -181,6 +181,15 @@ export const PARTNERS: Logo[] = [
   },
 ];
 
+export const SOCIAL_URLS = {
+  twitter: "https://x.com/PesaCheck",
+  facebook: "https://www.facebook.com/PesaCheck",
+  whatsapp: "https://www.whatsapp.com/channel/0029Va0d3VACcW4wD5Woh01P",
+  slack: "https://code4africa.slack.com/",
+  linkedin: "https://www.linkedin.com/company/code-for-africa",
+  instagram: "https://www.instagram.com/pesacheck",
+} as const;
+
 export const SOCIAL_ICONS: {
   icon: ElementType;
   label: string;
@@ -189,23 +198,23 @@ export const SOCIAL_ICONS: {
   {
     icon: FaXTwitter,
     label: "Twitter / X",
-    href: "https://x.com/PesaCheck",
+    href: SOCIAL_URLS.twitter,
   },
   {
     icon: FiFacebook,
     label: "Facebook",
-    href: "https://www.facebook.com/PesaCheck",
+    href: SOCIAL_URLS.facebook,
   },
   {
     icon: FaWhatsapp,
     label: "WhatsApp",
-    href: "https://www.whatsapp.com/channel/0029Va0d3VACcW4wD5Woh01P",
+    href: SOCIAL_URLS.whatsapp,
   },
-  { icon: FiSlack, label: "Slack", href: "https://code4africa.slack.com/" },
+  { icon: FiSlack, label: "Slack", href: SOCIAL_URLS.slack },
   {
     icon: FiLinkedin,
     label: "LinkedIn",
-    href: "https://www.linkedin.com/company/code-for-africa",
+    href: SOCIAL_URLS.linkedin,
   },
 ];
 
