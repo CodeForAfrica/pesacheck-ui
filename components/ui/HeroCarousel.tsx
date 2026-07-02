@@ -9,8 +9,9 @@ import "swiper/css";
 import { DateRow } from "@/components/ui/MetaRow";
 import type { Story } from "@/lib/home-content";
 
-// Mirrors Container's left padding exactly: px-5 / sm:px-8 / lg:centered with max-w-[1240px]
-const INDENT = "pl-5 sm:pl-8 lg:pl-[max(0px,calc((100vw-1240px)/2))]";
+// Mirrors Container's left padding: px-5 / sm:px-8 / lg:px-10 / ≥1320px: centered with max-w-[1240px]
+const INDENT =
+  "pl-5 sm:pl-8 lg:pl-10 [@media(min-width:1320px)]:pl-[max(0px,calc((100vw-1240px)/2))]";
 
 function PreviewCard({ story }: { story: Story }) {
   return (
