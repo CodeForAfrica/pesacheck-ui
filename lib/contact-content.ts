@@ -28,6 +28,7 @@ import {
   FaWhatsapp,
 } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
+import { SOCIAL_URLS } from "@/lib/site";
 
 export const CONTACT_SOCIALS: {
   icon: ElementType;
@@ -35,11 +36,36 @@ export const CONTACT_SOCIALS: {
   label: string;
   href: string;
 }[] = [
-  { icon: FaLinkedinIn, color: "#0A66C2", label: "LinkedIn", href: "#" },
-  { icon: FaInstagram, color: "#E1306C", label: "Instagram", href: "#" },
-  { icon: FaFacebook, color: "#0866FF", label: "Facebook", href: "#" },
-  { icon: FaWhatsapp, color: "#25D366", label: "WhatsApp", href: "#" },
-  { icon: FaXTwitter, color: "#000000", label: "Twitter / X", href: "#" },
+  {
+    icon: FaLinkedinIn,
+    color: "#0A66C2",
+    label: "LinkedIn",
+    href: SOCIAL_URLS.linkedin,
+  },
+  {
+    icon: FaInstagram,
+    color: "#E1306C",
+    label: "Instagram",
+    href: SOCIAL_URLS.instagram,
+  },
+  {
+    icon: FaFacebook,
+    color: "#0866FF",
+    label: "Facebook",
+    href: SOCIAL_URLS.facebook,
+  },
+  {
+    icon: FaWhatsapp,
+    color: "#25D366",
+    label: "WhatsApp",
+    href: SOCIAL_URLS.whatsapp,
+  },
+  {
+    icon: FaXTwitter,
+    color: "#000000",
+    label: "Twitter / X",
+    href: SOCIAL_URLS.twitter,
+  },
 ];
 
 // "Send us a message" form fields. Static visual only — no submission backend.
