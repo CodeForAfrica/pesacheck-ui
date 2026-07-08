@@ -185,6 +185,8 @@ export const SOCIAL_URLS = {
   twitter: "https://x.com/PesaCheck",
   facebook: "https://www.facebook.com/PesaCheck",
   whatsapp: "https://www.whatsapp.com/channel/0029Va0d3VACcW4wD5Woh01P",
+  whatsappContact:
+    "https://api.whatsapp.com/send/?phone=254780542626&text&type=phone_number&app_absent=0",
   slack: "https://code4africa.slack.com/",
   linkedin: "https://www.linkedin.com/company/code-for-africa",
   instagram: "https://www.instagram.com/pesacheck",
