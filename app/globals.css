@@ -52,3 +52,12 @@ body {
   color: var(--color-pesacheck-black);
   font-family: var(--font-sans);
 }
+
+/*
+ * Hide the reCAPTCHA v3 floating badge (contact form). Google allows this as
+ * long as the required "protected by reCAPTCHA" notice is shown next to the
+ * form — see ContactMessageForm's submit-button caption.
+ */
+.grecaptcha-badge {
+  visibility: hidden;
+}
