@@ -71,15 +71,19 @@ export const ABOUT_MENU_ITEMS: NavMenuItem[] = [
  */
 export const FACT_CHECKS_MENU_ITEMS: NavMenuItem[] = [
   { label: "All fact-checks", href: "/fact-checks", icon: FiGrid },
-  { label: "By Language", href: "/fact-checks/by-language", icon: LuLanguages },
+  {
+    label: "By Language",
+    href: "/fact-checks?open=language",
+    icon: LuLanguages,
+  },
   {
     label: "By Topic",
-    href: "/fact-checks/by-topic",
+    href: "/fact-checks?open=topic",
     icon: LuMessageCircleWarning,
   },
-  { label: "Quick Reads", href: "/fact-checks/quick-reads", icon: FiBookOpen },
-  { label: "Explainers", href: "/fact-checks/explainers", icon: FiPlay },
-  { label: "By Country", href: "/fact-checks/by-country", icon: FiGlobe },
+  { label: "Quick Reads", href: "/fact-checks", icon: FiBookOpen },
+  { label: "Explainers", href: "/fact-checks", icon: FiPlay },
+  { label: "By Country", href: "/fact-checks?open=region", icon: FiGlobe },
 ];
 
 export const NAV_LINKS: NavLink[] = [

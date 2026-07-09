@@ -40,11 +40,14 @@ export function FactChecksExplorer({
   page,
   totalPages,
   filters,
+  openFilter = null,
 }: {
   stories: Story[];
   page: number;
   totalPages: number;
   filters: FilterSelection;
+  /** Filter dropdown to open on arrival (`?open=<dimension>` — mega-menu links). */
+  openFilter?: FilterDimension | null;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -54,8 +57,16 @@ export function FactChecksExplorer({
   // feedback; rebases to `filters` once the navigation transition resolves.
   const [optimistic, setOptimistic] = useOptimistic(filters);
   const [openDropdown, setOpenDropdown] = useState<FilterDimension | null>(
-    null,
+    openFilter,
   );
+
+  // Re-open the requested dropdown when `?open=` changes while the page is
+  // already mounted (e.g. clicking "By Topic" in the header from /fact-checks).
+  const [prevOpenFilter, setPrevOpenFilter] = useState(openFilter);
+  if (openFilter !== prevOpenFilter) {
+    setPrevOpenFilter(openFilter);
+    if (openFilter) setOpenDropdown(openFilter);
+  }
 
   const chips = FILTERS.flatMap(({ dimension }) =>
     optimistic[dimension].map((value) => ({ dimension, value })),
