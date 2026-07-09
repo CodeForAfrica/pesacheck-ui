@@ -11,11 +11,20 @@ export const FUNDING_HERO = {
     "PesaCheck is Africa's largest indigenous fact-checking organisation, debunking misleading claims and providing accurate information for sound decision-making",
 };
 
-// A section's body is an ordered list of blocks so paragraphs and bullet lists
-// keep their source order.
+// A section's body is an ordered list of blocks so paragraphs, bullet lists and
+// inline images keep their source order. Paragraph/list text may embed
+// markdown-style links — `[label](href)` — rendered by `components/ui/RichText`.
 export type ContentBlock =
   | { type: "p"; text: string }
-  | { type: "ul"; items: string[] };
+  | { type: "ul"; items: string[] }
+  | {
+      type: "img";
+      src: string;
+      alt: string;
+      width: number;
+      height: number;
+      caption?: string;
+    };
 
 // Image layout beneath the copy. "small" boxes pair up in a 2-col grid;
 // "large" boxes span the full reading column. Mirrors the grey rectangles in
@@ -37,11 +46,11 @@ export const FUNDING_SECTIONS: FundingSection[] = [
     blocks: [
       {
         type: "p",
-        text: "PesaCheck was founded with a seed grant from CfA's innovateAFRICA fund in 2017, and continues to be incubated and co-funded through the fund.",
+        text: "PesaCheck was founded with a seed grant from CfA's [innovateAFRICA](https://innovateafrica.fund/) fund in 2017, and continues to be incubated and co-funded through the fund.",
       },
       {
         type: "p",
-        text: "PesaCheck has in the past received direct financial support from the International Budget Partnership (IBP) for activities in Kenya, Google's tech-for-good arm Jigsaw for pan-African research and to tackle gender-focused fact-checking, the Bill & Melinda Gates Foundation (BMGF) for fact-checking health issues, the (now defunct) Data Zetu initiative and Twaweza for activities in Tanzania, and the U.S.-based International Center for Journalists (ICFJ) for activities across East Africa.",
+        text: "PesaCheck has in the past received direct financial support from the [International Budget Partnership](https://www.internationalbudget.org/) (IBP) for activities in Kenya, Google's tech-for-good arm [Jigsaw](https://jigsaw.google.com/) for pan-African research and to tackle gender-focused fact-checking, the [Bill & Melinda Gates Foundation](https://www.gatesfoundation.org/) (BMGF) for fact-checking health issues, the (now defunct) [Data Zetu](https://web.archive.org/web/20190509095921/http://datazetu.dlab.or.tz/) initiative and [Twaweza](https://www.twaweza.org/) for activities in Tanzania, and the U.S.-based [International Center for Journalists](https://www.icfj.org/) (ICFJ) for activities across East Africa.",
       },
       {
         type: "p",
@@ -57,11 +66,11 @@ export const FUNDING_SECTIONS: FundingSection[] = [
     blocks: [
       {
         type: "p",
-        text: "PesaCheck does not have any institutional or remunerative relationships with governments, politicians or political parties. PesaCheck's training programmes do however receive support from state-funded international media development programmes in Germany (through the Deutsche Welle Akademie for skills development in Ethiopia, Ghana and Kenya, and the Deutsche Gesellschaft für Internationale Zusammenarbeit for skills development in Kenya) and France (through the Agence Française de Développement for training across Francophone Africa).",
+        text: "PesaCheck does not have any institutional or remunerative relationships with governments, politicians or political parties. PesaCheck's training programmes do however receive support from state-funded international media development programmes in Germany (through the [Deutsche Welle Akademie](https://www.dw.com/en/dw-akademie/about-us/s-9519) for skills development in Ethiopia, Ghana and Kenya, and the [Deutsche Gesellschaft für Internationale Zusammenarbeit](https://www.giz.de/en/html/index.html) for skills development in Kenya) and France (through the [Agence Française de Développement](https://www.afd.fr/en) for training across Francophone Africa).",
       },
       {
         type: "p",
-        text: "PesaCheck also receives support from the United Nations Educational, Scientific and Cultural Organization (UNESCO) to support the African Fact-Checking Alliance (AFCA) to seed-fund and train newsroom-based 'CheckDesks' in 270 media in 20 African countries, and from the United Nations Development Programme (UNDP) for supporting election-focused fact-checking in Kenya. These partnerships explicitly exclude any donor influence over editorial decision-making or content production, and are confined to underwriting the cost of trainers/logistics, as well as to provide fellowship stipends for trainees.",
+        text: "PesaCheck also receives support from the [United Nations Educational, Scientific and Cultural Organization](https://www.unesco.org/en) (UNESCO) to support the [African Fact-Checking Alliance](https://factcheck.africa/) (AFCA) to seed-fund and train newsroom-based 'CheckDesks' in 270 media in 20 African countries, and from the [United Nations Development Programme](https://www.undp.org/) (UNDP) for supporting election-focused fact-checking in Kenya. These partnerships explicitly exclude any donor influence over editorial decision-making or content production, and are confined to underwriting the cost of trainers/logistics, as well as to provide fellowship stipends for trainees.",
       },
       {
         type: "p",

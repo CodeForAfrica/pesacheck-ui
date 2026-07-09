@@ -12,11 +12,20 @@ export const PRINCIPLES_HERO = {
     "PesaCheck is Africa's largest indigenous fact-checking organisation, debunking misleading claims and providing accurate information for sound decision-making",
 };
 
-// A section's body is an ordered list of blocks so paragraphs and bullet lists
-// keep their source order.
+// A section's body is an ordered list of blocks so paragraphs, bullet lists and
+// inline images keep their source order. Paragraph/list text may embed
+// markdown-style links — `[label](href)` — rendered by `components/ui/RichText`.
 export type ContentBlock =
   | { type: "p"; text: string }
-  | { type: "ul"; items: string[] };
+  | { type: "ul"; items: string[] }
+  | {
+      type: "img";
+      src: string;
+      alt: string;
+      width: number;
+      height: number;
+      caption?: string;
+    };
 
 // Image layout beneath the copy. "small" boxes pair up in a 2-col grid;
 // "large" boxes span the full reading column. Mirrors the grey rectangles in
@@ -50,15 +59,15 @@ export const PRINCIPLES_SECTIONS: PrinciplesSection[] = [
       },
       {
         type: "p",
-        text: "PesaCheck goes beyond just fact-check reports. We also build data-driven tools for our media partners or the public itself to verify facts in the information they receive. PesaYetu gives users easy access to government budget and census/demographic data, in shareable infographic formats. Wajibisha (or PromiseTracker, in non-Kiswahili speaking countries) helps both watchdog organisations and ordinary citizens check what promises politicians or government has made. TaxClock helps taxpayers check what government is using their money for.",
+        text: "PesaCheck goes beyond just fact-check reports. We also build data-driven tools for our media partners or the public itself to verify facts in the information they receive. [PesaYetu](https://pesayetu.pesacheck.org/) gives users easy access to government budget and census/demographic data, in shareable infographic formats. Wajibisha (or [PromiseTracker](https://promisetracker.africa/), in non-Kiswahili speaking countries) helps both watchdog organisations and ordinary citizens check what promises politicians or government has made. [TaxClock](https://taxclock.pesacheck.org/) helps taxpayers check what government is using their money for.",
       },
       {
         type: "p",
-        text: "PesaCheck has in-country fact-checkers in Benin, Burkina Faso, Burundi, Cameroon, Central African Republic, Côte d'Ivoire, Democratic Republic of Congo, Ethiopia, Guinea, Kenya, Mali, Niger, Senegal, Tanzania and Uganda. PesaCheck also supports fact-checking partners elsewhere in Africa, including Ghana, Nigeria, South Africa, South Sudan, Togo, and Zimbabwe.",
+        text: "PesaCheck has in-country fact-checkers in Benin, Burkina Faso, Burundi, Cameroon, Central African Republic, Côte d'Ivoire, Democratic Republic of Congo, Ethiopia, Guinea, Kenya, Mali, Niger, Senegal, Tanzania and Uganda. PesaCheck also supports fact-checking partners elsewhere in Africa, including Ghana, Nigeria, South Africa, South Sudan, Togo, and Zimbabwe. We also work closely with CfA's forensic investigation team targeting disinformation, the [iLAB](https://investigate.africa/reports/), at the [African Network of Centres for Investigative Reporting](https://investigate.africa/) (ANCIR), which empowers investigative newsrooms across the continent. And, we regularly collaborate with the Atlantic Council's Digital Forensic Research Lab ([DFRLab](https://medium.com/dfrlab)) initiative's Africa team, which is incubated by CfA.",
       },
       {
         type: "p",
-        text: "All our operations are guided by principles laid out by the International Fact-Checking Network.",
+        text: "All our operations are guided by principles laid out by the [International Fact-Checking Network](https://www.poynter.org/ifcn/).",
       },
     ],
     learnMore: false,
@@ -98,7 +107,7 @@ export const PRINCIPLES_SECTIONS: PrinciplesSection[] = [
       },
       {
         type: "p",
-        text: "As such, PesaCheck's work is evidence-driven with all our research and fact-checking based on source documents or other evidence (such as data, or budgets, or multimedia recordings). We cite all the evidence we use in every fact-check, linking to the public version of the material where possible. Where there is no public version, PesaCheck uploads source documents to CfA's sourceAFRICA platform for our audience to read, annotate and share. We also upload any data we use to CfA's openAFRICA platform for our audience to review, test and re-use as they wish. And, we back-up copies of videos or audio files, and webpages to Archive.org to ensure there is an abiding public record, even if the original source disappears.",
+        text: "As such, PesaCheck's work is evidence-driven with all our research and fact-checking based on source documents or other evidence (such as data, or budgets, or multimedia recordings). We cite all the evidence we use in every fact-check, linking to the public version of the material where possible. Where there is no public version, PesaCheck uploads source documents to CfA's [sourceAFRICA](https://sourceafrica.net/) platform for our audience to read, annotate and share. We also upload any data we use to CfA's [openAFRICA](https://africaopendata.org/) platform for our audience to review, test and re-use as they wish. And, we back-up copies of videos or audio files, and webpages to [Archive.org](https://archive.org/) to ensure there is an abiding public record, even if the original source disappears.",
       },
       {
         type: "p",
@@ -122,15 +131,15 @@ export const PRINCIPLES_SECTIONS: PrinciplesSection[] = [
     blocks: [
       {
         type: "p",
-        text: "PesaCheck is an initiative of Code for Africa (CfA), which is the continent's largest open data/civic technology initiative with 103 full-time staff (as at June 2022) in 21 African countries.",
+        text: "PesaCheck is an initiative of [Code for Africa](https://codeforafrica.org/) (CfA), which is the continent's largest open data/civic technology initiative with 103 full-time staff (as at June 2022) in 21 African countries.",
       },
       {
         type: "p",
-        text: "CfA is registered as a public benefit and tax-exempt non-profit organisation in South Africa (registration number: 168–092 NPO), as well as an NGO in Kenya (where it is registered as the Civic Media Foundation, with registration number CPR/2016/220101) and Nigeria (registered as the Civic Foundation Nigeria Ltd/Gte RC 1503312).",
+        text: "CfA is registered as a public benefit and tax-exempt non-profit organisation in South Africa (registration number: [168–092 NPO](http://www.npo.gov.za/PublicNpo/Npo/DetailsPublicDocs/33619918)), as well as an NGO in Kenya (where it is registered as the Civic Media Foundation, with registration number CPR/2016/220101) and Nigeria (registered as the Civic Foundation Nigeria Ltd/Gte RC 1503312).",
       },
       {
         type: "p",
-        text: "All CfA staff, including PesaCheck's team of 30 full-time editors/fact-checkers, are governed by the organisation's Charter, which explicitly states that CfA is non-partisan and non-aligned, and that CfA does not support or oppose any political party or candidate or cause.",
+        text: "All CfA staff, including PesaCheck's team of 30 full-time editors/fact-checkers, are governed by the organisation's [Charter](https://medium.com/code-for-africa/about-us-567c3fde3ad3), which explicitly states that CfA is non-partisan and non-aligned, and that CfA does not support or oppose any political party or candidate or cause.",
       },
       {
         type: "p",
@@ -154,11 +163,11 @@ export const PRINCIPLES_SECTIONS: PrinciplesSection[] = [
       },
       {
         type: "p",
-        text: "To help combat the spread of misinformation at source, PesaCheck has partnered with Facebook since 2018, and with WhatsApp since 2020. As a third party fact-checker with Meta's Journalism Program, PesaCheck looks into questionable claims published on the platform that touch on matters of public interest, and rates them (as false, partly false, altered, missing context and satire) using a set of transparent processes for arriving at a determination.",
+        text: "To help combat the spread of misinformation at source, PesaCheck has partnered with [Facebook since 2018](https://pesacheck.org/pesacheck-and-facebook-partner-to-fight-misinformation-in-kenya-d6a45ee70c18), and with WhatsApp since 2020. As a third party fact-checker with [Meta's Journalism Program](https://www.facebook.com/journalismproject/programs/third-party-fact-checking), PesaCheck looks into questionable claims published on the platform that touch on matters of public interest, and rates them (as false, partly false, altered, missing context and satire) using a set of transparent processes for arriving at a determination.",
       },
       {
         type: "p",
-        text: "PesaCheck shares its findings with Facebook, which then decides to take action, if any, on the original posts that sparked our fact-checking.",
+        text: "PesaCheck shares its findings with Facebook, which then decides to take action, if any, on the original posts that sparked our fact-checking. [Learn more about fact-checking on Facebook](https://web.facebook.com/business/help/1964098996981326?id=211528469955719).",
       },
     ],
     learnMore: false,
@@ -170,7 +179,7 @@ export const PRINCIPLES_SECTIONS: PrinciplesSection[] = [
     blocks: [
       {
         type: "p",
-        text: "PesaCheck has a number of ways for the public to lodge complaints about its fact-checks, or to ask our researchers to fact-check a dubious claim by a public figure. But, who watches the watchdog? PesaCheck is a verified signatory of the International Fact-Checking Network's (IFCN) Code of Principles.",
+        text: "PesaCheck has a number of ways for the public to lodge complaints about its fact-checks, or to ask our researchers to fact-check a dubious claim by a public figure. But, who watches the watchdog? PesaCheck is a verified signatory of the International Fact-Checking Network's (IFCN) [Code of Principles](https://www.ifcncodeofprinciples.poynter.org/).",
       },
       {
         type: "p",
@@ -191,7 +200,7 @@ export const PRINCIPLES_SECTIONS: PrinciplesSection[] = [
       },
       {
         type: "p",
-        text: "To ensure that the code has teeth, and that PesaCheck is accountable, IFCN offers an independent complaint mechanism for anyone who believes that fact-checkers are violating their commitment to the principles.",
+        text: "To ensure that the code has teeth, and that PesaCheck is accountable, IFCN offers an independent [complaint mechanism](https://www.ifcncodeofprinciples.poynter.org/complaints-policy) for anyone who believes that fact-checkers are violating their commitment to the principles.",
       },
     ],
     learnMore: false,

@@ -10,11 +10,20 @@ export const METHODOLOGY_HERO = {
     "PesaCheck is Africa's largest indigenous fact-checking organisation, debunking misleading claims and providing accurate information for sound decision-making",
 };
 
-// A section's body is an ordered list of blocks so paragraphs and bullet lists
-// keep their source order.
+// A section's body is an ordered list of blocks so paragraphs, bullet lists and
+// inline images keep their source order. Paragraph/list text may embed
+// markdown-style links — `[label](href)` — rendered by `components/ui/RichText`.
 export type ContentBlock =
   | { type: "p"; text: string }
-  | { type: "ul"; items: string[] };
+  | { type: "ul"; items: string[] }
+  | {
+      type: "img";
+      src: string;
+      alt: string;
+      width: number;
+      height: number;
+      caption?: string;
+    };
 
 // Image layout beneath the copy. "small" boxes pair up in a 2-col grid;
 // "large" boxes span the full reading column. Mirrors the grey rectangles in
@@ -44,11 +53,18 @@ export const METHODOLOGY_SECTIONS: MethodologySection[] = [
       },
       {
         type: "p",
-        text: "PesaCheck is an initiative of Code for Africa (CfA), which is the continent's largest network of civic technology and digital democracy labs in 26 countries. PesaCheck forms part of CfA's portfolio of information integrity projects that includes a series of seed grants to the continent's first dedicated fact-checking organisation, Africa Check starting in 2012, and the African Network of Centres for Investigative Reporting's (ANCIR) iLAB for forensic data-driven network analysis of the influence operations behind disinformation.",
+        text: "PesaCheck is an initiative of Code for Africa (CfA), which is the continent's largest network of civic technology and digital democracy labs in 26 countries. PesaCheck forms part of CfA's portfolio of information integrity projects that includes a series of seed grants to the continent's first dedicated fact-checking organisation, [Africa Check](https://africacheck.org/) starting in 2012, and the [African Network of Centres for Investigative Reporting](https://investigate.africa/)'s (ANCIR) iLAB for forensic data-driven network analysis of the influence operations behind disinformation. CfA has also made extended grants and technical support to [africanDRONE](https://africandrone.org/) and [African Defence Review](https://www.africandefence.net/) (ADR) for the use of satellite and drone imagery for fact-checking in conflict zones, and to a series of fact-checking start-ups everywhere from Cameroon and Kenya, to Somalia and South Sudan.",
       },
       {
         type: "p",
-        text: "CfA is also the custodian of the African Fact-Checking Alliance (AFCA), founded in 2021, with 349 partner newsrooms in 27 African countries, which trains journalists in fact-checking and helps media collaborate on joint projects to debunk harmful mis/disinformation campaigns across the continent.",
+        text: "In addition to the grants and technical support to individual fact-checking teams, CfA is the custodian of the [African Fact-Checking Alliance](https://factcheck.africa/) (AFCA), founded in 2021, with 349 partner newsrooms in 27 African countries, which trains journalists in fact-checking and helps media collaborate on joint projects to debunk harmful mis/disinformation campaigns across the continent. AFCA often works closely with another CfA initiative: the [African Digital Democracy Observatory](https://disinfo.africa/) (ADDO), which networks academic researchers and policy think tanks that tackle information disorder issues, ranging from malign state-affiliated influence campaigns to disinformation conspiracist networks.",
+      },
+      {
+        type: "img",
+        src: "/images/methodology/afca.png",
+        alt: "African Fact-Checking Alliance",
+        width: 1400,
+        height: 560,
       },
       {
         type: "p",
@@ -75,8 +91,23 @@ export const METHODOLOGY_SECTIONS: MethodologySection[] = [
         text: "PesaCheck is structured as a journalistic newsroom, with a clear step-by-step workflow system that uses editorial checklists and production guidelines to create a transparent process for identifying eligible claims for our teams to fact-check, and a standardised methodology for researching and reporting our findings.",
       },
       {
+        type: "img",
+        src: "/images/methodology/fact-checking-process.jpeg",
+        alt: "PesaCheck's five-step fact-checking process: identify claim, find data, authenticate data, verify claim, publish findings",
+        width: 1400,
+        height: 728,
+      },
+      {
         type: "p",
         text: "The process ensures that each fact-check is reviewed and validated by multiple editors, to prevent personal bias/agendas. The structure (and accompanying role descriptions) also clearly outline the roles, responsibilities and mandate for each team member.",
+      },
+      {
+        type: "img",
+        src: "/images/methodology/editorial-workflow.jpeg",
+        alt: "PesaCheck's editorial workflow diagram",
+        width: 1400,
+        height: 263,
+        caption: "A snapshot of PesaCheck's editorial workflow process",
       },
       {
         type: "p",
@@ -89,6 +120,14 @@ export const METHODOLOGY_SECTIONS: MethodologySection[] = [
       {
         type: "p",
         text: "The PesaCheck newsdesk receives additional support from CfA's wider data journalism and infographic design teams, as well as its digital engagement (social media and multimedia) team. PesaCheck works closely with CfA's Academy to help mentor and train other newsrooms or civic watchdogs.",
+      },
+      {
+        type: "img",
+        src: "/images/methodology/newsroom-roles.png",
+        alt: "Organisation chart of PesaCheck's newsroom roles",
+        width: 1400,
+        height: 744,
+        caption: "An overview of the roles in PesaCheck's newsroom",
       },
     ],
     learnMore: false,
@@ -107,6 +146,13 @@ export const METHODOLOGY_SECTIONS: MethodologySection[] = [
         text: "Our fact-checkers are always locally based, in the 13 countries we report from, in Burkina Faso, Burundi, Cameroon, Central African Republic, Côte d'Ivoire, Ethiopia, Guinea, Kenya, Mali, Niger, Senegal, Tanzania and Uganda. The managing editor and chief copy editor are based in Kenya, while the special projects editor and other Francophone support staff are based in Senegal.",
       },
       {
+        type: "img",
+        src: "/images/methodology/coverage-map.jpeg",
+        alt: "Map of Africa showing PesaCheck CopyDesk hubs, countries with PesaCheck staff or offices, and countries with CfA staff or labs",
+        width: 833,
+        height: 687,
+      },
+      {
         type: "p",
         text: "The fact-checkers regularly collaborate on regional verification projects, tackling cross-cutting thematic issues such as climate denialism and the COVID-19 health emergency, or assisting each other as part of 'rapid response teams' during civil wars/conflicts/coups in countries such as the Central African Republic, Ethiopia and Mali, as well as during the run-up/polling to fiercely contested elections.",
       },
@@ -116,7 +162,11 @@ export const METHODOLOGY_SECTIONS: MethodologySection[] = [
       },
       {
         type: "p",
-        text: "PesaCheck's fact-checkers focus on verifying the accuracy and meaning of the actual content in mis-/disinformation claims. The iLAB at ANCIR uses data science and forensic investigation to probe the 'hidden hand' networks and digital techniques used to make misleading content go viral. PesaCheck often collaborates with the iLAB and another CfA partner, the Digital Forensic Labs' (DFRLab) Africa team, to expose large-scale coordinated inauthentic behaviour (CiB) and influence operations.",
+        text: "PesaCheck's fact-checkers focus on verifying the accuracy and meaning of the actual content in mis-/disinformation claims. The [iLAB](https://investigate.africa/ilab-reports/) at ANCIR uses data science and forensic investigation to probe the 'hidden hand' networks and digital techniques used to make misleading content go viral. PesaCheck often collaborates with the iLAB and another CfA partner, the [Digital Forensic Labs](https://medium.com/dfrlab)' (DFRLab) Africa team, to expose large-scale coordinated inauthentic behaviour (CiB) and influence operations.",
+      },
+      {
+        type: "p",
+        text: "More information on the core PesaCheck team can be found [on our About page](/about).",
       },
     ],
     learnMore: false,
@@ -132,7 +182,7 @@ export const METHODOLOGY_SECTIONS: MethodologySection[] = [
       },
       {
         type: "p",
-        text: "We use a number of 'social listening' and content analysis tools, as well as specialist tools shared by the social media platforms themselves, to understand what misleading content is going viral or is having measurable harmful impacts. We also collect requests from the public on claims that need checking using our dedicated WhatsApp tip-line and online form.",
+        text: "We use a number of 'social listening' and content analysis tools, such as [Crowdtangle](https://www.crowdtangle.com/), [Meltwater](https://www.meltwater.com/en) and [Primer.ai](https://primer.ai/), as well as specialist tools shared by the social media platforms themselves, to understand what misleading content is going viral or is having measurable harmful impacts. We also collect requests from the public on claims that need checking using our dedicated [WhatsApp](https://wa.me/254780542626) tip-line and [this online form](https://docs.google.com/forms/d/e/1FAIpQLSeI9xshwBWxwDuLwT4jhR9hdRLUNkwdjo0sqEqV9N5r5lCQYQ/viewform).",
       },
       {
         type: "p",
@@ -140,7 +190,7 @@ export const METHODOLOGY_SECTIONS: MethodologySection[] = [
       },
       {
         type: "p",
-        text: "As a requirement for all our fact-checks, we include multiple sources of information and references. This helps to underline the veracity of our arguments. In addition, the sources are referenced accurately. To do this, we use sourceAFRICA, a repository of actionable documents. Through sourceAFRICA, the PesaCheck team can:",
+        text: "As a requirement for all our fact-checks, we include multiple sources of information and references. This helps to underline the veracity of our arguments. In addition, the sources are referenced accurately. To do this, we use [sourceAFRICA](https://sourceafrica.net/), a repository of actionable documents. Through sourceAFRICA, the PesaCheck team can:",
       },
       {
         type: "ul",
@@ -151,7 +201,11 @@ export const METHODOLOGY_SECTIONS: MethodologySection[] = [
       },
       {
         type: "p",
-        text: "Every source document that is referenced in a story is saved on sourceAFRICA in order to preserve a copy and link directly to the information being referenced.",
+        text: "Every source document that is referenced in a story is saved on [sourceAFRICA](https://sourceafrica.net/) in order to preserve a copy and link directly to the information being referenced.",
+      },
+      {
+        type: "p",
+        text: "All sources and facts to be checked will be recorded on [Check](http://checkmedia.org/), where fact-check requests crowdsourced from the public and from social media will be managed and updated as they progress.",
       },
       {
         type: "p",
@@ -180,11 +234,11 @@ export const METHODOLOGY_SECTIONS: MethodologySection[] = [
       {
         type: "ul",
         items: [
-          "Amounts that can be checked and verified",
-          "Statements that are causing the most buzz",
-          "Statements that have gone viral on social media or are being repeated often by public officials",
-          "Statements that can be proved or are well supported by facts — is the statement a prediction, or subjective?",
-          "Numbers that may have been manipulated to support a partisan message",
+          "Amounts that can be checked and verified. Example: [Cabinet Secretary Phyllis Kandie promises Ksh18bn for orphans, disabled kids](https://pesacheck.org/cabinet-secretary-phyllis-kandie-promises-sh18bn-for-orphans-disabled-kids-7b953b5f4550)",
+          "Statements that are causing the most buzz. Example: [Who really controls Ward Development Funds?](https://pesacheck.org/governors-or-elected-county-assembly-members-who-really-controls-the-money-8238fad5ca4c)",
+          "Statements that have gone viral on social media or are being repeated often by public officials. Example: [Will Kenya Olympic champs get Sh1bn bonus](https://pesacheck.org/will-kenyas-olympic-champs-get-a-ksh1-billion-bonus-216c42809da7)",
+          "Statements that can be proved or are well supported by facts — is the statement a prediction, or subjective? Example: [Is Kenya increasing funding to the health sector?](https://pesacheck.org/is-kenya-increasing-investment-in-health-sector-2fd1155929f0)",
+          "Numbers that may have been manipulated to support a partisan message. Examples: [Uhuru's maternity care numbers exaggerated](https://pesacheck.org/uhurus-maternity-care-promises-exaggerated-2c238a3dfd9b); [Has Kiambu collected Ksh4.7bn in revenue?](https://pesacheck.org/has-kiambu-county-doubled-its-revenue-to-ksh4-7-billion-a9e16bb140f4)",
         ],
       },
       {
@@ -194,9 +248,9 @@ export const METHODOLOGY_SECTIONS: MethodologySection[] = [
       {
         type: "ul",
         items: [
-          "Emailing the newsdesk at hello@pesacheck.org",
-          "Emailing the managing editor at doreen@pesacheck.org",
-          "Contacting us on PesaCheck's WhatsApp tipline at +254 780 542626",
+          "Emailing the newsdesk at [hello@pesacheck.org](mailto:hello@pesacheck.org)",
+          "Emailing the managing editor at [doreen@pesacheck.org](mailto:doreen@pesacheck.org)",
+          "Contacting us on PesaCheck's [WhatsApp tipline](https://wa.me/254780542626) at +254 780 542626",
         ],
       },
       {
@@ -233,7 +287,7 @@ export const METHODOLOGY_SECTIONS: MethodologySection[] = [
           "Is the statement being checked included verbatim?",
           "Is there an explainer for why this statement was selected for checking?",
           "Has the category of deception been identified?",
-          "Have all the sources for the fact-check been identified? Any source documents used in the fact-check that are not already online need to be annotated and uploaded to sourceAFRICA, including any additional useful data identified in the process of fact-checking.",
+          "Have all the sources for the fact-check been identified? Any source documents used in the fact-check that are not already online need to be annotated and uploaded to [sourceAFRICA](https://sourceafrica.net/), including any additional useful data identified in the process of fact-checking.",
           "Has the reason for labelling the statement False, Hoax, etc been indicated?",
           "Is the label (False, Hoax, etc) mentioned briefly at the top of the story, and in more detail at the end of the story?",
           "Have any links to the sources and the statement being checked been included in the body of the article?",
@@ -249,7 +303,7 @@ export const METHODOLOGY_SECTIONS: MethodologySection[] = [
     blocks: [
       {
         type: "p",
-        text: "We use the following final editing checklist based in part on the PolitiFact checklist:",
+        text: "We use the following final editing checklist based in part on the [PolitiFact checklist](https://www.factcheck.org/our-process/):",
       },
       {
         type: "ul",
@@ -275,8 +329,8 @@ export const METHODOLOGY_SECTIONS: MethodologySection[] = [
         type: "ul",
         items: [
           "We don't post anything that we cannot stand by.",
-          "All posts follow a consistent structure — a question statement (what), a source (who) and a link to the story (where to find more).",
-          "Each fact check needs a standard hashtag, for example #PesaCheck.",
+          "All posts follow a consistent structure — a question statement (what), a source (who) and a link to the story (where to find more). Example: FACT CHECK: Did [@Kandie_Phyllis](https://twitter.com/Kandie_Phyllis) misspeak about pledging Sh18bn for disabled kids? [@PesaCheck](https://twitter.com/PesaCheck) finds out.",
+          "Each fact check needs a standard hashtag, for example [#PesaCheck](https://twitter.com/hashtag/PesaCheck).",
           "All reactions and comments are looked into, especially when they lead to potential follow-up stories that may arise out of the fact check.",
         ],
       },
@@ -314,7 +368,7 @@ export const METHODOLOGY_SECTIONS: MethodologySection[] = [
       },
       {
         type: "p",
-        text: "The correction policy was sourced in part from Buzzfeed and The Washington Post.",
+        text: "The correction policy was sourced in part from [Buzzfeed](https://www.buzzfeed.com/emmyf/buzzfeed-style-guide) and [The Washington Post](https://www.washingtonpost.com/news/ask-the-post/wp/2017/01/01/policies-and-standards/).",
       },
     ],
     learnMore: false,
@@ -362,7 +416,7 @@ export const METHODOLOGY_SECTIONS: MethodologySection[] = [
       },
       {
         type: "p",
-        text: "For further clarification, contact us at hello@pesacheck.org.",
+        text: "For further clarification, contact us at [hello@pesacheck.org](mailto:hello@pesacheck.org). You can also [find our contact information here](/about/contact-us).",
       },
     ],
     learnMore: false,
