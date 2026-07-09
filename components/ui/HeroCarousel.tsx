@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { Autoplay, FreeMode } from "swiper/modules";
+import { FreeMode } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import type { Swiper as SwiperType } from "swiper/types";
 import "swiper/css";
@@ -70,16 +70,11 @@ export function HeroCarousel({ stories }: { stories: Story[] }) {
     <div className="relative mt-12 pb-10 lg:pb-[88px]">
       <div className={INDENT}>
         <Swiper
-          modules={[FreeMode, Autoplay]}
+          modules={[FreeMode]}
           slidesPerView="auto"
           spaceBetween={20}
           freeMode
           grabCursor
-          autoplay={{
-            delay: 4000,
-            disableOnInteraction: false,
-            pauseOnMouseEnter: true,
-          }}
           className="!overflow-visible [&_.swiper-slide]:mr-5"
           slidesOffsetAfter={20}
           onSwiper={handleSwiper}
