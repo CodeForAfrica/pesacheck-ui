@@ -24,7 +24,7 @@ export function AlliesSection() {
                 height: "40px",
                 width: `${Math.round((logo.width / logo.height) * 40)}px`,
               }}
-              className="shrink-0 object-contain grayscale transition hover:grayscale-0"
+              className="shrink-0 cursor-pointer object-contain grayscale transition hover:grayscale-0"
             />
           ))}
         </div>
