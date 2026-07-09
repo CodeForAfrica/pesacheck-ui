@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { FiMessageCircle } from "react-icons/fi";
+import { NewsletterForm } from "@/components/home/NewsletterForm";
 import { Container } from "@/components/ui/SectionHeading";
 import {
   WHATSAPP_BANNER,
@@ -38,8 +38,7 @@ function ColumnGraphic({ graphic }: { graphic: WhatsappColumn["graphic"] }) {
         className="size-[120px] rounded-md object-contain"
       />
     );
-  if (graphic === "message")
-    return <FiMessageCircle size={120} className="size-[120px]" aria-hidden />;
+  if (graphic === "message") return <NewsletterForm />;
 }
 
 export function WhatsappBanner() {
