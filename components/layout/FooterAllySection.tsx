@@ -26,7 +26,7 @@ function LogoStrip({ logos }: { logos: Logo[] }) {
               height: "48px",
               width: `${Math.round((logo.width / logo.height) * 48)}px`,
             }}
-            className="object-contain grayscale"
+            className="object-contain grayscale transition hover:grayscale-0"
           />
         </a>
       ))}

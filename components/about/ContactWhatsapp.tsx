@@ -1,17 +1,27 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Container } from "@/components/ui/SectionHeading";
 import { CONTACT_WHATSAPP } from "@/lib/contact-content";
+import { SOCIAL_URLS } from "@/lib/site";
 
 function ColumnGraphic({ graphic }: { graphic: "whatsapp" | "qr" }) {
   if (graphic === "whatsapp")
     return (
-      <Image
-        src="/images/whatsapp-icon.svg"
-        alt="WhatsApp"
-        width={120}
-        height={120}
-        className="size-[120px]"
-      />
+      <Link
+        href={SOCIAL_URLS.whatsappContact}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Chat with PesaCheck on WhatsApp"
+        className="transition-opacity hover:opacity-80"
+      >
+        <Image
+          src="/images/whatsapp-icon.svg"
+          alt="WhatsApp"
+          width={120}
+          height={120}
+          className="size-[120px]"
+        />
+      </Link>
     );
   return (
     <Image

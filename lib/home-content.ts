@@ -164,8 +164,8 @@ export const WHATSAPP_COLUMNS: WhatsappColumn[] = [
   },
   {
     graphic: "message",
-    title: "Subscribe to our weekly newsletter",
-    body: "Send us photos, videos or text with the details and we’ll investigate",
+    title: "Subscribe to receive updates from us!",
+    body: "Be the first to know; subscribe to receive updates from PesaCheck",
   },
 ];
 
