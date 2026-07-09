@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import { PARTNERS_DESCRIPTION, PARTNERS_LOGOS } from "@/lib/partners-content";
 
@@ -14,7 +15,7 @@ export function OurPartnersSection() {
         </div>
         <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-6">
           {PARTNERS_LOGOS.map((logo) => (
-            <a
+            <Link
               key={logo.alt}
               href={logo.href}
               target="_blank"
@@ -32,7 +33,7 @@ export function OurPartnersSection() {
                 }}
                 className="object-contain grayscale transition hover:grayscale-0"
               />
-            </a>
+            </Link>
           ))}
         </div>
       </Container>

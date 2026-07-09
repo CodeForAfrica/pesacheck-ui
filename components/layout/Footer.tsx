@@ -22,7 +22,7 @@ export function Footer() {
             <span className="text-xs font-medium text-neutral-500">
               An intitative of:
             </span>
-            <a
+            <Link
               href="https://codeforafrica.org/"
               target="_blank"
               rel="noopener noreferrer"
@@ -34,7 +34,7 @@ export function Footer() {
                 height={32}
                 className="h-8 w-auto"
               />
-            </a>
+            </Link>
           </div>
           <Image
             src="/images/footer/ifcn.png"
@@ -88,20 +88,13 @@ export function Footer() {
           <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm font-semibold text-neutral-900">
             {LEGAL.map((item) => {
               if (!item.href) return <span key={item.label}>{item.label}</span>;
-              return item.href.startsWith("http") ? (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="transition-colors hover:text-pesacheck-blue"
-                >
-                  {item.label}
-                </a>
-              ) : (
+              const external = item.href.startsWith("http");
+              return (
                 <Link
                   key={item.label}
                   href={item.href}
+                  target={external ? "_blank" : undefined}
+                  rel={external ? "noopener noreferrer" : undefined}
                   className="transition-colors hover:text-pesacheck-blue"
                 >
                   {item.label}

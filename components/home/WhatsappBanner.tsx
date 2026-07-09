@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { FiMessageCircle } from "react-icons/fi";
 import { Container } from "@/components/ui/SectionHeading";
 import {
@@ -6,17 +7,26 @@ import {
   WHATSAPP_COLUMNS,
   type WhatsappColumn,
 } from "@/lib/home-content";
+import { SOCIAL_URLS } from "@/lib/site";
 
 function ColumnGraphic({ graphic }: { graphic: WhatsappColumn["graphic"] }) {
   if (graphic === "whatsapp")
     return (
-      <Image
-        src="/images/whatsapp-icon.svg"
-        alt="WhatsApp"
-        width={120}
-        height={120}
-        className="size-[120px]"
-      />
+      <Link
+        href={SOCIAL_URLS.whatsappContact}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Chat with PesaCheck on WhatsApp"
+        className="transition-opacity hover:opacity-80"
+      >
+        <Image
+          src="/images/whatsapp-icon.svg"
+          alt="WhatsApp"
+          width={120}
+          height={120}
+          className="size-[120px]"
+        />
+      </Link>
     );
   if (graphic === "qr")
     return (
