@@ -269,36 +269,34 @@ export type Tool = {
   image: string;
 };
 
-const TOOL_BODY =
-  "Learn more about Pesayetu Gorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero et velit interdum, ac aliquet odio mattis.";
-
 // Row-major order: top-left, top-right, bottom-left, bottom-right.
+// Copy from https://github.com/CodeForAfrica/pesacheck-ui/issues/48.
 export const TOOLS: Tool[] = [
   {
-    name: "Pesayetu",
-    tagline: "Explore | Visualise | Contextualise.",
-    body: TOOL_BODY,
+    name: "PesaYetu",
+    tagline: "Explore. Visualise. Contextualise.",
+    body: "Explore government budgets, public spending and demographic data through interactive visualisations that make complex public information easier to understand and share.",
     cta: "Visit website",
     image: "/images/tools/pesayetu.png",
   },
   {
     name: "Promise Tracker",
-    tagline: "Do policies follow promises? Find out",
-    body: TOOL_BODY,
+    tagline: "Track promises. Measure progress. Demand accountability.",
+    body: "Monitor political and government commitments, follow implementation progress, and see whether elected leaders are delivering on the promises they've made.",
     cta: "Visit website",
     image: "/images/tools/promise-tracker.png",
   },
   {
     name: "Tax Clock",
-    tagline: "How much of your time is your own? Find out",
-    body: TOOL_BODY,
+    tagline: "See where your tax time goes.",
+    body: "Estimate how much of your working time goes towards paying taxes and better understand how public revenue supports government services.",
     cta: "Visit website",
     image: "/images/tools/tax-clock.png",
   },
   {
     name: "Biscuit Index",
-    tagline: "The biscuit index. Find out more",
-    body: TOOL_BODY,
+    tagline: "Track the cost of everyday living.",
+    body: "Follow changes in the price of everyday essentials through simple, easy-to-understand indicators that help put inflation and the cost of living into context.",
     cta: "Visit website",
     image: "/images/tools/biscuit-index.png",
   },
