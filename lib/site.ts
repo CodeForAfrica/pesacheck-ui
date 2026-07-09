@@ -184,7 +184,9 @@ export const PARTNERS: Logo[] = [
 export const SOCIAL_URLS = {
   twitter: "https://x.com/PesaCheck",
   facebook: "https://www.facebook.com/PesaCheck",
+  // Broadcast channel to follow (used by the social icon lists).
   whatsapp: "https://www.whatsapp.com/channel/0029Va0d3VACcW4wD5Woh01P",
+  // Direct 1:1 chat with the PesaCheck line (the "direct line to the facts" CTA).
   whatsappContact:
     "https://api.whatsapp.com/send/?phone=254780542626&text&type=phone_number&app_absent=0",
   slack: "https://code4africa.slack.com/",
