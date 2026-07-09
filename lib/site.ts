@@ -127,7 +127,11 @@ export const FOOTER_NAV: { label: string; href: string }[] = [
   { label: "Contact Us", href: "/about/contact-us" },
 ];
 
-export const LEGAL = ["Copyright 2026 PesaCheck", "Imprint", "Privacy policy"];
+export const LEGAL: { label: string; href?: string }[] = [
+  { label: "Copyright 2026 PesaCheck" },
+  { label: "Imprint", href: "/about/contact-us#imprint" },
+  { label: "Privacy policy", href: "https://trustlab.africa/privacy-policy" },
+];
 
 export type Logo = {
   src: string;

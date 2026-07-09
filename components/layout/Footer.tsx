@@ -86,9 +86,28 @@ export function Footer() {
             </div>
           </div>
           <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm font-semibold text-neutral-900">
-            {LEGAL.map((l) => (
-              <span key={l}>{l}</span>
-            ))}
+            {LEGAL.map((item) => {
+              if (!item.href) return <span key={item.label}>{item.label}</span>;
+              return item.href.startsWith("http") ? (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition-colors hover:text-pesacheck-blue"
+                >
+                  {item.label}
+                </a>
+              ) : (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className="transition-colors hover:text-pesacheck-blue"
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
           </div>
         </div>
       </Container>
