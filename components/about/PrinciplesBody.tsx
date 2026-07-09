@@ -72,7 +72,7 @@ function Section({ section }: { section: PrinciplesSection }) {
           </button>
         )}
 
-        <SectionImages images={section.images} />
+        {section.images.length > 0 && <SectionImages images={section.images} />}
       </div>
     </section>
   );

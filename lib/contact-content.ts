@@ -142,8 +142,8 @@ export const CONTACT_LOCATIONS: LocationCard[] = [
   {
     country: "Benin",
     city: "Cotonou",
-    email: "hello@pesacheck.org",
-    phone: "+254 769 014382",
+    name: "Josaphat Finogbé",
+    email: "josaphat@pesacheck.org",
   },
   {
     country: "Burkina Faso",
@@ -170,15 +170,13 @@ export const CONTACT_LOCATIONS: LocationCard[] = [
   },
   {
     country: "Cote d’Ivoire",
-    city: "Cotonou",
     name: "Mardochée Boli",
     email: "mardochee@pesacheck.org",
   },
   {
     country: "Democratic Republic of Congo (DRC)",
-    city: "Goma",
-    name: "Gustave Katsura",
-    email: "gustave.katsuva@pesacheck.org",
+    name: "Doreen Wainainah",
+    email: "doreen@pesacheck.org",
   },
   {
     country: "Ethiopia",
@@ -201,17 +199,17 @@ export const CONTACT_LOCATIONS: LocationCard[] = [
   { country: "Niger", name: "Simon Muli", email: "simon@pesacheck.org" },
   {
     country: "Nigeria",
-    city: "Addis Ababa",
     name: "Doreen Wainainah",
     email: "doreen@pesacheck.org",
   },
   {
     country: "Senegal",
-    name: "Josaphat Finogbé",
-    email: "josaphat@pesacheck.org",
+    name: "Eve Sokeng",
+    email: "eve@pesacheck.org",
   },
   {
     country: "Somalia",
+    city: "Mogadishu",
     name: "Hassan Istiila",
     email: "hassan.osman@pesacheck.org",
   },
@@ -221,20 +219,20 @@ export const CONTACT_LOCATIONS: LocationCard[] = [
     name: "Christiaan van der Merwe",
     email: "christiaan@pesacheck.org",
   },
+  { country: "Tanzania", name: "Simon Muli", email: "simon@pesacheck.org" },
   {
     country: "Uganda",
     city: "Kampala",
     name: "Pius Enywaru",
     email: "pius@pesacheck.org",
   },
-  { country: "Tanzania", name: "Simon Muli", email: "simon@pesacheck.org" },
 ];
 
 // WhatsApp call-out section.
 export const CONTACT_WHATSAPP = {
   heading: "We are on whatsapp!",
   phone: "+254 780 542626",
-  body: "We are on whatsapp Gorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero et velit interdum, ac aliquet odio mattis.",
+  body: "Send us claims that need checking on our dedicated WhatsApp tip-line, or follow our channel for the latest fact-checks from the PesaCheck team.",
   columns: [
     {
       graphic: "whatsapp" as const,
