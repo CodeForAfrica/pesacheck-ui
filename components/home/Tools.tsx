@@ -7,7 +7,9 @@ import { ABOUT_BLURB } from "@/lib/site";
 function ToolCard({ tool }: { tool: Tool }) {
   return (
     <a
-      href="#"
+      href={tool.href}
+      target="_blank"
+      rel="noopener noreferrer"
       className="group relative flex aspect-[610/474] w-full overflow-hidden rounded-lg"
     >
       <Image

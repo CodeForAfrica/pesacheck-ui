@@ -10,18 +10,25 @@ function LogoStrip({ logos }: { logos: Logo[] }) {
   return (
     <div className="flex flex-wrap items-center gap-x-8 gap-y-8">
       {logos.map((logo) => (
-        <Image
+        <a
           key={logo.src}
-          src={logo.src}
-          alt={logo.alt}
-          width={logo.width}
-          height={logo.height}
-          style={{
-            height: "48px",
-            width: `${Math.round((logo.width / logo.height) * 48)}px`,
-          }}
-          className="shrink-0 object-contain grayscale"
-        />
+          href={logo.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="shrink-0"
+        >
+          <Image
+            src={logo.src}
+            alt={logo.alt}
+            width={logo.width}
+            height={logo.height}
+            style={{
+              height: "48px",
+              width: `${Math.round((logo.width / logo.height) * 48)}px`,
+            }}
+            className="object-contain grayscale"
+          />
+        </a>
       ))}
     </div>
   );

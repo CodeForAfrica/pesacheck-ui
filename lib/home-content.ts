@@ -267,6 +267,8 @@ export type Tool = {
   body: string;
   cta: string;
   image: string;
+  /** The product's own website — the whole card links out to it. */
+  href: string;
 };
 
 const TOOL_BODY =
@@ -280,6 +282,7 @@ export const TOOLS: Tool[] = [
     body: TOOL_BODY,
     cta: "Visit website",
     image: "/images/tools/pesayetu.png",
+    href: "https://pesayetu.pesacheck.org/",
   },
   {
     name: "Promise Tracker",
@@ -287,6 +290,7 @@ export const TOOLS: Tool[] = [
     body: TOOL_BODY,
     cta: "Visit website",
     image: "/images/tools/promise-tracker.png",
+    href: "https://promisetracker.africa/",
   },
   {
     name: "Tax Clock",
@@ -294,6 +298,7 @@ export const TOOLS: Tool[] = [
     body: TOOL_BODY,
     cta: "Visit website",
     image: "/images/tools/tax-clock.png",
+    href: "https://taxclock.pesacheck.org/",
   },
   {
     name: "Biscuit Index",
@@ -301,5 +306,6 @@ export const TOOLS: Tool[] = [
     body: TOOL_BODY,
     cta: "Visit website",
     image: "/images/tools/biscuit-index.png",
+    href: "https://biscuitindex.codeforkenya.org/",
   },
 ];

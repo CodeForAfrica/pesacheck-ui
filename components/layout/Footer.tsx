@@ -22,13 +22,19 @@ export function Footer() {
             <span className="text-xs font-medium text-neutral-500">
               An intitative of:
             </span>
-            <Image
-              src="/images/footer/cfa-logo-bw.svg"
-              alt="Code for Africa"
-              width={73}
-              height={32}
-              className="h-8 w-auto"
-            />
+            <a
+              href="https://codeforafrica.org/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Image
+                src="/images/footer/cfa-logo-bw.svg"
+                alt="Code for Africa"
+                width={73}
+                height={32}
+                className="h-8 w-auto"
+              />
+            </a>
           </div>
           <Image
             src="/images/footer/ifcn.png"

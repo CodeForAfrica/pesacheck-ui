@@ -14,18 +14,25 @@ export function OurPartnersSection() {
         </div>
         <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-6">
           {PARTNERS_LOGOS.map((logo) => (
-            <Image
+            <a
               key={logo.alt}
-              src={logo.src}
-              alt={logo.alt}
-              width={logo.width}
-              height={logo.height}
-              style={{
-                height: "40px",
-                width: `${Math.round((logo.width / logo.height) * 40)}px`,
-              }}
-              className="shrink-0 object-contain grayscale transition hover:grayscale-0"
-            />
+              href={logo.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0"
+            >
+              <Image
+                src={logo.src}
+                alt={logo.alt}
+                width={logo.width}
+                height={logo.height}
+                style={{
+                  height: "40px",
+                  width: `${Math.round((logo.width / logo.height) * 40)}px`,
+                }}
+                className="object-contain grayscale transition hover:grayscale-0"
+              />
+            </a>
           ))}
         </div>
       </Container>
