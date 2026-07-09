@@ -5,6 +5,7 @@ import {
   type FilterSelection,
   filtersToQuery,
   parseFilterParams,
+  parseOpenParam,
 } from "@/lib/data/fact-check-filters";
 
 const sel = (over: Partial<FilterSelection> = {}): FilterSelection => ({
@@ -124,6 +125,24 @@ describe("parseFilterParams", () => {
     expect(
       parseFilterParams({ region: ["KEN, NGA"], language: undefined }),
     ).toEqual({ region: ["KEN", "NGA"], language: [], topic: [] });
+  });
+});
+
+describe("parseOpenParam", () => {
+  it("accepts each known dimension", () => {
+    expect(parseOpenParam("region")).toBe("region");
+    expect(parseOpenParam("language")).toBe("language");
+    expect(parseOpenParam("topic")).toBe("topic");
+  });
+
+  it("takes the first value of an array-valued param", () => {
+    expect(parseOpenParam(["topic", "region"])).toBe("topic");
+  });
+
+  it("rejects unknown values and missing params", () => {
+    expect(parseOpenParam("verdict")).toBeNull();
+    expect(parseOpenParam("")).toBeNull();
+    expect(parseOpenParam(undefined)).toBeNull();
   });
 });
 

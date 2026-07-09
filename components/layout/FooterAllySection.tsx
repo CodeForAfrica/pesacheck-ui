@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FiArrowUpRight } from "react-icons/fi";
 import { Container } from "@/components/ui/SectionHeading";
@@ -10,18 +11,25 @@ function LogoStrip({ logos }: { logos: Logo[] }) {
   return (
     <div className="flex flex-wrap items-center gap-x-8 gap-y-8">
       {logos.map((logo) => (
-        <Image
+        <Link
           key={logo.src}
-          src={logo.src}
-          alt={logo.alt}
-          width={logo.width}
-          height={logo.height}
-          style={{
-            height: "48px",
-            width: `${Math.round((logo.width / logo.height) * 48)}px`,
-          }}
-          className="shrink-0 cursor-pointer object-contain grayscale transition hover:grayscale-0"
-        />
+          href={logo.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="shrink-0"
+        >
+          <Image
+            src={logo.src}
+            alt={logo.alt}
+            width={logo.width}
+            height={logo.height}
+            style={{
+              height: "48px",
+              width: `${Math.round((logo.width / logo.height) * 48)}px`,
+            }}
+            className="object-contain grayscale transition hover:grayscale-0"
+          />
+        </Link>
       ))}
     </div>
   );
