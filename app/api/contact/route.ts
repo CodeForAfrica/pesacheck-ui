@@ -12,6 +12,7 @@ import { NextResponse } from "next/server";
  * - AIRTABLE_BASE_ID     required — target base id (app…)
  * - AIRTABLE_TABLE_NAME  optional — table name (default "Contact Us")
  * - RECAPTCHA_SECRET_KEY optional — enables server-side captcha checks
+ * - RECAPTCHA_SCORE_THRESHOLD optional — reject score below this (default 0.7)
  */
 
 const AIRTABLE_TOKEN = process.env.AIRTABLE_API_TOKEN;
@@ -20,7 +21,14 @@ const AIRTABLE_TABLE_NAME = process.env.AIRTABLE_TABLE_NAME ?? "Contact Us";
 const RECAPTCHA_SECRET = process.env.RECAPTCHA_SECRET_KEY;
 
 // reCAPTCHA v3 returns a 0.0–1.0 score; below this we treat the request as a bot.
-const SCORE_THRESHOLD = 0.7;
+// Configurable via env (RECAPTCHA_SCORE_THRESHOLD), defaulting to 0.7.
+const rawScoreThreshold = process.env.RECAPTCHA_SCORE_THRESHOLD;
+const parsedScoreThreshold = rawScoreThreshold
+  ? Number(rawScoreThreshold)
+  : NaN;
+const SCORE_THRESHOLD = Number.isFinite(parsedScoreThreshold)
+  ? parsedScoreThreshold
+  : 0.7;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 type ContactPayload = {
