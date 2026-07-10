@@ -71,15 +71,19 @@ export const ABOUT_MENU_ITEMS: NavMenuItem[] = [
  */
 export const FACT_CHECKS_MENU_ITEMS: NavMenuItem[] = [
   { label: "All fact-checks", href: "/fact-checks", icon: FiGrid },
-  { label: "By Language", href: "/fact-checks/by-language", icon: LuLanguages },
+  {
+    label: "By Language",
+    href: "/fact-checks?open=language",
+    icon: LuLanguages,
+  },
   {
     label: "By Topic",
-    href: "/fact-checks/by-topic",
+    href: "/fact-checks?open=topic",
     icon: LuMessageCircleWarning,
   },
-  { label: "Quick Reads", href: "/fact-checks/quick-reads", icon: FiBookOpen },
-  { label: "Explainers", href: "/fact-checks/explainers", icon: FiPlay },
-  { label: "By Country", href: "/fact-checks/by-country", icon: FiGlobe },
+  { label: "Quick Reads", href: "/fact-checks", icon: FiBookOpen },
+  { label: "Explainers", href: "/fact-checks", icon: FiPlay },
+  { label: "By Country", href: "/fact-checks?open=region", icon: FiGlobe },
 ];
 
 export const NAV_LINKS: NavLink[] = [
@@ -123,9 +127,20 @@ export const FOOTER_NAV: { label: string; href: string }[] = [
   { label: "Contact Us", href: "/about/contact-us" },
 ];
 
-export const LEGAL = ["Copyright 2026 PesaCheck", "Imprint", "Privacy policy"];
+export const LEGAL: { label: string; href?: string }[] = [
+  { label: "Copyright 2026 PesaCheck" },
+  { label: "Imprint", href: "/about/contact-us#imprint" },
+  { label: "Privacy policy", href: "https://trustlab.africa/privacy-policy" },
+];
 
-export type Logo = { src: string; alt: string; width: number; height: number };
+export type Logo = {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+  /** The ally/partner's own website — every rendered logo links out to it. */
+  href: string;
+};
 
 export const ALLIES: Logo[] = [
   {
@@ -133,24 +148,28 @@ export const ALLIES: Logo[] = [
     alt: "Civic Signal",
     width: 1024,
     height: 337,
+    href: "https://civicsignal.africa/",
   },
   {
     src: "/images/partners/ally-takwimu.png",
     alt: "Takwimu",
     width: 292,
     height: 48,
+    href: "https://takwimu.africa/",
   },
   {
     src: "/images/partners/ally-academy-africa.svg",
     alt: "Academy Africa",
     width: 88,
     height: 40,
+    href: "https://academy.africa/",
   },
   {
     src: "/images/partners/ally-ancir-ilab.png",
     alt: "ANCIR iLAB",
     width: 305,
     height: 86,
+    href: "https://investigativecenters.org/",
   },
 ];
 
@@ -160,24 +179,28 @@ export const PARTNERS: Logo[] = [
     alt: "Meta",
     width: 522,
     height: 196,
+    href: "https://meta.com/",
   },
   {
     src: "/images/partners/partner-un.png",
     alt: "United Nations",
     width: 1970,
     height: 610,
+    href: "https://un.org/",
   },
   {
     src: "/images/partners/partner-tiktok.png",
     alt: "TikTok",
     width: 298,
     height: 102,
+    href: "https://tiktok.com/",
   },
   {
     src: "/images/partners/partner-dw.png",
     alt: "Deutsche Welle",
     width: 1200,
     height: 323,
+    href: "https://dw.com/",
   },
 ];
 
