@@ -5,7 +5,7 @@
  */
 
 export const METHODOLOGY_HERO = {
-  title: "Methodology",
+  title: "How PesaCheck Works",
   subtitle:
     "PesaCheck is Africa's largest indigenous fact-checking organisation, debunking misleading claims and providing accurate information for sound decision-making",
 };
@@ -44,8 +44,15 @@ export const METHODOLOGY_SECTIONS: MethodologySection[] = [
     title: "Who We Are",
     blocks: [
       {
+        type: "img",
+        src: "/images/methodology/methodology.webp",
+        alt: "How PesaCheck works",
+        width: 1400,
+        height: 788,
+      },
+      {
         type: "p",
-        text: "PesaCheck was East Africa's first fact-checking initiative when it was co-founded by Justin Arenstein and Catherine Gicheru as part of their joint ICFJ Knight Fellowships in 2016 (covering Kenya, Tanzania and Uganda), and was the continent's first to focus on public finances and government statistics that are often used to confuse or mislead the public. The initiative grew quickly, both geographically and to cover additional topics. It is today Africa's largest indigenous fact-checking organisation with full-time researchers in 18 African countries, spanning the Sahel and Horn of Africa, as well as the Congo Basin region.",
+        text: "**PesaCheck** was East Africa's first fact-checking initiative when it was co-founded by Justin Arenstein and Catherine Gicheru as part of their joint ICFJ Knight Fellowships in 2016 (covering Kenya, Tanzania and Uganda), and was the continent's first to focus on public finances and government statistics that are often used to confuse or mislead the public. The initiative grew quickly, both geographically and to cover additional topics. It is today Africa's largest indigenous fact-checking organisation with full-time researchers in 18 African countries, spanning the Sahel and Horn of Africa, as well as the Congo Basin region.",
       },
       {
         type: "p",
@@ -53,11 +60,11 @@ export const METHODOLOGY_SECTIONS: MethodologySection[] = [
       },
       {
         type: "p",
-        text: "PesaCheck is an initiative of Code for Africa (CfA), which is the continent's largest network of civic technology and digital democracy labs in 26 countries. PesaCheck forms part of CfA's portfolio of information integrity projects that includes a series of seed grants to the continent's first dedicated fact-checking organisation, [Africa Check](https://africacheck.org/) starting in 2012, and the [African Network of Centres for Investigative Reporting](https://investigate.africa/)'s (ANCIR) iLAB for forensic data-driven network analysis of the influence operations behind disinformation. CfA has also made extended grants and technical support to [africanDRONE](https://africandrone.org/) and [African Defence Review](https://www.africandefence.net/) (ADR) for the use of satellite and drone imagery for fact-checking in conflict zones, and to a series of fact-checking start-ups everywhere from Cameroon and Kenya, to Somalia and South Sudan.",
+        text: "**PesaCheck** is an initiative of **Code for Africa** (CfA), which is the continent's largest network of civic technology and digital democracy labs in 26 countries. PesaCheck forms part of CfA's portfolio of information integrity projects that includes a series of seed grants to the continent's first dedicated fact-checking organisation, **[Africa Check](https://africacheck.org/)** starting in 2012, and the **[African Network of Centres for Investigative Reporting](https://investigate.africa/)**'s (ANCIR) iLAB for forensic data-driven network analysis of the influence operations behind disinformation. CfA has also made extended grants and technical support to **[africanDRONE](https://africandrone.org/)** and **[African Defence Review](https://www.africandefence.net/)** (ADR) for the use of satellite and drone imagery for fact-checking in conflict zones, and to a series of fact-checking start-ups everywhere from Cameroon and Kenya, to Somalia and South Sudan.",
       },
       {
         type: "p",
-        text: "In addition to the grants and technical support to individual fact-checking teams, CfA is the custodian of the [African Fact-Checking Alliance](https://factcheck.africa/) (AFCA), founded in 2021, with 349 partner newsrooms in 27 African countries, which trains journalists in fact-checking and helps media collaborate on joint projects to debunk harmful mis/disinformation campaigns across the continent. AFCA often works closely with another CfA initiative: the [African Digital Democracy Observatory](https://disinfo.africa/) (ADDO), which networks academic researchers and policy think tanks that tackle information disorder issues, ranging from malign state-affiliated influence campaigns to disinformation conspiracist networks.",
+        text: "In addition to the grants and technical support to individual fact-checking teams, CfA is the custodian of the **[African Fact-Checking Alliance](https://factcheck.africa/)** (AFCA), founded in 2021, with 349 partner newsrooms in 27 African countries, which trains journalists in fact-checking and helps media collaborate on joint projects to debunk harmful mis/disinformation campaigns across the continent. AFCA often works closely with another CfA initiative: the **[African Digital Democracy Observatory](https://disinfo.africa/)** (ADDO), which networks academic researchers and policy think tanks that tackle information disorder issues, ranging from malign state-affiliated influence campaigns to disinformation conspiracist networks.",
       },
       {
         type: "img",
@@ -111,7 +118,7 @@ export const METHODOLOGY_SECTIONS: MethodologySection[] = [
       },
       {
         type: "p",
-        text: "PesaCheck is headed by a publisher, who is also CfA's chief operating officer. The publisher drives organisational strategy and partnerships. PesaCheck's editorial strategy and direction is set by PesaCheck's editor-in-chief, who is also CfA's chief executive officer. PesaCheck's newsroom is led by its managing editor, who is the senior editorial decision-maker and is responsible for shaping day-to-day editorial priorities and signing off all fact-checks before publication. The managing editor is assisted by three deputy editors: a news editor who manages the NewsDesk and in-country researchers/fact-checkers across the continent; a chief copy editor who manages the multilingual CopyDesk that uses a three-step process to check all fact-checks for factual accuracy and grammatical correctness; and a special projects editor who oversees PesaCheck's digital innovations including our DebunkBot, PromiseTracker, PesaYetu and TaxClock toolkits.",
+        text: "PesaCheck is headed by a **publisher**, who is also CfA's chief operating officer. The publisher drives organisational strategy and partnerships. PesaCheck's editorial strategy and direction is set by PesaCheck's **editor-in-chief**, who is also CfA's chief executive officer. PesaCheck's newsroom is led by its **managing editor**, who is the senior editorial decision-maker and is responsible for shaping day-to-day editorial priorities and signing off all fact-checks before publication. The managing editor is assisted by three deputy editors: a **news editor** who manages the NewsDesk and in-country researchers/fact-checkers across the continent; a **chief copy editor** who manages the multilingual CopyDesk that uses a three-step process to check all fact-checks for factual accuracy and grammatical correctness; and a **special projects editor** who oversees PesaCheck's digital innovations including our DebunkBot, PromiseTracker, PesaYetu and TaxClock toolkits.",
       },
       {
         type: "p",
@@ -162,7 +169,7 @@ export const METHODOLOGY_SECTIONS: MethodologySection[] = [
       },
       {
         type: "p",
-        text: "PesaCheck's fact-checkers focus on verifying the accuracy and meaning of the actual content in mis-/disinformation claims. The [iLAB](https://investigate.africa/ilab-reports/) at ANCIR uses data science and forensic investigation to probe the 'hidden hand' networks and digital techniques used to make misleading content go viral. PesaCheck often collaborates with the iLAB and another CfA partner, the [Digital Forensic Labs](https://medium.com/dfrlab)' (DFRLab) Africa team, to expose large-scale coordinated inauthentic behaviour (CiB) and influence operations.",
+        text: "PesaCheck's fact-checkers focus on verifying the accuracy and meaning of the actual content in mis-/disinformation claims. The **[iLAB](https://investigate.africa/ilab-reports/)** at ANCIR uses data science and forensic investigation to probe the 'hidden hand' networks and digital techniques used to make misleading content go viral. PesaCheck often collaborates with the iLAB and another CfA partner, the **[Digital Forensic Labs](https://medium.com/dfrlab)**' (DFRLab) Africa team, to expose large-scale coordinated inauthentic behaviour (CiB) and influence operations.",
       },
       {
         type: "p",
@@ -178,7 +185,7 @@ export const METHODOLOGY_SECTIONS: MethodologySection[] = [
     blocks: [
       {
         type: "p",
-        text: "There is a lot of mis-/disinformation and other misleading content out there. This includes claims by public figures and pundits at public events and in the mainstream media (in print media, or on TV and radio, and on their online outlets), as well as on government or political party websites, on social media (including on chat platforms such as WhatsApp) or blogging and multimedia sites such as YouTube.",
+        text: "There is a **lot** of mis-/disinformation and other misleading content out there. This includes claims by public figures and pundits at public events and in the mainstream media (in print media, or on TV and radio, and on their online outlets), as well as on government or political party websites, on social media (including on chat platforms such as WhatsApp) or blogging and multimedia sites such as YouTube.",
       },
       {
         type: "p",
@@ -195,8 +202,8 @@ export const METHODOLOGY_SECTIONS: MethodologySection[] = [
       {
         type: "ul",
         items: [
-          "Archive the source documents for future reference",
-          "Annotate the specific page where the information is sourced from, giving readers an opportunity to review the document in its entirety",
+          "**Archive** the source documents for future reference",
+          "**Annotate** the specific page where the information is sourced from, giving readers an opportunity to review the document in its entirety",
         ],
       },
       {
@@ -272,14 +279,14 @@ export const METHODOLOGY_SECTIONS: MethodologySection[] = [
       {
         type: "ul",
         items: [
-          "Golden Rule 1: Only one fact per fact-check. We limit each fact check to one statement only, or a set of statements that are clearly related.",
-          "Golden Rule 2: Check every fact check. We do our best to corroborate the fact/verification. For example, rather than using a newspaper story about the budget, we use the budget document to fact check a statement.",
-          "Golden Rule 3: Draw a conclusion based on the facts. After all the research, corroboration and interviews, we assign a label to the fact check: False, Satire, Partly False, False Headline, Missing Context, Hoax, Not Eligible or Inconclusive.",
+          "**Golden Rule 1: Only one fact per fact-check.** We limit each fact check to one statement only, or a set of statements that are clearly related.",
+          "**Golden Rule 2: Check every fact check.** We do our best to corroborate the fact/verification. For example, rather than using a newspaper story about the budget, we use the budget document to fact check a statement.",
+          "**Golden Rule 3: Draw a conclusion based on the facts.** After all the research, corroboration and interviews, we assign a label to the fact check: **False, Satire, Partly False, False Headline, Missing Context, Hoax, Not Eligible** or **Inconclusive**.",
         ],
       },
       {
         type: "p",
-        text: "We use this checklist to write and prepare our fact-checks:",
+        text: "We use this **checklist** to write and prepare our fact-checks:",
       },
       {
         type: "ul",
@@ -348,7 +355,7 @@ export const METHODOLOGY_SECTIONS: MethodologySection[] = [
       },
       {
         type: "p",
-        text: "When we run a correction, clarification or editor's note, our goal is to tell readers, as clearly and quickly as possible, what was wrong and what is correct. Anyone should be able to understand how and why a mistake has been corrected. It is necessary to use a correction, clarification or editor's note to inform readers whenever we correct a significant mistake. Updates are used to reflect important new information or clarifications; corrections are for mistakes.",
+        text: "When we run a correction, clarification or editor's note, our goal is to tell readers, as clearly and quickly as possible, what was wrong and what is correct. Anyone should be able to understand how and why a mistake has been corrected. It is necessary to use a correction, clarification or editor's note to inform readers whenever we correct a **significant** mistake. Updates are used to reflect important new information or clarifications; corrections are for mistakes.",
       },
       {
         type: "p",
@@ -368,7 +375,7 @@ export const METHODOLOGY_SECTIONS: MethodologySection[] = [
       },
       {
         type: "p",
-        text: "The correction policy was sourced in part from [Buzzfeed](https://www.buzzfeed.com/emmyf/buzzfeed-style-guide) and [The Washington Post](https://www.washingtonpost.com/news/ask-the-post/wp/2017/01/01/policies-and-standards/).",
+        text: "The correction policy was sourced in part from **[Buzzfeed](https://www.buzzfeed.com/emmyf/buzzfeed-style-guide)** and **[The Washington Post](https://www.washingtonpost.com/news/ask-the-post/wp/2017/01/01/policies-and-standards/)**.",
       },
     ],
     learnMore: false,
