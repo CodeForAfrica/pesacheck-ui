@@ -3,6 +3,7 @@
  * live Ghost site (https://pesacheck.org/our-methodology/) per issue #45.
  * Site-wide content (nav, footer, allies/partners) lives in `lib/site.ts`.
  */
+import type { ContentBlock } from "@/lib/content-blocks";
 
 export const METHODOLOGY_HERO = {
   title: "How PesaCheck Works",
@@ -10,20 +11,7 @@ export const METHODOLOGY_HERO = {
     "PesaCheck is Africa's largest indigenous fact-checking organisation, debunking misleading claims and providing accurate information for sound decision-making",
 };
 
-// A section's body is an ordered list of blocks so paragraphs, bullet lists and
-// inline images keep their source order. Paragraph/list text may embed
-// markdown-style links — `[label](href)` — rendered by `components/ui/RichText`.
-export type ContentBlock =
-  | { type: "p"; text: string }
-  | { type: "ul"; items: string[] }
-  | {
-      type: "img";
-      src: string;
-      alt: string;
-      width: number;
-      height: number;
-      caption?: string;
-    };
+export type { ContentBlock } from "@/lib/content-blocks";
 
 // Image layout beneath the copy. "small" boxes pair up in a 2-col grid;
 // "large" boxes span the full reading column. Mirrors the grey rectangles in

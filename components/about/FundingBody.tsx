@@ -1,7 +1,6 @@
-import Image from "next/image";
 import { FiArrowUpRight } from "react-icons/fi";
 import { FundingSectionNav } from "@/components/about/FundingSectionNav";
-import { RichText } from "@/components/ui/RichText";
+import { ContentBlocks } from "@/components/ui/ContentBlocks";
 import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import {
   FUNDING_SECTIONS,
@@ -51,37 +50,7 @@ function Section({ section }: { section: FundingSection }) {
 
       <div className="mt-8 max-w-[610px]">
         <div className="flex flex-col gap-5 text-sm font-medium leading-5 text-neutral-900">
-          {section.blocks.map((block) =>
-            block.type === "p" ? (
-              <p key={block.text}>
-                <RichText text={block.text} />
-              </p>
-            ) : block.type === "ul" ? (
-              <ul key={block.items[0]} className="list-disc pl-5">
-                {block.items.map((item) => (
-                  <li key={item}>
-                    <RichText text={item} />
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <figure key={block.src}>
-                <Image
-                  src={block.src}
-                  alt={block.alt}
-                  width={block.width}
-                  height={block.height}
-                  sizes="(max-width: 1024px) 100vw, 610px"
-                  className="w-full rounded-lg"
-                />
-                {block.caption && (
-                  <figcaption className="mt-2 text-xs font-medium text-neutral-500">
-                    {block.caption}
-                  </figcaption>
-                )}
-              </figure>
-            ),
-          )}
+          <ContentBlocks blocks={section.blocks} />
         </div>
 
         {section.learnMore && (
