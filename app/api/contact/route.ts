@@ -2,15 +2,21 @@ import { NextResponse } from "next/server";
 
 /**
  * Contact form endpoint (issue #41). Validates the "Send us a message" payload,
- * verifies reCAPTCHA v3 (when configured), and forwards the message to a Slack
- * channel via an Incoming Webhook.
+ * verifies reCAPTCHA v3 (when configured), and stores the submission as a row
+ * in an Airtable base so PesaCheck has a trackable log of requests (status,
+ * contact details, follow-up). Slack pings, if wanted, are configured natively
+ * in Airtable rather than in code.
  *
  * Config (see .env.example):
- * - SLACK_CONTACT_WEBHOOK_URL   required — where submissions are posted
- * - RECAPTCHA_SECRET_KEY        optional — enables server-side captcha checks
+ * - AIRTABLE_API_TOKEN   required — Airtable Personal Access Token
+ * - AIRTABLE_BASE_ID     required — target base id (app…)
+ * - AIRTABLE_TABLE_NAME  optional — table name (default "Contact Us")
+ * - RECAPTCHA_SECRET_KEY optional — enables server-side captcha checks
  */
 
-const SLACK_WEBHOOK = process.env.SLACK_CONTACT_WEBHOOK_URL;
+const AIRTABLE_TOKEN = process.env.AIRTABLE_API_TOKEN;
+const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
+const AIRTABLE_TABLE_NAME = process.env.AIRTABLE_TABLE_NAME ?? "Contact Us";
 const RECAPTCHA_SECRET = process.env.RECAPTCHA_SECRET_KEY;
 
 // reCAPTCHA v3 returns a 0.0–1.0 score; below this we treat the request as a bot.
@@ -42,34 +48,6 @@ async function verifyRecaptcha(token: string): Promise<boolean> {
   if (!res.ok) return false;
   const data = (await res.json()) as { success?: boolean; score?: number };
   return Boolean(data.success) && (data.score ?? 0) >= SCORE_THRESHOLD;
-}
-
-function slackMessage(p: Omit<ContactPayload, "recaptchaToken">) {
-  return {
-    text: `New contact message from ${p.fullName}`,
-    blocks: [
-      {
-        type: "header",
-        text: {
-          type: "plain_text",
-          text: "📥 New contact message",
-          emoji: true,
-        },
-      },
-      {
-        type: "section",
-        fields: [
-          { type: "mrkdwn", text: `*Name:*\n${p.fullName}` },
-          { type: "mrkdwn", text: `*Email:*\n<mailto:${p.email}|${p.email}>` },
-          { type: "mrkdwn", text: `*Subject:*\n${p.subject}` },
-        ],
-      },
-      {
-        type: "section",
-        text: { type: "mrkdwn", text: `*Message:*\n${p.description}` },
-      },
-    ],
-  };
 }
 
 export async function POST(req: Request) {
@@ -117,8 +95,8 @@ export async function POST(req: Request) {
     }
   }
 
-  if (!SLACK_WEBHOOK) {
-    console.error("SLACK_CONTACT_WEBHOOK_URL is not configured.");
+  if (!AIRTABLE_TOKEN || !AIRTABLE_BASE_ID) {
+    console.error("AIRTABLE_API_TOKEN / AIRTABLE_BASE_ID is not configured.");
     return NextResponse.json(
       {
         error: "Messaging is not configured. Please email hello@pesacheck.org.",
@@ -127,25 +105,45 @@ export async function POST(req: Request) {
     );
   }
 
-  let slackRes: Response;
+  const endpoint = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(
+    AIRTABLE_TABLE_NAME,
+  )}`;
+
+  let res: Response;
   try {
-    slackRes = await fetch(SLACK_WEBHOOK, {
+    res = await fetch(endpoint, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(
-        slackMessage({ fullName, email, subject, description }),
-      ),
+      headers: {
+        Authorization: `Bearer ${AIRTABLE_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      // typecast lets Airtable create the "New" single-select option if absent.
+      body: JSON.stringify({
+        typecast: true,
+        records: [
+          {
+            fields: {
+              Name: fullName,
+              Email: email,
+              Subject: subject,
+              Message: description,
+              Status: "New",
+            },
+          },
+        ],
+      }),
     });
   } catch (err) {
-    console.error("Slack webhook request failed:", err);
+    console.error("Airtable request failed:", err);
     return NextResponse.json(
       { error: "Failed to send message. Please try again." },
       { status: 502 },
     );
   }
 
-  if (!slackRes.ok) {
-    console.error("Slack webhook returned", slackRes.status);
+  if (!res.ok) {
+    const detail = await res.text().catch(() => "");
+    console.error("Airtable returned", res.status, detail);
     return NextResponse.json(
       { error: "Failed to send message. Please try again." },
       { status: 502 },
