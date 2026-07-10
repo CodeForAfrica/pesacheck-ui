@@ -1,12 +1,8 @@
 import { FiArrowUpRight } from "react-icons/fi";
-import { MethodologySectionNav } from "@/components/about/MethodologySectionNav";
+import { AboutSectionNav } from "@/components/about/AboutSectionNav";
 import { ContentBlocks } from "@/components/ui/ContentBlocks";
 import { Container, SectionHeading } from "@/components/ui/SectionHeading";
-import {
-  type ImageSlot,
-  METHODOLOGY_SECTIONS,
-  type MethodologySection,
-} from "@/lib/methodology-content";
+import type { AboutSection, ImageSlot } from "@/lib/content-blocks";
 
 // Grey placeholder boxes mirror the design's image rectangles until real assets
 // land. "small" boxes pair in a 2-col grid; "large" spans the reading column.
@@ -43,7 +39,7 @@ function SectionImages({ images }: { images: ImageSlot[] }) {
   );
 }
 
-function Section({ section }: { section: MethodologySection }) {
+function Section({ section }: { section: AboutSection }) {
   return (
     <section id={section.id} className="scroll-mt-28">
       <SectionHeading title={section.title} />
@@ -69,18 +65,27 @@ function Section({ section }: { section: MethodologySection }) {
   );
 }
 
-export function MethodologyBody() {
+/**
+ * Shared body template for the long-form About pages (Methodology, Principles,
+ * Funding): a sticky section nav beside the titled, anchor-linkable sections.
+ * Pages own the content — pass their `AboutSection[]` from `lib/*-content.ts`.
+ */
+export function AboutPageBody({
+  navLabel,
+  sections,
+}: {
+  navLabel: string;
+  sections: AboutSection[];
+}) {
   return (
     <Container className="py-14 lg:py-[70px]">
       <div className="grid gap-12 lg:grid-cols-[180px_1fr] lg:gap-16">
-        <MethodologySectionNav
-          items={METHODOLOGY_SECTIONS.map((s) => ({
-            id: s.id,
-            title: s.title,
-          }))}
+        <AboutSectionNav
+          label={navLabel}
+          items={sections.map((s) => ({ id: s.id, title: s.title }))}
         />
         <div className="flex flex-col gap-16 lg:gap-20">
-          {METHODOLOGY_SECTIONS.map((section) => (
+          {sections.map((section) => (
             <Section key={section.id} section={section} />
           ))}
         </div>

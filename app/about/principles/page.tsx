@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { PrinciplesBody } from "@/components/about/PrinciplesBody";
+import { AboutPageBody } from "@/components/about/AboutPageBody";
 import { PrinciplesHero } from "@/components/about/PrinciplesHero";
+import { PRINCIPLES_SECTIONS } from "@/lib/principles-content";
 
 export const metadata: Metadata = {
   title: "Principles — PesaCheck",
@@ -12,7 +13,7 @@ export default function PrinciplesPage() {
   return (
     <>
       <PrinciplesHero />
-      <PrinciplesBody />
+      <AboutPageBody navLabel="Principles" sections={PRINCIPLES_SECTIONS} />
     </>
   );
 }

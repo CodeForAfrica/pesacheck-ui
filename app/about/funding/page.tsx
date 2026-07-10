@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { FundingBody } from "@/components/about/FundingBody";
+import { AboutPageBody } from "@/components/about/AboutPageBody";
 import { FundingHero } from "@/components/about/FundingHero";
+import { FUNDING_SECTIONS } from "@/lib/funding-content";
 
 export const metadata: Metadata = {
   title: "Funding — PesaCheck",
@@ -12,7 +13,7 @@ export default function FundingPage() {
   return (
     <>
       <FundingHero />
-      <FundingBody />
+      <AboutPageBody navLabel="Funding" sections={FUNDING_SECTIONS} />
     </>
   );
 }

@@ -17,3 +17,17 @@ export type ContentBlock =
       height: number;
       caption?: string;
     };
+
+// Design-placeholder image layout beneath a section's copy. "small" boxes pair
+// up in a 2-col grid; "large" boxes span the full reading column. Mirrors the
+// grey rectangles in the Figma design.
+export type ImageSlot = "small" | "large";
+
+/** One titled, anchor-linkable section of an About page body. */
+export type AboutSection = {
+  id: string;
+  title: string;
+  blocks: ContentBlock[];
+  learnMore: boolean;
+  images: ImageSlot[];
+};

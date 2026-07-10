@@ -5,11 +5,18 @@ import { useEffect, useState } from "react";
 type NavItem = { id: string; title: string };
 
 /**
- * Sticky table-of-contents rail beside the principles sections. Highlights the
- * section currently in view (scroll-spy) and smooth-scrolls on click. Hidden on
- * narrow screens where the content stacks full-width.
+ * Sticky table-of-contents rail beside an About page's sections. Highlights
+ * the section currently in view (scroll-spy) and smooth-scrolls on click.
+ * Hidden on narrow screens where the content stacks full-width.
  */
-export function PrinciplesSectionNav({ items }: { items: NavItem[] }) {
+export function AboutSectionNav({
+  label,
+  items,
+}: {
+  /** Page name for the nav's accessible label, e.g. "Methodology". */
+  label: string;
+  items: NavItem[];
+}) {
   const [activeId, setActiveId] = useState(items[0]?.id ?? "");
 
   useEffect(() => {
@@ -35,7 +42,7 @@ export function PrinciplesSectionNav({ items }: { items: NavItem[] }) {
   }, [items]);
 
   return (
-    <nav aria-label="Principles sections" className="hidden lg:block">
+    <nav aria-label={`${label} sections`} className="hidden lg:block">
       <ul className="sticky top-28 flex flex-col gap-3 text-sm font-medium">
         {items.map((item) => {
           const isActive = item.id === activeId;

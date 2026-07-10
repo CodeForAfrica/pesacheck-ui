@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { MethodologyBody } from "@/components/about/MethodologyBody";
+import { AboutPageBody } from "@/components/about/AboutPageBody";
 import { MethodologyHero } from "@/components/about/MethodologyHero";
+import { METHODOLOGY_SECTIONS } from "@/lib/methodology-content";
 
 export const metadata: Metadata = {
   title: "Methodology — PesaCheck",
@@ -12,7 +13,7 @@ export default function MethodologyPage() {
   return (
     <>
       <MethodologyHero />
-      <MethodologyBody />
+      <AboutPageBody navLabel="Methodology" sections={METHODOLOGY_SECTIONS} />
     </>
   );
 }

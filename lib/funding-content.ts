@@ -4,7 +4,7 @@
  * (https://pesacheck.org/our-principles/) per issue #45. Site-wide content
  * (nav, footer, allies/partners) lives in `lib/site.ts`.
  */
-import type { ContentBlock } from "@/lib/content-blocks";
+import type { AboutSection } from "@/lib/content-blocks";
 
 export const FUNDING_HERO = {
   title: "Funding",
@@ -12,22 +12,7 @@ export const FUNDING_HERO = {
     "PesaCheck is Africa's largest indigenous fact-checking organisation, debunking misleading claims and providing accurate information for sound decision-making",
 };
 
-export type { ContentBlock } from "@/lib/content-blocks";
-
-// Image layout beneath the copy. "small" boxes pair up in a 2-col grid;
-// "large" boxes span the full reading column. Mirrors the grey rectangles in
-// the design.
-export type ImageSlot = "small" | "large";
-
-export type FundingSection = {
-  id: string;
-  title: string;
-  blocks: ContentBlock[];
-  learnMore: boolean;
-  images: ImageSlot[];
-};
-
-export const FUNDING_SECTIONS: FundingSection[] = [
+export const FUNDING_SECTIONS: AboutSection[] = [
   {
     id: "how-we-are-funded",
     title: "How We Are Funded",

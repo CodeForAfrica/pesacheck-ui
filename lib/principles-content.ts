@@ -5,7 +5,7 @@
  * Funding page (`lib/funding-content.ts`). Site-wide content (nav, footer,
  * allies/partners) lives in `lib/site.ts`.
  */
-import type { ContentBlock } from "@/lib/content-blocks";
+import type { AboutSection } from "@/lib/content-blocks";
 
 export const PRINCIPLES_HERO = {
   title: "Principles",
@@ -13,22 +13,7 @@ export const PRINCIPLES_HERO = {
     "PesaCheck is Africa's largest indigenous fact-checking organisation, debunking misleading claims and providing accurate information for sound decision-making",
 };
 
-export type { ContentBlock } from "@/lib/content-blocks";
-
-// Image layout beneath the copy. "small" boxes pair up in a 2-col grid;
-// "large" boxes span the full reading column. Mirrors the grey rectangles in
-// the design.
-export type ImageSlot = "small" | "large";
-
-export type PrinciplesSection = {
-  id: string;
-  title: string;
-  blocks: ContentBlock[];
-  learnMore: boolean;
-  images: ImageSlot[];
-};
-
-export const PRINCIPLES_SECTIONS: PrinciplesSection[] = [
+export const PRINCIPLES_SECTIONS: AboutSection[] = [
   {
     id: "who-we-are",
     title: "Who We Are",
