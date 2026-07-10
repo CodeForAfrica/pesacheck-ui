@@ -1,92 +1,8 @@
 import Image from "next/image";
-import { FiChevronDown, FiMail, FiMapPin, FiPhoneCall } from "react-icons/fi";
+import { FiMail, FiMapPin, FiPhoneCall } from "react-icons/fi";
+import { ContactMessageForm } from "@/components/about/ContactMessageForm";
 import { Container, SectionHeading } from "@/components/ui/SectionHeading";
-import {
-  CONTACT_FORM,
-  CONTACT_HQ,
-  CONTACT_SOCIALS,
-  type ContactField,
-} from "@/lib/contact-content";
-
-// Shared field shell: label + required asterisk above the control.
-function Field({
-  field,
-  children,
-}: {
-  field: ContactField;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className={field.span === "full" ? "sm:col-span-2" : ""}>
-      <label
-        htmlFor={field.name}
-        className="flex gap-0.5 text-sm font-medium text-neutral-800"
-      >
-        {field.label}
-        {field.required && <span className="text-[#fc0d1b]">*</span>}
-      </label>
-      <div className="mt-1.5">{children}</div>
-    </div>
-  );
-}
-
-const CONTROL =
-  "w-full rounded-lg border border-neutral-200 bg-white px-3.5 text-sm font-medium text-neutral-900 placeholder:text-neutral-500 focus:border-pesacheck-blue focus:outline-none";
-
-function FormControl({ field }: { field: ContactField }) {
-  if (field.type === "textarea") {
-    return (
-      <textarea
-        id={field.name}
-        name={field.name}
-        placeholder={field.placeholder}
-        rows={4}
-        className={`${CONTROL} min-h-[104px] resize-none py-3`}
-      />
-    );
-  }
-
-  if (field.type === "select") {
-    return (
-      <div className="relative">
-        <select
-          id={field.name}
-          name={field.name}
-          defaultValue=""
-          className={`${CONTROL} h-12 appearance-none pr-10 text-neutral-500`}
-        >
-          <option value="" disabled>
-            {field.placeholder}
-          </option>
-          {field.options?.map((opt) => (
-            <option key={opt} value={opt} className="text-neutral-900">
-              {opt}
-            </option>
-          ))}
-        </select>
-        <FiChevronDown
-          size={16}
-          className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2"
-          aria-hidden
-        />
-      </div>
-    );
-  }
-
-  const FieldIcon = field.icon;
-  return (
-    <div className="relative flex h-12 items-center gap-2 rounded-lg border border-neutral-200 bg-white px-3.5 focus-within:border-pesacheck-blue">
-      {FieldIcon && <FieldIcon size={16} className="shrink-0" aria-hidden />}
-      <input
-        id={field.name}
-        name={field.name}
-        type={field.type}
-        placeholder={field.placeholder}
-        className="min-w-0 flex-1 bg-transparent text-sm font-medium text-neutral-900 placeholder:text-neutral-500 focus:outline-none"
-      />
-    </div>
-  );
-}
+import { CONTACT_HQ, CONTACT_SOCIALS } from "@/lib/contact-content";
 
 function ContactRow({
   icon: ContactIcon,
@@ -110,27 +26,7 @@ export function ContactForm() {
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_400px] lg:gap-12">
         {/* Message form */}
-        <div className="rounded-xl border border-neutral-100 bg-white p-6 lg:p-7">
-          <h3 className="text-xl font-semibold text-neutral-900">
-            {CONTACT_FORM.heading}
-          </h3>
-          <form className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2">
-            {CONTACT_FORM.fields.map((field) => (
-              <Field key={field.name} field={field}>
-                <FormControl field={field} />
-              </Field>
-            ))}
-            <div className="sm:col-span-2">
-              {/* Static visual only — no submission backend. */}
-              <button
-                type="button"
-                className="rounded-lg bg-pesacheck-blue px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-pesacheck-blue/90"
-              >
-                {CONTACT_FORM.submitLabel}
-              </button>
-            </div>
-          </form>
-        </div>
+        <ContactMessageForm />
 
         {/* Supporting photo */}
         <div className="relative aspect-[400/453] w-full overflow-hidden rounded-xl bg-neutral-100 lg:aspect-auto">
