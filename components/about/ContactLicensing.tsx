@@ -10,7 +10,11 @@ export function ContactLicensing() {
         <div className="text-sm font-medium leading-5 text-neutral-900">
           <p>{CONTACT_LICENSING.body}</p>
 
-          <h3 className="mt-8 text-sm font-bold text-neutral-900">
+          {/* Anchor target for the footer "Imprint" link. */}
+          <h3
+            id="imprint"
+            className="mt-8 scroll-mt-28 text-sm font-bold text-neutral-900"
+          >
             {CONTACT_LICENSING.imprintHeading}
           </h3>
           <div className="mt-2 flex flex-col gap-1">

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { FiArrowUpRight } from "react-icons/fi";
 import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import { TOOLS, type Tool } from "@/lib/home-content";
@@ -6,8 +7,10 @@ import { ABOUT_BLURB } from "@/lib/site";
 
 function ToolCard({ tool }: { tool: Tool }) {
   return (
-    <a
-      href="#"
+    <Link
+      href={tool.href}
+      target="_blank"
+      rel="noopener noreferrer"
       className="group relative flex aspect-[610/474] w-full overflow-hidden rounded-lg"
     >
       <Image
@@ -35,7 +38,7 @@ function ToolCard({ tool }: { tool: Tool }) {
           />
         </span>
       </div>
-    </a>
+    </Link>
   );
 }
 
