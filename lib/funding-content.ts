@@ -1,9 +1,10 @@
 /**
- * Page-specific content for the About → Funding page, transcribed from the Figma
- * design (node 2866:2553). Site-wide content (nav, footer, allies/partners) lives
- * in `lib/site.ts`. The design ships with placeholder ("Qorem ipsum…") copy and
- * grey image boxes, faithfully reproduced here as a content template.
+ * Page-specific content for the About → Funding page. Copy sourced from the
+ * "Transparency of Funding" section of the live Ghost site
+ * (https://pesacheck.org/our-principles/) per issue #45. Site-wide content
+ * (nav, footer, allies/partners) lives in `lib/site.ts`.
  */
+import type { AboutSection } from "@/lib/content-blocks";
 
 export const FUNDING_HERO = {
   title: "Funding",
@@ -11,70 +12,73 @@ export const FUNDING_HERO = {
     "PesaCheck is Africa's largest indigenous fact-checking organisation, debunking misleading claims and providing accurate information for sound decision-making",
 };
 
-// A section's body is an ordered list of blocks so paragraphs and bullet lists
-// keep their Figma order.
-export type ContentBlock =
-  | { type: "p"; text: string }
-  | { type: "ul"; items: string[] };
-
-// Image layout beneath the copy. "small" boxes pair up in a 2-col grid;
-// "large" boxes span the full reading column. Mirrors the grey rectangles in
-// the design.
-export type ImageSlot = "small" | "large";
-
-export type FundingSection = {
-  id: string;
-  title: string;
-  blocks: ContentBlock[];
-  learnMore: boolean;
-  images: ImageSlot[];
-};
-
-const LOREM_LONG =
-  "Qorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eu turpis molestie, dictum est a, mattis tellus. Sed dignissim, metus nec fringilla accumsan, risus sem sollicitudin lacus, ut interdum tellus elit sed risus. Maecenas eget condimentum velit, sit amet feugiat lectus. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.";
-
-const LOREM_SHORT =
-  "Donec ut rhoncus ex. Suspendisse ac rhoncus nisl, eu tempor urna. Curabitur vel bibendum lorem. Morbi convallis convallis diam sit amet lacinia. Aliquam in elementum tellus.";
-
-const LOREM_MED =
-  "Qorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eu turpis molestie, dictum est a, mattis tellus. Sed dignissim, metus nec fringilla accumsan, risus sem sollicitudin lacus, ut interdum tellus elit sed risus. Aliquam in elementum tellus.";
-
-const BULLETS = ["Funding", "Funding", "Funding"];
-
-export const FUNDING_SECTIONS: FundingSection[] = [
+export const FUNDING_SECTIONS: AboutSection[] = [
   {
-    id: "section-one",
-    title: "Section One",
+    id: "how-we-are-funded",
+    title: "How We Are Funded",
     blocks: [
-      { type: "p", text: LOREM_LONG },
-      { type: "p", text: LOREM_SHORT },
-      { type: "ul", items: BULLETS },
-      { type: "p", text: LOREM_MED },
+      {
+        type: "p",
+        text: "PesaCheck was founded with a seed grant from CfA's **[innovateAFRICA](https://innovateafrica.fund/)** fund in 2017, and continues to be incubated and co-funded through the fund.",
+      },
+      {
+        type: "p",
+        text: "PesaCheck has in the past received direct financial support from the **[International Budget Partnership](https://www.internationalbudget.org/)** (IBP) for activities in Kenya, Google's tech-for-good arm **[Jigsaw](https://jigsaw.google.com/)** for pan-African research and to tackle gender-focused fact-checking, the **[Bill & Melinda Gates Foundation](https://www.gatesfoundation.org/)** (BMGF) for fact-checking health issues, the (now defunct) **[Data Zetu](https://web.archive.org/web/20190509095921/http://datazetu.dlab.or.tz/)** initiative and **[Twaweza](https://www.twaweza.org/)** for activities in Tanzania, and the U.S.-based **[International Center for Journalists](https://www.icfj.org/)** (ICFJ) for activities across East Africa.",
+      },
+      {
+        type: "p",
+        text: "We received three project grants from **IFCN** over the past two years, to support fact-checking on Covid-19 issues and for research into persistent conspiracy claims on YouTube. PesaCheck also carries out paid third-party fact-checking for **Meta** on Facebook and Instagram, receives support costs from WhatsApp for operating a public tip-line on the platform, and receives occasional ad-hoc travel sponsorships, from organisations such as **Access Now**, **Poynter**, and **Article 19**, for its team to participate in fact-check gatherings.",
+      },
     ],
     learnMore: false,
-    images: ["small", "small", "large"],
+    images: [],
   },
   {
-    id: "section-two",
-    title: "Section Two",
+    id: "editorial-independence",
+    title: "Editorial Independence",
     blocks: [
-      { type: "p", text: LOREM_LONG },
-      { type: "p", text: LOREM_SHORT },
-      { type: "ul", items: BULLETS },
-      { type: "p", text: LOREM_MED },
+      {
+        type: "p",
+        text: "PesaCheck does not have any institutional or remunerative relationships with governments, politicians or political parties. PesaCheck's training programmes do however receive support from state-funded international media development programmes in Germany (through the **[Deutsche Welle Akademie](https://www.dw.com/en/dw-akademie/about-us/s-9519)** for skills development in Ethiopia, Ghana and Kenya, and the **[Deutsche Gesellschaft für Internationale Zusammenarbeit](https://www.giz.de/en/html/index.html)** for skills development in Kenya) and France (through the **[Agence Française de Développement](https://www.afd.fr/en)** for training across Francophone Africa).",
+      },
+      {
+        type: "p",
+        text: "PesaCheck also receives support from the **[United Nations Educational, Scientific and Cultural Organization](https://www.unesco.org/en)** (UNESCO) to support the **[African Fact-Checking Alliance](https://factcheck.africa/)** (AFCA) to seed-fund and train newsroom-based 'CheckDesks' in 270 media in 20 African countries, and from the **[United Nations Development Programme](https://www.undp.org/)** (UNDP) for supporting election-focused fact-checking in Kenya. These partnerships explicitly exclude any donor influence over editorial decision-making or content production, and are confined to underwriting the cost of trainers/logistics, as well as to provide fellowship stipends for trainees.",
+      },
+      {
+        type: "p",
+        text: "Where PesaCheck has received funding, either directly or indirectly, related to a foreign government or one of its development agencies or sovereign funds, the terms of these grants include clauses that explicitly guarantee complete editorial control for PesaCheck.",
+      },
     ],
-    learnMore: true,
-    images: ["large"],
+    learnMore: false,
+    images: [],
   },
   {
-    id: "section-three",
-    title: "Section Three",
+    id: "our-income",
+    title: "Our Income",
     blocks: [
-      { type: "p", text: LOREM_LONG },
-      { type: "p", text: LOREM_SHORT },
-      { type: "p", text: LOREM_MED },
+      {
+        type: "p",
+        text: "PesaCheck's income from July 2018 to June 2019 was $175,780 which paid for a team of 11 researchers, fact-checkers and editors working out of offices in Dar es Salaam, Kampala and Nairobi.",
+      },
+      {
+        type: "img",
+        src: "/images/funding/funding-2022.png",
+        alt: "PesaCheck funding 2022: Meta 3rd Party Fact Check Program 53.4%, Deutsche Welle Akademie 13.3%, International Center for Journalists 12.4%, Meta WhatsApp 4.3%, Agence Française de Développement 4%, and other smaller funders",
+        width: 1220,
+        height: 836,
+        caption: "PesaCheck funding, 2022. Source: PesaCheck",
+      },
+      {
+        type: "img",
+        src: "/images/funding/funding-2023.png",
+        alt: "PesaCheck funding 2023: Meta 3PFC 43%, TikTok 18%, UNDP 12%, PactWorld 5%, Deutsche Welle Akademie 4.7%, Google News Initiative 3.6%, and other smaller funders",
+        width: 1220,
+        height: 836,
+        caption: "PesaCheck funding, 2023. Source: PesaCheck",
+      },
     ],
-    learnMore: true,
-    images: ["small", "small"],
+    learnMore: false,
+    images: [],
   },
 ];
