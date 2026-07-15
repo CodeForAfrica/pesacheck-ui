@@ -1,4 +1,3 @@
-import { Toaster } from "sonner";
 import { ContentDesks } from "@/components/home/ContentDesks";
 import { Hero } from "@/components/home/Hero";
 import { LatestStories } from "@/components/home/LatestStories";
@@ -53,7 +52,6 @@ export default async function Home() {
       <ContentDesks desks={desks ?? CONTENT_DESKS} />
       <LatestStories stories={latest ?? [LATEST_FEATURE, ...LATEST_GRID]} />
       <Tools />
-      <Toaster position="bottom-right" richColors />
     </>
   );
 }
