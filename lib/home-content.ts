@@ -138,6 +138,10 @@ export const SPOTLIGHT_GRID: Story[] = [
 
 export const WHATSAPP_BANNER = "/images/whatsapp-banner/banner2.png";
 
+// Hosted Mailchimp signup form — the newsletter CTA links out to it.
+export const NEWSLETTER_FORM_URL =
+  "https://twitter.us6.list-manage.com/subscribe?u=65e5825507b3cec760f272e79&id=c2ff751541";
+
 export type WhatsappColumn = {
   graphic: "whatsapp" | "qr" | "message" | "";
   title: string;
