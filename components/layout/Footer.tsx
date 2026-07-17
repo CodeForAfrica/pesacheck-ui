@@ -17,7 +17,7 @@ export function Footer() {
               alt="PesaCheck"
               width={190}
               height={52}
-              className="-ml-4 h-auto w-auto grayscale"
+              className="-ml-4 h-auto w-auto grayscale transition hover:grayscale-0"
             />
             <span className="text-xs font-medium text-neutral-500">
               An intitative of:
@@ -41,7 +41,7 @@ export function Footer() {
             alt="IFCN"
             width={108}
             height={131}
-            className="h-24 w-auto object-contain grayscale"
+            className="h-14 w-auto object-contain grayscale transition hover:grayscale-0"
           />
         </div>
 
