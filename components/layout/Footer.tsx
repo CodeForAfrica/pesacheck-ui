@@ -86,8 +86,8 @@ export function Footer() {
             </div>
           </div>
           <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm font-semibold text-neutral-900">
+            <span>Copyright {new Date().getFullYear()} PesaCheck</span>
             {LEGAL.map((item) => {
-              if (!item.href) return <span key={item.label}>{item.label}</span>;
               const external = item.href.startsWith("http");
               return (
                 <Link
