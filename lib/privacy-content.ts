@@ -1,6 +1,6 @@
 /**
- * Page-specific content for the Privacy Policy page (issue #61). Copy is Code
- * for Africa's data-protection policy, transcribed from the approved design.
+ * Page-specific content for the Privacy Policy page. Copy is Code for Africa's
+ * data-protection policy, transcribed from the approved design.
  * Body copy reuses the shared `ContentBlock` model (paragraphs / lists, with
  * `**bold**` and `[label](href)` markup via `RichText`); the page renders it in
  * the design's single-column legal layout (see `PrivacyBody`). Site-wide

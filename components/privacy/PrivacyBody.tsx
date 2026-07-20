@@ -3,8 +3,8 @@ import { Container } from "@/components/ui/SectionHeading";
 import { PRIVACY_ABOUT, PRIVACY_SECTIONS } from "@/lib/privacy-content";
 
 /**
- * Single-column legal-document layout for the Privacy Policy (issue #61),
- * matching the design: a 612px reading column, numbered sections separated by
+ * Single-column legal-document layout for the Privacy Policy, matching the
+ * design: a 612px reading column, numbered sections separated by
  * plain grey hairline dividers (no blue accent bar, no side nav), and the
  * secondary "about CfA" note at the end. Body copy reuses `ContentBlocks`.
  */
