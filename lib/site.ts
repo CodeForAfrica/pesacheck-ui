@@ -127,10 +127,11 @@ export const FOOTER_NAV: { label: string; href: string }[] = [
   { label: "Contact Us", href: "/about/contact-us" },
 ];
 
-export const LEGAL: { label: string; href?: string }[] = [
-  { label: "Copyright 2026 PesaCheck" },
+// Linked legal items only — the copyright line is rendered separately in the
+// footer with the current year (see `Footer`).
+export const LEGAL: { label: string; href: string }[] = [
   { label: "Imprint", href: "/about/contact-us#imprint" },
-  { label: "Privacy policy", href: "https://trustlab.africa/privacy-policy" },
+  { label: "Privacy policy", href: "/privacy-policy" },
 ];
 
 export type Logo = {
