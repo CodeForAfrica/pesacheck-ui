@@ -11,7 +11,7 @@ export function Footer() {
 
       <Container className="pb-16">
         <div className="flex flex-wrap items-center justify-between gap-6 pt-10">
-          <div className="flex items-end gap-4">
+          <div className="flex items-center gap-4">
             <Image
               src="/pesacheck-logo.png"
               alt="PesaCheck"
@@ -41,7 +41,7 @@ export function Footer() {
             alt="IFCN"
             width={108}
             height={131}
-            className="h-14 w-auto object-contain grayscale transition hover:grayscale-0"
+            className="h-[131px] w-[108px] object-contain grayscale transition hover:grayscale-0"
           />
         </div>
 
