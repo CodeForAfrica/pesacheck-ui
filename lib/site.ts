@@ -159,7 +159,7 @@ export const ALLIES: Logo[] = [
     href: "https://takwimu.africa/",
   },
   {
-    src: "/images/partners/ally-academy-africa.svg",
+    src: "/images/partners/ally-academy-africa.png",
     alt: "Academy Africa",
     width: 88,
     height: 40,

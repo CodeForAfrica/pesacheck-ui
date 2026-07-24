@@ -28,11 +28,11 @@ export function Footer() {
               rel="noopener noreferrer"
             >
               <Image
-                src="/images/footer/cfa-logo-bw.svg"
+                src="/images/footer/cfa-logo-colored.svg"
                 alt="Code for Africa"
                 width={73}
                 height={32}
-                className="h-8 w-auto"
+                className="h-8 w-auto grayscale transition hover:grayscale-0"
               />
             </Link>
           </div>
