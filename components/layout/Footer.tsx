@@ -11,13 +11,13 @@ export function Footer() {
 
       <Container className="pb-16">
         <div className="flex flex-wrap items-center justify-between gap-6 pt-10">
-          <div className="flex items-end gap-4">
+          <div className="flex items-center gap-4">
             <Image
               src="/pesacheck-logo.png"
               alt="PesaCheck"
               width={190}
               height={52}
-              className="-ml-4 h-auto w-auto grayscale"
+              className="-ml-4 h-auto w-auto grayscale transition hover:grayscale-0"
             />
             <span className="text-xs font-medium text-neutral-500">
               An intitative of:
@@ -28,11 +28,11 @@ export function Footer() {
               rel="noopener noreferrer"
             >
               <Image
-                src="/images/footer/cfa-logo-bw.svg"
+                src="/images/footer/cfa-logo-colored.svg"
                 alt="Code for Africa"
                 width={73}
                 height={32}
-                className="h-8 w-auto"
+                className="h-8 w-auto grayscale transition hover:grayscale-0"
               />
             </Link>
           </div>
@@ -41,7 +41,7 @@ export function Footer() {
             alt="IFCN"
             width={108}
             height={131}
-            className="h-24 w-auto object-contain grayscale"
+            className="h-[131px] w-[108px] object-contain grayscale transition hover:grayscale-0"
           />
         </div>
 
