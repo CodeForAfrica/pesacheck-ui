@@ -5,12 +5,16 @@ import { LATEST_FEATURE, LATEST_GRID, type Story } from "@/lib/home-content";
 // Static fallback: a flat list in layout order (feature, secondary, …grid).
 const LATEST_FALLBACK: Story[] = [LATEST_FEATURE, ...LATEST_GRID];
 
+// Keep the section to two rows: the feature row, then one full grid row.
+const GRID_LIMIT = 3;
+
 export function LatestStories({
   stories = LATEST_FALLBACK,
 }: {
   stories?: Story[];
 }) {
-  const [feature, secondary, ...grid] = stories;
+  const [feature, secondary, ...rest] = stories;
+  const grid = rest.slice(0, GRID_LIMIT);
 
   return (
     <section

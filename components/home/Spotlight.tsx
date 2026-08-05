@@ -14,12 +14,16 @@ const SPOTLIGHT_FALLBACK: Story[] = [
   ...SPOTLIGHT_GRID,
 ];
 
+// Keep the section to two rows: the feature row, then one full grid row.
+const GRID_LIMIT = 4;
+
 export function Spotlight({
   stories = SPOTLIGHT_FALLBACK,
 }: {
   stories?: Story[];
 }) {
-  const [feature, secondary, ...grid] = stories;
+  const [feature, secondary, ...rest] = stories;
+  const grid = rest.slice(0, GRID_LIMIT);
 
   return (
     <section

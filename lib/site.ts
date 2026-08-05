@@ -119,12 +119,12 @@ export const FOOTER_ABOUT =
   "This site is a project of Code for Africa, the continent's largest network of civic technology and data journalism labs. All content is released under a Creative Commons Attribution Licence. Reuse it to help empower your own community.";
 
 export const FOOTER_NAV: { label: string; href: string }[] = [
-  { label: "Knowledge Base", href: "/knowledge" },
-  { label: "About Pesacheck", href: "/about" },
-  { label: "Methodology", href: "/about/methodology" },
-  { label: "Funding and Principles", href: "/about/funding" },
-  { label: "Our Products", href: "/tools" },
+  { label: "About PesaCheck", href: "/about" },
   { label: "Contact Us", href: "/about/contact-us" },
+  { label: "Funding and Principles", href: "/about/funding" },
+  { label: "Knowledge", href: "/knowledge" },
+  { label: "Methodology", href: "/about/methodology" },
+  { label: "Tools", href: "/tools" },
 ];
 
 // Linked legal items only — the copyright line is rendered separately in the
