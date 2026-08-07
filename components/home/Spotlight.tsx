@@ -3,6 +3,7 @@ import { StoryCard } from "@/components/ui/StoryCard";
 import {
   SPOTLIGHT_FEATURE,
   SPOTLIGHT_GRID,
+  SPOTLIGHT_GRID_LIMIT,
   SPOTLIGHT_SECONDARY,
   type Story,
 } from "@/lib/home-content";
@@ -14,16 +15,15 @@ const SPOTLIGHT_FALLBACK: Story[] = [
   ...SPOTLIGHT_GRID,
 ];
 
-// Keep the section to two rows: the feature row, then one full grid row.
-const GRID_LIMIT = 4;
-
 export function Spotlight({
   stories = SPOTLIGHT_FALLBACK,
+  gridLimit = SPOTLIGHT_GRID_LIMIT,
 }: {
   stories?: Story[];
+  gridLimit?: number;
 }) {
   const [feature, secondary, ...rest] = stories;
-  const grid = rest.slice(0, GRID_LIMIT);
+  const grid = rest.slice(0, gridLimit);
 
   return (
     <section

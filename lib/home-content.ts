@@ -88,6 +88,11 @@ export const HERO_PREVIEW: Story[] = [
 ];
 
 // Spotlight: one feature story + a grid of smaller ones.
+// Grid cards shown below the feature row, capping the section at two rows.
+// Matches the desktop column count (lg:grid-cols-4); raise by a multiple of 4
+// to show more rows.
+export const SPOTLIGHT_GRID_LIMIT = 4;
+
 export const SPOTLIGHT_FEATURE: Story = {
   image: "/images/spotlight/long-format6-5.png",
   alt: "Spotlight feature story",
@@ -209,6 +214,12 @@ export const TRENDING: Story[] = [
     href: ARTICLE_HREF,
   },
 ];
+
+// Latest Stories: one feature story + a grid of smaller ones.
+// Grid cards shown below the feature row, capping the section at two rows.
+// Matches the desktop column count (lg:grid-cols-3); raise by a multiple of 3
+// to show more rows.
+export const LATEST_GRID_LIMIT = 3;
 
 export const LATEST_FEATURE: Story = {
   image: "/images/hero-preview-cards/story-large.png",
