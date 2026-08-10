@@ -1,16 +1,24 @@
 import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import { StoryCard } from "@/components/ui/StoryCard";
-import { LATEST_FEATURE, LATEST_GRID, type Story } from "@/lib/home-content";
+import {
+  LATEST_FEATURE,
+  LATEST_GRID,
+  LATEST_GRID_LIMIT,
+  type Story,
+} from "@/lib/home-content";
 
 // Static fallback: a flat list in layout order (feature, secondary, …grid).
 const LATEST_FALLBACK: Story[] = [LATEST_FEATURE, ...LATEST_GRID];
 
 export function LatestStories({
   stories = LATEST_FALLBACK,
+  gridLimit = LATEST_GRID_LIMIT,
 }: {
   stories?: Story[];
+  gridLimit?: number;
 }) {
-  const [feature, secondary, ...grid] = stories;
+  const [feature, secondary, ...rest] = stories;
+  const grid = rest.slice(0, gridLimit);
 
   return (
     <section
