@@ -1,9 +1,28 @@
 import Image from "next/image";
 import Link from "next/link";
 import { FiArrowUpRight } from "react-icons/fi";
-import { Container, SectionHeading } from "@/components/ui/SectionHeading";
+import { Container } from "@/components/ui/SectionHeading";
 import { TOOLS, type Tool } from "@/lib/home-content";
 import { ABOUT_BLURB } from "@/lib/site";
+
+/**
+ * Heading for this section: navy accent bar and a plain divider, per the Figma
+ * redesign. Deliberately local — the shared `SectionHeading` (blue bar plus a
+ * blue segment on the divider) still drives the other home-page sections.
+ */
+function ToolsHeading({ title }: { title: string }) {
+  return (
+    <div className="w-full">
+      <div className="flex items-center gap-4">
+        <span className="h-7 w-[5px] shrink-0 bg-pesacheck-black" />
+        <h2 className="text-2xl font-extrabold leading-10 text-pesacheck-black md:text-[30px]">
+          {title}
+        </h2>
+      </div>
+      <div className="mt-4 h-px w-full bg-neutral-100" />
+    </div>
+  );
+}
 
 function ToolCard({ tool }: { tool: Tool }) {
   return (
@@ -11,33 +30,38 @@ function ToolCard({ tool }: { tool: Tool }) {
       href={tool.href}
       target="_blank"
       rel="noopener noreferrer"
-      className="group relative flex aspect-[610/474] w-full overflow-hidden rounded-lg"
+      className="group flex flex-col"
     >
-      <Image
-        src={tool.image}
-        alt={tool.name}
-        fill
-        sizes="(max-width: 1024px) 100vw, 610px"
-        className="object-cover transition-transform duration-300 group-hover:scale-105"
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent" />
-
-      <div className="relative mt-auto flex flex-col gap-2 p-8 text-white">
-        <h3 className="text-lg font-extrabold">{tool.name}</h3>
-        <p className="text-sm font-medium">{tool.tagline}</p>
-        <p className="max-w-[550px] text-sm font-medium leading-5 text-white/90">
-          {tool.body}
-        </p>
-        <span className="my-1 h-0.5 w-10 rounded bg-white" />
-        <span className="flex items-center gap-1 text-sm font-medium">
-          {tool.cta}
-          <FiArrowUpRight
-            size={10}
-            className="brightness-0 invert"
-            aria-hidden
-          />
-        </span>
+      {/*
+       * The mockups sit at 120% and pinned to the top, which crops the phones.
+       * Hovering eases back to 100% so the whole composition — and the screen
+       * content in it — comes into view. The frame carries the artwork's own
+       * lavender so there is no white flash before the image paints.
+       */}
+      <div className="relative aspect-[533/271] w-full overflow-hidden rounded-lg bg-[#d0d7f9]">
+        <Image
+          src={tool.image}
+          alt=""
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 292px"
+          className="origin-top scale-120 object-cover object-top transition-transform duration-500 ease-out group-hover:scale-100"
+        />
       </div>
+
+      <h3 className="mt-5 text-2xl font-extrabold text-pesacheck-black">
+        {tool.name}
+      </h3>
+      <span className="mt-2 h-[3px] w-7 bg-pesacheck-blue" />
+      <p className="mt-3 text-md font-medium text-neutral-600">
+        {tool.tagline}
+      </p>
+      <p className="mt-4 line-clamp-3 text-md font-medium text-neutral-800">
+        {tool.body}
+      </p>
+      <span className="mt-3 flex items-center gap-1.5 text-md font-semibold text-pesacheck-blue">
+        {tool.cta}
+        <FiArrowUpRight size={14} aria-hidden />
+      </span>
     </Link>
   );
 }
@@ -46,12 +70,12 @@ export function Tools() {
   return (
     <section id="tools" className="py-14 lg:py-20">
       <Container>
-        <SectionHeading title="More than fact-checking" />
-        <p className="mt-6 max-w-[610px] text-sm font-medium leading-5 text-neutral-900">
+        <ToolsHeading title="More than fact-checking" />
+        <p className="mt-4 max-w-[610px] text-md font-medium text-neutral-600">
           {ABOUT_BLURB}
         </p>
 
-        <div className="mt-10 grid gap-6 lg:grid-cols-2">
+        <div className="mt-7 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {TOOLS.map((tool) => (
             <ToolCard key={tool.name} tool={tool} />
           ))}
