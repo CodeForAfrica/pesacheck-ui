@@ -1,4 +1,5 @@
 import { Container, SectionHeading } from "@/components/ui/SectionHeading";
+import { ShowMoreLink } from "@/components/ui/ShowMoreLink";
 import { StoryCard } from "@/components/ui/StoryCard";
 import {
   LATEST_FEATURE,
@@ -26,7 +27,10 @@ export function LatestStories({
       style={{ background: "var(--Neutral-50, #F6F7F8)" }}
     >
       <Container>
-        <SectionHeading title="Latest Stories" />
+        <SectionHeading
+          title="Latest Stories"
+          action={<ShowMoreLink href="/fact-checks" />}
+        />
 
         <div className="mt-10 grid gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2">

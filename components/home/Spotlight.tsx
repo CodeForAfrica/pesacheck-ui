@@ -1,4 +1,5 @@
 import { Container, SectionHeading } from "@/components/ui/SectionHeading";
+import { ShowMoreLink } from "@/components/ui/ShowMoreLink";
 import { StoryCard } from "@/components/ui/StoryCard";
 import {
   SPOTLIGHT_FEATURE,
@@ -32,7 +33,10 @@ export function Spotlight({
       style={{ background: "var(--Neutral-50, #F6F7F8)" }}
     >
       <Container>
-        <SectionHeading title="Spotlight" />
+        <SectionHeading
+          title="Spotlight"
+          action={<ShowMoreLink href="/fact-checks" />}
+        />
 
         <div className="mt-10 grid gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2">
