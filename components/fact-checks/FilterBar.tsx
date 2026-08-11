@@ -176,7 +176,7 @@ export function FilterBar({
   onClear: () => void;
 }) {
   return (
-    <div className="mx-auto w-full max-w-[1030px] rounded-[20px] border-[0.5px] border-neutral-200 bg-white p-6 shadow-[0px_10px_30px_0px_rgba(2,29,51,0.08)] sm:p-8">
+    <div className="mx-auto w-full max-w-[830px] rounded-[20px] border-[0.5px] border-neutral-200 bg-white p-6 shadow-[0px_10px_30px_0px_rgba(2,29,51,0.08)] sm:p-8">
       <p className="text-center text-base font-bold text-gray-800">
         Filter By:
       </p>
@@ -198,44 +198,42 @@ export function FilterBar({
       </div>
 
       {/*
-        Always render this row so its height is reserved up-front: selecting the
-        first filter then reveals chips/actions in place instead of growing the
-        card and shoving the listing down (`min-h` holds one row's worth of space).
+        Chips only take up space once something is selected — the design's card
+        hugs the dropdown row, so reserving a chip row up-front left a visible
+        gap. Picking the first filter grows the card and nudges the listing down.
       */}
-      <div className="mt-5 flex min-h-[34px] flex-wrap items-center justify-center gap-3">
-        {chips.length > 0 && (
-          <>
-            {chips.map((chip) => {
-              const label = filterLabel(chip.dimension, chip.value);
-              return (
-                <span
-                  key={`${chip.dimension}-${chip.value}`}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-pesacheck-blue py-[5px] pl-3 pr-2.5 text-sm font-medium text-white"
+      {chips.length > 0 && (
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+          {chips.map((chip) => {
+            const label = filterLabel(chip.dimension, chip.value);
+            return (
+              <span
+                key={`${chip.dimension}-${chip.value}`}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-pesacheck-blue py-[5px] pl-3 pr-2.5 text-sm font-medium text-white"
+              >
+                {label}
+                <button
+                  type="button"
+                  aria-label={`Remove ${label} filter`}
+                  onClick={() => onRemoveChip(chip.dimension, chip.value)}
+                  className="text-white/80 transition-colors hover:text-white"
                 >
-                  {label}
-                  <button
-                    type="button"
-                    aria-label={`Remove ${label} filter`}
-                    onClick={() => onRemoveChip(chip.dimension, chip.value)}
-                    className="text-white/80 transition-colors hover:text-white"
-                  >
-                    <Close />
-                  </button>
-                </span>
-              );
-            })}
+                  <Close />
+                </button>
+              </span>
+            );
+          })}
 
-            <button
-              type="button"
-              onClick={onClear}
-              className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#fc0d18] transition-colors hover:text-[#d00b15]"
-            >
-              <Close />
-              Clear Filters
-            </button>
-          </>
-        )}
-      </div>
+          <button
+            type="button"
+            onClick={onClear}
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#fc0d18] transition-colors hover:text-[#d00b15]"
+          >
+            <Close />
+            Clear Filters
+          </button>
+        </div>
+      )}
     </div>
   );
 }
