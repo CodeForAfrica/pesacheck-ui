@@ -20,7 +20,7 @@ export function TaxonomyRow({
   const parts = [topic, region, language].filter(Boolean) as string[];
   if (parts.length === 0) return null;
   return (
-    <div className="flex items-center gap-1 text-xs font-medium text-neutral-900">
+    <div className="flex items-center gap-1 text-xs font-normal leading-[1.4] text-[#8b9099]">
       {parts.map((part, i) => (
         <Fragment key={part}>
           {i > 0 && <Dot />}
@@ -55,5 +55,5 @@ export function DateRow({
 }
 
 function Dot() {
-  return <span className="size-[2px] shrink-0 rounded-full bg-neutral-900" />;
+  return <span className="size-[2px] shrink-0 rounded-full bg-current" />;
 }
