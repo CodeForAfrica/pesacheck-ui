@@ -1,28 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { FiArrowUpRight } from "react-icons/fi";
-import { Container } from "@/components/ui/SectionHeading";
+import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import { TOOLS, type Tool } from "@/lib/home-content";
 import { ABOUT_BLURB } from "@/lib/site";
-
-/**
- * Heading for this section: navy accent bar and a plain divider, per the Figma
- * redesign. Deliberately local — the shared `SectionHeading` (blue bar plus a
- * blue segment on the divider) still drives the other home-page sections.
- */
-function ToolsHeading({ title }: { title: string }) {
-  return (
-    <div className="w-full">
-      <div className="flex items-center gap-4">
-        <span className="h-7 w-[5px] shrink-0 bg-pesacheck-black" />
-        <h2 className="text-2xl font-extrabold leading-10 text-pesacheck-black md:text-[30px]">
-          {title}
-        </h2>
-      </div>
-      <div className="mt-4 h-px w-full bg-neutral-100" />
-    </div>
-  );
-}
 
 function ToolCard({ tool }: { tool: Tool }) {
   return (
@@ -70,7 +51,7 @@ export function Tools() {
   return (
     <section id="tools" className="py-14 lg:py-20">
       <Container>
-        <ToolsHeading title="More than fact-checking" />
+        <SectionHeading title="More than fact-checking" />
         <p className="mt-4 max-w-[610px] text-md font-medium text-neutral-600">
           {ABOUT_BLURB}
         </p>
