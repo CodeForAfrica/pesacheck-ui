@@ -247,6 +247,12 @@ export const CONTACT_WHATSAPP = {
   ],
 };
 
+// Fact-check submission CTA — Google Form callout, last section on the page.
+export const CONTACT_FACT_CHECK_CTA = {
+  formUrl:
+    "https://docs.google.com/forms/d/e/1FAIpQLSeI9xshwBWxwDuLwT4jhR9hdRLUNkwdjo0sqEqV9N5r5lCQYQ/viewform?usp=sf_link&ref=pesacheck.org",
+};
+
 // Licensing & syndication section.
 export const CONTACT_LICENSING = {
   heading: "Licensing and syndication",
