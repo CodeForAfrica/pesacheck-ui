@@ -50,7 +50,9 @@ export function Footer() {
           />
         </div>
 
-        <nav className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold text-neutral-900">
+        <div className="mt-8 h-px w-full bg-neutral-100" />
+
+        <nav className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold text-neutral-900">
           {FOOTER_NAV.map((l) => (
             <Link
               key={l.label}
@@ -62,7 +64,7 @@ export function Footer() {
           ))}
         </nav>
 
-        <div className="mt-8 h-px w-full bg-neutral-100" />
+        <div className="mt-6 h-px w-full bg-neutral-100" />
 
         <div className="mt-6 flex flex-wrap items-center justify-between gap-6">
           <div className="flex items-center gap-4">
