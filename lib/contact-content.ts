@@ -248,8 +248,11 @@ export const CONTACT_WHATSAPP = {
 };
 
 // Fact-check submission CTA — Google Form callout, last section on the page.
+// Form URL lives in env (see .env.example) rather than hardcoded here, since
+// it's expected to move to a CMS-managed value once that's figured out.
 export const CONTACT_FACT_CHECK_CTA = {
   formUrl:
+    process.env.NEXT_PUBLIC_FACT_CHECK_FORM_URL ??
     "https://docs.google.com/forms/d/e/1FAIpQLSeI9xshwBWxwDuLwT4jhR9hdRLUNkwdjo0sqEqV9N5r5lCQYQ/viewform?usp=sf_link&ref=pesacheck.org",
 };
 
