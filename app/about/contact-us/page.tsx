@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Toaster } from "sonner";
+import { ContactFactCheckCta } from "@/components/about/ContactFactCheckCta";
 import { ContactForm } from "@/components/about/ContactForm";
 import { ContactHero } from "@/components/about/ContactHero";
 import { ContactLicensing } from "@/components/about/ContactLicensing";
@@ -20,6 +21,7 @@ export default function ContactUsPage() {
       <ContactLocations />
       <ContactWhatsapp />
       <ContactLicensing />
+      <ContactFactCheckCta />
       <Toaster position="bottom-right" richColors />
     </>
   );
