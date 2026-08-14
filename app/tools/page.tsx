@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { ComingSoon } from "@/components/tools/ComingSoon";
 import { ToolsHero } from "@/components/tools/ToolsHero";
+import { ToolsShowcase } from "@/components/tools/ToolsShowcase";
 
 export const metadata: Metadata = {
   title: "Tools — PesaCheck",
@@ -12,7 +12,7 @@ export default function ToolsPage() {
   return (
     <>
       <ToolsHero />
-      <ComingSoon />
+      <ToolsShowcase />
     </>
   );
 }
