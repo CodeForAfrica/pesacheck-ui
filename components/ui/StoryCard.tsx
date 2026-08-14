@@ -54,7 +54,7 @@ export function StoryCard({
               />
             )}
             <h3
-              className={`font-extrabold leading-6 text-gray-800 ${titleClassName}`}
+              className={`line-clamp-3 font-bold leading-[1.35] tracking-[-0.01em] text-pesacheck-black transition-colors group-hover:text-pesacheck-blue ${titleClassName}`}
             >
               {story.title}
             </h3>
@@ -83,11 +83,12 @@ export function StoryCard({
           className="object-cover transition-transform duration-300 group-hover:scale-105"
         />
         {story.verdict && (
-          <span className="absolute left-2.5 top-2.5 z-10">
+          <span className="absolute left-[14px] top-[14px] z-10">
             <VerdictBadge label={story.verdict} />
           </span>
         )}
-        <span className="absolute right-2.5 top-2.5 z-10">
+        {/* Same inset as the verdict pill so the two line up across the card. */}
+        <span className="absolute right-[14px] top-[14px] z-10">
           <ArrowButton />
         </span>
       </div>
@@ -103,7 +104,7 @@ export function StoryCard({
             />
           )}
           <h3
-            className={`font-extrabold leading-6 text-gray-800 ${titleClassName}`}
+            className={`line-clamp-3 font-bold leading-[1.35] tracking-[-0.01em] text-pesacheck-black transition-colors group-hover:text-pesacheck-blue ${titleClassName}`}
           >
             {story.title}
           </h3>

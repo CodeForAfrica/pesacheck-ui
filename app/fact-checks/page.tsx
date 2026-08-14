@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { FactChecksContentDesks } from "@/components/fact-checks/FactChecksContentDesks";
 import { FactChecksExplorer } from "@/components/fact-checks/FactChecksExplorer";
 import {
   parseFilterParams,
@@ -54,15 +53,12 @@ export default async function FactChecksPage({
     (await getFactChecks(page, filters).catch(() => null)) ?? staticPage(page);
 
   return (
-    <>
-      <FactChecksExplorer
-        stories={listing.stories}
-        page={listing.page}
-        totalPages={listing.totalPages}
-        filters={filters}
-        openFilter={openFilter}
-      />
-      <FactChecksContentDesks />
-    </>
+    <FactChecksExplorer
+      stories={listing.stories}
+      page={listing.page}
+      totalPages={listing.totalPages}
+      filters={filters}
+      openFilter={openFilter}
+    />
   );
 }

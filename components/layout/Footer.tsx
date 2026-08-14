@@ -10,32 +10,37 @@ export function Footer() {
       <FooterAllySection />
 
       <Container className="pb-16">
-        <div className="flex flex-wrap items-center justify-between gap-6 pt-10">
-          <div className="flex items-center gap-4">
-            <Image
-              src="/pesacheck-logo.png"
-              alt="PesaCheck"
-              width={190}
-              height={52}
-              className="-ml-4 h-auto w-auto grayscale transition hover:grayscale-0"
-            />
-            <span className="text-xs font-medium text-neutral-500">
-              An intitative of:
-            </span>
-            <Link
-              href="https://codeforafrica.org/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+        <div className="flex flex-wrap items-start justify-between gap-6 pt-10">
+          {/* Masthead and blurb share a column so the IFCN badge sits beside
+              them rather than pushing the blurb below its full height. */}
+          <div>
+            <div className="flex items-center gap-4">
               <Image
-                src="/images/footer/cfa-logo-colored.svg"
-                alt="Code for Africa"
-                width={73}
-                height={32}
-                className="h-8 w-auto grayscale transition hover:grayscale-0"
+                src="/pesacheck-logo.png"
+                alt="PesaCheck"
+                width={190}
+                height={52}
+                className="-ml-4 h-auto w-auto grayscale transition hover:grayscale-0"
               />
-            </Link>
+              <span className="text-xs font-medium text-neutral-500">
+                An initiative of:
+              </span>
+              <Link
+                href="https://codeforafrica.org/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm font-bold"
+              >
+                <span className="text-[#0d0d0d]">Code for </span>
+                <span className="text-[#0049a7]">Africa</span>
+              </Link>
+            </div>
+
+            <p className="max-w-[610px] text-sm font-medium leading-5 text-[#5f656c]">
+              {FOOTER_ABOUT}
+            </p>
           </div>
+
           <Image
             src="/images/footer/ifcn.png"
             alt="IFCN"
@@ -45,11 +50,9 @@ export function Footer() {
           />
         </div>
 
-        <p className="mt-8 max-w-[610px] text-sm font-medium leading-5 text-neutral-900">
-          {FOOTER_ABOUT}
-        </p>
+        <div className="mt-8 h-px w-full bg-neutral-100" />
 
-        <nav className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold text-neutral-900">
+        <nav className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold text-neutral-900">
           {FOOTER_NAV.map((l) => (
             <Link
               key={l.label}
@@ -61,7 +64,7 @@ export function Footer() {
           ))}
         </nav>
 
-        <div className="mt-8 h-px w-full bg-neutral-100" />
+        <div className="mt-6 h-px w-full bg-neutral-100" />
 
         <div className="mt-6 flex flex-wrap items-center justify-between gap-6">
           <div className="flex items-center gap-4">

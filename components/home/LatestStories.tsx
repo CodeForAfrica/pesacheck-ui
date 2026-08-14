@@ -1,4 +1,5 @@
 import { Container, SectionHeading } from "@/components/ui/SectionHeading";
+import { ShowMoreLink } from "@/components/ui/ShowMoreLink";
 import { StoryCard } from "@/components/ui/StoryCard";
 import {
   LATEST_FEATURE,
@@ -48,6 +49,10 @@ export function LatestStories({
           {grid.map((story) => (
             <StoryCard key={story.href ?? story.title} story={story} />
           ))}
+        </div>
+
+        <div className="mt-7 flex justify-end">
+          <ShowMoreLink href="/fact-checks" />
         </div>
       </Container>
     </section>

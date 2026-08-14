@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useOptimistic, useState, useTransition } from "react";
 import { Pagination } from "@/components/ui/Pagination";
-import { Container } from "@/components/ui/SectionHeading";
+import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import { StoryCard } from "@/components/ui/StoryCard";
 import {
   EMPTY_FILTERS,
@@ -138,6 +138,9 @@ export function FactChecksExplorer({
       {/* Listing */}
       <section className="py-14 lg:py-20">
         <Container>
+          {/* The listing is the page's only titled section — there is no hero. */}
+          <SectionHeading title="Fact Checks" />
+
           {stories.length === 0 ? (
             <p className="py-16 text-center text-base font-medium text-neutral-500">
               {chips.length > 0
@@ -146,7 +149,7 @@ export function FactChecksExplorer({
             </p>
           ) : (
             <>
-              <div className="grid gap-8 lg:grid-cols-3">
+              <div className="mt-10 grid gap-8 lg:grid-cols-3">
                 <div className="lg:col-span-2">
                   <StoryCard
                     story={feature}

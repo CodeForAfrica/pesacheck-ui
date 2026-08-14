@@ -1,9 +1,10 @@
 import type { ReactNode } from "react";
 
 /**
- * Section heading: blue accent bar + bold title, with a full-width divider
- * carrying a short blue underline segment beneath the title. Matches Figma
- * "Spotlight" / "Trending Stories" / "Latest Stories" headings.
+ * Section heading: navy accent bar + bold title over a full-width hairline
+ * divider, with an optional action (a "Show more" link, carousel arrows) on
+ * the right. Matches Figma "Spotlight" / "Fact Checks" / "More than
+ * fact-checking" headings.
  */
 export function SectionHeading({
   title,
@@ -16,16 +17,14 @@ export function SectionHeading({
     <div className="w-full">
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <span className="h-10 w-[3px] shrink-0 rounded bg-pesacheck-blue" />
-          <h2 className="text-2xl font-extrabold leading-10 text-gray-800 md:text-[30px]">
+          <span className="h-[30px] w-[5px] shrink-0 bg-pesacheck-black" />
+          <h2 className="text-2xl font-extrabold leading-10 text-pesacheck-black md:text-[30px]">
             {title}
           </h2>
         </div>
         {action}
       </div>
-      <div className="relative mt-5 h-px w-full bg-neutral-100">
-        <span className="absolute left-0 top-0 h-px w-40 bg-pesacheck-blue" />
-      </div>
+      <div className="mt-4 h-px w-full bg-neutral-100" />
     </div>
   );
 }
