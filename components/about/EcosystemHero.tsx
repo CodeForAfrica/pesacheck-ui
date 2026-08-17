@@ -30,7 +30,7 @@ export function EcosystemHero() {
           <h1 className="text-[40px] font-extrabold leading-[1.1] text-white sm:text-[52px] lg:text-[60px]">
             {ECOSYSTEM_HERO.title}
           </h1>
-          <p className="mt-5 max-w-[635px] text-base font-medium leading-6 text-white/90">
+          <p className="mt-[18px] max-w-[560px] text-[17px] font-normal leading-[1.5] text-white/90 sm:text-xl">
             {ECOSYSTEM_HERO.subtitle}
           </p>
         </div>
