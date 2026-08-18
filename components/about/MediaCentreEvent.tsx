@@ -1,6 +1,47 @@
 import Image from "next/image";
+import Link from "next/link";
+import { FiArrowUpRight } from "react-icons/fi";
 import { Container, SectionHeading } from "@/components/ui/SectionHeading";
-import { EVENT } from "@/lib/media-centre-content";
+import {
+  EVENT,
+  UPCOMING,
+  UPCOMING_LABEL,
+  type UpcomingEvent,
+} from "@/lib/media-centre-content";
+
+function UpcomingCard({ event }: { event: UpcomingEvent }) {
+  return (
+    <div className="flex flex-col">
+      <p className="text-xs leading-[18px] text-neutral-500">{event.meta}</p>
+
+      <div className="mt-3 flex flex-1 gap-3">
+        <span className="mt-[9px] h-5 w-[3px] shrink-0 bg-pesacheck-black" />
+        {/* The pill row sits at the bottom so it lines up across the three
+            cards whatever depth their copy wraps to. */}
+        <div className="flex min-w-0 flex-1 flex-col">
+          <h4 className="text-xl font-bold leading-[30px] text-pesacheck-black">
+            {event.title}
+          </h4>
+          <p className="mt-3 text-md font-medium leading-[26px] text-neutral-800">
+            {event.body}
+          </p>
+          <div className="mt-auto flex items-center justify-between gap-3 pt-5">
+            <span className="rounded-full border border-neutral-100 px-3.5 py-1 text-xs leading-[18px] text-neutral-600">
+              {event.kind}
+            </span>
+            <a
+              href={event.href}
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-pesacheck-blue"
+            >
+              Details
+              <FiArrowUpRight size={14} aria-hidden />
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function MediaCentreEvent() {
   return (
@@ -42,7 +83,26 @@ export function MediaCentreEvent() {
                 </div>
               ))}
             </dl>
+
+            <Link
+              href={EVENT.cta.href}
+              className="mt-8 inline-flex items-center gap-1.5 text-sm font-semibold text-pesacheck-blue transition-colors hover:text-pesacheck-black"
+            >
+              {EVENT.cta.label}
+              <FiArrowUpRight size={14} aria-hidden />
+            </Link>
           </div>
+        </div>
+
+        {/* Secondary listing: the same events treatment at a quarter of the
+            weight, so the summit above keeps the section's attention. */}
+        <h3 className="mt-12 text-sm font-bold uppercase tracking-wide text-neutral-600">
+          {UPCOMING_LABEL}
+        </h3>
+        <div className="mt-5 grid gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:gap-4">
+          {UPCOMING.map((event) => (
+            <UpcomingCard key={event.title} event={event} />
+          ))}
         </div>
       </Container>
     </section>
