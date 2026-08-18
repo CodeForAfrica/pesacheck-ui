@@ -2,8 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { FiArrowUpRight } from "react-icons/fi";
 import { Container, SectionHeading } from "@/components/ui/SectionHeading";
-import { TOOLS, type Tool } from "@/lib/home-content";
 import { ABOUT_BLURB } from "@/lib/site";
+import { TOOLS, type Tool } from "@/lib/tools-content";
 
 function ToolCard({ tool }: { tool: Tool }) {
   return (
