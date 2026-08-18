@@ -1,14 +1,10 @@
-"use client";
-
-import { useMemo, useState } from "react";
-import { FilterBar, type Selection } from "@/components/fact-checks/FilterBar";
 import { Container } from "@/components/ui/SectionHeading";
 import { StoryCard } from "@/components/ui/StoryCard";
+import type { FilterSelection } from "@/lib/data/fact-check-filters";
 import {
   FEATURE,
   FEATURE_SECONDARY,
   FILTERS,
-  type FilterDimension,
   filterLabel,
   STORIES,
 } from "@/lib/fact-checks-content";
@@ -16,17 +12,7 @@ import type { Story } from "@/lib/home-content";
 
 const POOL: Story[] = [FEATURE, FEATURE_SECONDARY, ...STORIES];
 
-const EMPTY: Selection = { region: [], language: [], topic: [] };
-
-function clone(sel: Selection): Selection {
-  return {
-    region: [...sel.region],
-    language: [...sel.language],
-    topic: [...sel.topic],
-  };
-}
-
-function matchesFilters(story: Story, applied: Selection): boolean {
+function matchesFilters(story: Story, applied: FilterSelection): boolean {
   // The static search pool is tagged with display labels, while the filter bar
   // emits taxonomy codes — resolve codes to labels before comparing.
   return FILTERS.every(({ dimension }) => {
@@ -91,53 +77,21 @@ function SearchIllustration() {
   );
 }
 
-export function SearchExplorer({ query }: { query: string }) {
-  // Filters auto-apply: `selected` is the live filter set (no separate "Apply"
-  // step), so results recompute as the reader toggles options or removes chips.
-  const [selected, setSelected] = useState<Selection>(() => clone(EMPTY));
-  const [openDropdown, setOpenDropdown] = useState<FilterDimension | null>(
-    null,
+/**
+ * Search results. Filtering is driven entirely by the URL (`query` + the
+ * header search bar's applied filters) — there's no in-page filter UI; see
+ * `Header`.
+ */
+export function SearchExplorer({
+  query,
+  filters,
+}: {
+  query: string;
+  filters: FilterSelection;
+}) {
+  const results = POOL.filter(
+    (s) => matchesQuery(s, query) && matchesFilters(s, filters),
   );
-
-  const chips = useMemo(
-    () =>
-      FILTERS.flatMap(({ dimension }) =>
-        selected[dimension].map((value) => ({ dimension, value })),
-      ),
-    [selected],
-  );
-
-  const results = useMemo(
-    () =>
-      POOL.filter((s) => matchesQuery(s, query) && matchesFilters(s, selected)),
-    [query, selected],
-  );
-
-  const toggleOption = (dimension: FilterDimension, value: string) => {
-    setSelected((prev) => {
-      const next = clone(prev);
-      next[dimension] = next[dimension].includes(value)
-        ? next[dimension].filter((v) => v !== value)
-        : [...next[dimension], value];
-      return next;
-    });
-  };
-
-  const removeChip = (dimension: FilterDimension, value: string) => {
-    setSelected((prev) => {
-      const next = clone(prev);
-      next[dimension] = next[dimension].filter((v) => v !== value);
-      return next;
-    });
-  };
-
-  const toggleDropdown = (dimension: FilterDimension) =>
-    setOpenDropdown((cur) => (cur === dimension ? null : dimension));
-
-  const clear = () => {
-    setSelected(clone(EMPTY));
-    setOpenDropdown(null);
-  };
 
   const hasResults = results.length > 0;
 
@@ -192,21 +146,6 @@ export function SearchExplorer({ query }: { query: string }) {
         <p className="mt-1 text-lg font-extrabold text-neutral-900">
           &ldquo;{query}&rdquo;
         </p>
-      </section>
-
-      {/* Filter panel */}
-      <section className="bg-neutral-50">
-        <Container className="py-14 lg:py-16">
-          <FilterBar
-            selected={selected}
-            openDropdown={openDropdown}
-            chips={chips}
-            onToggleDropdown={toggleDropdown}
-            onToggleOption={toggleOption}
-            onRemoveChip={removeChip}
-            onClear={clear}
-          />
-        </Container>
       </section>
 
       {/* Results grid */}

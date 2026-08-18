@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import { SearchExplorer } from "@/components/search/SearchExplorer";
+import { parseFilterParams } from "@/lib/data/fact-check-filters";
+
+type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
 export async function generateMetadata({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: SearchParams;
 }): Promise<Metadata> {
   const { q } = await searchParams;
   return {
@@ -16,9 +19,11 @@ export async function generateMetadata({
 export default async function SearchPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: SearchParams;
 }) {
-  const { q = "" } = await searchParams;
+  const params = await searchParams;
+  const q = typeof params.q === "string" ? params.q : "";
+  const filters = parseFilterParams(params);
 
-  return <SearchExplorer query={q} />;
+  return <SearchExplorer query={q} filters={filters} />;
 }

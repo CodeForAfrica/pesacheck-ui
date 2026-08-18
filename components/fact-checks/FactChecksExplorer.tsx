@@ -1,140 +1,56 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { useOptimistic, useState, useTransition } from "react";
+import { useTransition } from "react";
 import { Pagination } from "@/components/ui/Pagination";
 import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import { StoryCard } from "@/components/ui/StoryCard";
 import {
-  EMPTY_FILTERS,
   type FilterSelection,
   filtersToQuery,
 } from "@/lib/data/fact-check-filters";
-import { FILTERS, type FilterDimension } from "@/lib/fact-checks-content";
+import { FILTERS } from "@/lib/fact-checks-content";
 import type { Story } from "@/lib/home-content";
-import { FilterBar } from "./FilterBar";
-
-function clone(sel: FilterSelection): FilterSelection {
-  return {
-    region: [...sel.region],
-    language: [...sel.language],
-    topic: [...sel.topic],
-  };
-}
 
 /**
- * The fact-checks grid + filter bar. Filtering and pagination are both
- * **server-side and URL-driven**: `stories` arrive already filtered/paged, and
- * every control navigates by mutating the query string (`?region=…&topic=…&page=N`),
- * which re-runs the server fetch.
- *
- * Filters **auto-apply** — there's no "Apply" step. The URL (`filters` prop) is
- * the single source of truth; toggling an option, removing a chip, or clearing
- * navigates straight away. `useOptimistic` mirrors the change so the checkboxes
- * and chips update instantly while the server re-fetches the grid in a
- * transition. Filter changes use `replace` (so a burst of toggles doesn't spam
- * history); pagination uses `push`.
+ * The fact-checks grid. Filtering and pagination are both **server-side and
+ * URL-driven**: `stories` arrive already filtered/paged, matching the query
+ * string (`?region=…&topic=…&page=N`). The filter dropdowns themselves live
+ * in the header search bar (see `Header`); this component only reflects the
+ * applied filters (as a read-only chip row) and drives pagination.
  */
 export function FactChecksExplorer({
   stories,
   page,
   totalPages,
   filters,
-  openFilter = null,
 }: {
   stories: Story[];
   page: number;
   totalPages: number;
   filters: FilterSelection;
-  /** Filter dropdown to open on arrival (`?open=<dimension>` — mega-menu links). */
-  openFilter?: FilterDimension | null;
 }) {
   const router = useRouter();
   const pathname = usePathname();
   const [, startTransition] = useTransition();
 
-  // Optimistic mirror of the applied (URL) filters — instant checkbox/chip
-  // feedback; rebases to `filters` once the navigation transition resolves.
-  const [optimistic, setOptimistic] = useOptimistic(filters);
-  const [openDropdown, setOpenDropdown] = useState<FilterDimension | null>(
-    openFilter,
-  );
-
-  // Re-open the requested dropdown when `?open=` changes while the page is
-  // already mounted (e.g. clicking "By Topic" in the header from /fact-checks).
-  const [prevOpenFilter, setPrevOpenFilter] = useState(openFilter);
-  if (openFilter !== prevOpenFilter) {
-    setPrevOpenFilter(openFilter);
-    if (openFilter) setOpenDropdown(openFilter);
-  }
-
   const chips = FILTERS.flatMap(({ dimension }) =>
-    optimistic[dimension].map((value) => ({ dimension, value })),
+    filters[dimension].map((value) => ({ dimension, value })),
   );
 
-  // Commit a filter/page change to the URL; the server re-fetches that slice.
-  const navigate = (
-    next: FilterSelection,
-    nextPage: number,
-    mode: "push" | "replace",
-  ) => {
-    const params = new URLSearchParams(filtersToQuery(next));
+  // Pagination keeps the applied filters; only the page changes.
+  const goToPage = (nextPage: number) => {
+    const params = new URLSearchParams(filtersToQuery(filters));
     if (nextPage > 1) params.set("page", String(nextPage));
     const qs = params.toString();
     const url = qs ? `${pathname}?${qs}` : pathname;
-    startTransition(() => {
-      setOptimistic(next);
-      router[mode](url);
-    });
+    startTransition(() => router.push(url));
   };
-
-  // Any filter change auto-applies and resets to page 1.
-  const commitFilters = (next: FilterSelection) => navigate(next, 1, "replace");
-
-  const toggleOption = (dimension: FilterDimension, value: string) => {
-    const next = clone(optimistic);
-    next[dimension] = next[dimension].includes(value)
-      ? next[dimension].filter((v) => v !== value)
-      : [...next[dimension], value];
-    commitFilters(next);
-  };
-
-  const removeChip = (dimension: FilterDimension, value: string) => {
-    const next = clone(optimistic);
-    next[dimension] = next[dimension].filter((v) => v !== value);
-    commitFilters(next);
-  };
-
-  const clear = () => {
-    setOpenDropdown(null);
-    commitFilters(EMPTY_FILTERS);
-  };
-
-  const toggleDropdown = (dimension: FilterDimension) =>
-    setOpenDropdown((cur) => (cur === dimension ? null : dimension));
-
-  // Pagination keeps the applied filters; only the page changes.
-  const goToPage = (next: number) => navigate(filters, next, "push");
 
   const [feature, secondary, ...grid] = stories;
 
   return (
     <>
-      {/* Filter panel — its own band below the hero, not overlapping it. */}
-      <section className="bg-neutral-50">
-        <Container className="py-14 lg:py-16">
-          <FilterBar
-            selected={optimistic}
-            openDropdown={openDropdown}
-            chips={chips}
-            onToggleDropdown={toggleDropdown}
-            onToggleOption={toggleOption}
-            onRemoveChip={removeChip}
-            onClear={clear}
-          />
-        </Container>
-      </section>
-
       {/* Listing */}
       <section className="py-14 lg:py-20">
         <Container>

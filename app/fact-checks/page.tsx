@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import { FactChecksExplorer } from "@/components/fact-checks/FactChecksExplorer";
-import {
-  parseFilterParams,
-  parseOpenParam,
-} from "@/lib/data/fact-check-filters";
+import { parseFilterParams } from "@/lib/data/fact-check-filters";
 import {
   clampPage,
   pageOffset,
@@ -45,7 +42,6 @@ export default async function FactChecksPage({
   const params = await searchParams;
   const page = parsePageParam(params.page);
   const filters = parseFilterParams(params);
-  const openFilter = parseOpenParam(params.open);
 
   // Filters narrow the grid server-side; the static fallback ignores them (it's
   // a degraded mode for when Hasura is unreachable) and just pages the design pool.
@@ -58,7 +54,6 @@ export default async function FactChecksPage({
       page={listing.page}
       totalPages={listing.totalPages}
       filters={filters}
-      openFilter={openFilter}
     />
   );
 }
