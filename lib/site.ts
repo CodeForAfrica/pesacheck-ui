@@ -29,8 +29,19 @@ import {
   LuScale,
   LuSearch,
 } from "react-icons/lu";
+import type { FilterDimension } from "@/lib/data/fact-check-filters";
 
-export type NavMenuItem = { label: string; href: string; icon: ElementType };
+export type NavMenuItem = {
+  label: string;
+  href: string;
+  icon: ElementType;
+  /**
+   * When present, this item opens the header search bar's filter panel with
+   * the matching dropdown expanded, instead of navigating to `href` — the
+   * fact-checks listing no longer has its own filter UI (issue #85).
+   */
+  filterDimension?: FilterDimension;
+};
 
 export type NavLink = {
   label: string;
@@ -73,17 +84,24 @@ export const FACT_CHECKS_MENU_ITEMS: NavMenuItem[] = [
   { label: "All fact-checks", href: "/fact-checks", icon: FiGrid },
   {
     label: "By Language",
-    href: "/fact-checks?open=language",
+    href: "/fact-checks",
     icon: LuLanguages,
+    filterDimension: "language",
   },
   {
     label: "By Topic",
-    href: "/fact-checks?open=topic",
+    href: "/fact-checks",
     icon: LuMessageCircleWarning,
+    filterDimension: "topic",
   },
   { label: "Quick Reads", href: "/fact-checks", icon: FiBookOpen },
   { label: "Explainers", href: "/fact-checks", icon: FiPlay },
-  { label: "By Country", href: "/fact-checks?open=region", icon: FiGlobe },
+  {
+    label: "By Country",
+    href: "/fact-checks",
+    icon: FiGlobe,
+    filterDimension: "region",
+  },
 ];
 
 export const NAV_LINKS: NavLink[] = [

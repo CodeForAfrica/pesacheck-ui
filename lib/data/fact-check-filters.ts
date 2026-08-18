@@ -128,18 +128,6 @@ export function parseFilterParams(params: SearchParams): FilterSelection {
   };
 }
 
-/**
- * Parse the `?open=<dimension>` param — used by the header mega-menu links
- * ("By Language", "By Topic", "By Country") to land on `/fact-checks` with the
- * matching filter dropdown already open. Unknown values are ignored.
- */
-export function parseOpenParam(
-  value: string | string[] | undefined,
-): FilterDimension | null {
-  const raw = Array.isArray(value) ? value[0] : value;
-  return FILTER_DIMENSIONS.find((dim) => dim === raw) ?? null;
-}
-
 /** Serialize active dimensions to query params (omits empty dimensions). */
 export function filtersToQuery(
   filters: FilterSelection,
