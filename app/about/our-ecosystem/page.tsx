@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
+import { EcosystemGroups } from "@/components/about/EcosystemGroups";
 import { EcosystemHero } from "@/components/about/EcosystemHero";
-import { ComingSoon } from "@/components/tools/ComingSoon";
+import { EcosystemRoles } from "@/components/about/EcosystemRoles";
 
 export const metadata: Metadata = {
   title: "Our Ecosystem — PesaCheck",
@@ -12,7 +13,8 @@ export default function OurEcosystemPage() {
   return (
     <>
       <EcosystemHero />
-      <ComingSoon label="Content Coming Soon" />
+      <EcosystemGroups />
+      <EcosystemRoles />
     </>
   );
 }
