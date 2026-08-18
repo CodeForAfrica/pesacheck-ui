@@ -173,6 +173,7 @@ export type SpotlightEvent = {
   title: string;
   body: string;
   details: { label: string; value: string }[];
+  cta: { label: string; href: string };
 };
 
 export const EVENT: SpotlightEvent = {
@@ -186,4 +187,41 @@ export const EVENT: SpotlightEvent = {
     { label: "Languages", value: "English, French, Kiswahili" },
     { label: "Cost", value: "Free for partner newsrooms" },
   ],
+  cta: { label: "Request an invitation", href: "/about/contact-us" },
 };
+
+export type UpcomingEvent = {
+  /** Date and place, e.g. "08 Oct 2026 · Accra". */
+  meta: string;
+  title: string;
+  body: string;
+  /** Pill under the copy — workshop, webinar, lab. */
+  kind: string;
+  href: string;
+};
+
+export const UPCOMING_LABEL = "Also coming up";
+
+export const UPCOMING: UpcomingEvent[] = [
+  {
+    meta: "08 Oct 2026 · Accra",
+    title: "Verifying election claims in real time",
+    body: "A one-day clinic for newsroom teams covering the Ghanaian polls, run with our West Africa desk.",
+    kind: "Workshop",
+    href: "#",
+  },
+  {
+    meta: "19 Nov 2026 · Online",
+    title: "Public finance data for fact-checkers",
+    body: "How to read national budgets and audit reports, with worked examples from four countries.",
+    kind: "Webinar",
+    href: "#",
+  },
+  {
+    meta: "03 Dec 2026 · Addis Ababa",
+    title: "Amharic and Somali verification lab",
+    body: "Two days on verification in low-resource languages, including tooling and community tip lines.",
+    kind: "Lab",
+    href: "#",
+  },
+];
