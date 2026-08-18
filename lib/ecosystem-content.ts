@@ -23,6 +23,7 @@ export type EcosystemItem = {
   tone: EcosystemTone;
   logo: EcosystemLogo;
   description: string;
+  href: string;
 };
 
 export type EcosystemGroup = {
@@ -56,6 +57,7 @@ export const ECOSYSTEM_GROUPS: EcosystemGroup[] = [
         logo: CFA_LOGO,
         description:
           "PesaCheck is a verified signatory of the International Fact-Checking Network's Code of Principles, and is reassessed annually against its standards for non-partisanship, transparency of sources and funding, and open corrections.",
+        href: "https://codeforafrica.org",
       },
       {
         name: "Africa Facts",
@@ -64,6 +66,7 @@ export const ECOSYSTEM_GROUPS: EcosystemGroup[] = [
         logo: CFA_LOGO,
         description:
           "PesaCheck takes part in the Africa Facts network of fact-checking organisations, sharing verification methods and coordinating with peers on claims that cross borders.",
+        href: "https://codeforafrica.org",
       },
       {
         name: "AFCA",
@@ -72,6 +75,7 @@ export const ECOSYSTEM_GROUPS: EcosystemGroup[] = [
         logo: CFA_LOGO,
         description:
           "PesaCheck works alongside AFCA members to counter mis- and disinformation across the continent's language and border lines.",
+        href: "https://codeforafrica.org",
       },
     ],
   },
@@ -85,6 +89,7 @@ export const ECOSYSTEM_GROUPS: EcosystemGroup[] = [
         logo: CFA_LOGO,
         description:
           "PesaCheck collaborates with ARIA partners — researchers, newsrooms and civic technologists — on cross-border responses to coordinated disinformation.",
+        href: "/fact-checks",
       },
       {
         name: "ANCIR",
@@ -93,6 +98,7 @@ export const ECOSYSTEM_GROUPS: EcosystemGroup[] = [
         logo: ANCIR_LOGO,
         description:
           "The African Network of Centres for Investigative Reporting, whose iLAB forensics team supports PesaCheck investigations with data, OSINT and network analysis.",
+        href: "/fact-checks",
       },
       {
         name: "Code for Africa",
@@ -101,6 +107,7 @@ export const ECOSYSTEM_GROUPS: EcosystemGroup[] = [
         logo: CFA_LOGO,
         description:
           "PesaCheck is an initiative of Code for Africa, the continent's largest network of civic technology and data journalism labs, operating in more than 20 countries.",
+        href: "/fact-checks",
       },
     ],
   },

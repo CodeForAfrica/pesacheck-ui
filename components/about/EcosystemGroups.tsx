@@ -84,7 +84,15 @@ export function EcosystemGroups() {
                       {item.description}
                     </p>
                     <Link
-                      href="/fact-checks"
+                      href={item.href}
+                      target={
+                        item.href.startsWith("http") ? "_blank" : undefined
+                      }
+                      rel={
+                        item.href.startsWith("http")
+                          ? "noopener noreferrer"
+                          : undefined
+                      }
                       className="mt-auto inline-flex w-fit items-center gap-[6px] text-[13px] font-semibold text-[#021d32] transition hover:text-pesacheck-blue"
                     >
                       Learn More <FiArrowUpRight size={13} aria-hidden />
