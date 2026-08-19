@@ -72,7 +72,7 @@ export function getTrending(): Promise<Story[]> {
 }
 
 export function getLatest(): Promise<Story[]> {
-  return getContentListStories("Top news");
+  return getContentListStories("Homepage — Latest");
 }
 
 export function getHeroPreview(): Promise<Story[]> {
