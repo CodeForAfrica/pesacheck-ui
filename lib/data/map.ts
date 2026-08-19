@@ -95,12 +95,12 @@ export function getVerdict(raw: string | null | undefined): string | undefined {
  * code — see `lib/data/fact-check-filters.ts`.
  */
 const LANGUAGE_LABELS: Record<string, string> = {
+  am: "Amharic",
   en: "English",
   fr: "French",
+  om: "Afaan Oromo",
+  so: "Somali",
   sw: "Swahili",
-  am: "Amharic",
-  ar: "Arabic",
-  pt: "Portuguese",
 };
 
 function languageLabel(code: string | null | undefined): string | undefined {
