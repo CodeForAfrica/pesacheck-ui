@@ -1,8 +1,8 @@
 import type { Article } from "@/lib/article-content";
 import { renderArticleBody } from "@/lib/data/body";
+import { mediaAssetUrl } from "@/lib/data/media";
 import type { Story } from "@/lib/home-content";
 
-const MEDIA_URL = process.env.NEXT_PUBLIC_MEDIA_URL ?? "";
 /**
  * Preference order for the card image. Staging exposes
  * `thumbnail|viewImage|baseImage|original|square`; prod/local may differ, so the
@@ -45,9 +45,9 @@ export function findRendition(
   const image = rendition?.image;
   if (!image) return undefined;
   if (image.variants?.includes("webp")) {
-    return `${MEDIA_URL}${image.asset_id}.webp`;
+    return mediaAssetUrl(image.asset_id, "webp");
   }
-  return `${MEDIA_URL}${image.asset_id}.${image.file_extension}`;
+  return mediaAssetUrl(image.asset_id, image.file_extension ?? "webp");
 }
 
 // ── Metadata / verdict / taxonomy ────────────────────────────────────────────
@@ -95,12 +95,12 @@ export function getVerdict(raw: string | null | undefined): string | undefined {
  * code — see `lib/data/fact-check-filters.ts`.
  */
 const LANGUAGE_LABELS: Record<string, string> = {
+  am: "Amharic",
   en: "English",
   fr: "French",
+  om: "Afaan Oromo",
+  so: "Somali",
   sw: "Swahili",
-  am: "Amharic",
-  ar: "Arabic",
-  pt: "Portuguese",
 };
 
 function languageLabel(code: string | null | undefined): string | undefined {

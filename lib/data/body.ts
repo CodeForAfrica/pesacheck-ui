@@ -2,15 +2,36 @@ import sanitizeHtml from "sanitize-html";
 
 const MEDIA_URL = process.env.NEXT_PUBLIC_MEDIA_URL ?? "";
 
-/** Matches `filename.ext` segments; the last one is the asset name. */
-const FILENAME = /[^/.]*\.\w{3,4}/g;
+const UPLOAD_MARKER = "/upload-raw/";
 
-/** Rewrite a publisher image src to `${MEDIA_URL}<filename>`. */
+/**
+ * Rewrite a Superdesk `upload-raw` image src to the public media host.
+ *
+ * Publisher bodies embed superdesk-internal URLs that vary by environment:
+ *   staging:  …/api/upload-raw/2026081813/6a8442c47f5b7187fc090a55   (date dir, no ext)
+ *   local:    …/api/upload-raw/6a84522d02f9c19201447b02.png          (ext, no date dir)
+ *
+ * Non-`upload-raw` srcs (external evidence images, embeds) are left untouched.
+ */
 function rewriteImageSrc(src: string | undefined): string {
   if (!src) return "";
-  const matches = src.match(FILENAME);
-  if (!matches?.length) return src;
-  return `${MEDIA_URL}${matches[matches.length - 1]}`;
+  const at = src.indexOf(UPLOAD_MARKER);
+  if (at === -1) return src;
+
+  // Everything after `/upload-raw/`, minus any query/hash.
+  let assetPath = src.slice(at + UPLOAD_MARKER.length).split(/[?#]/)[0];
+  if (!assetPath) return src;
+
+  // Split off a trailing file extension if the last segment has one.
+  let ext = "webp";
+  const dot = assetPath.lastIndexOf(".");
+  if (dot > assetPath.lastIndexOf("/")) {
+    ext = assetPath.slice(dot + 1);
+    assetPath = assetPath.slice(0, dot);
+  }
+
+  const assetId = assetPath.replace(/\//g, "_");
+  return `${MEDIA_URL}${assetId}.${ext}`;
 }
 
 const OPTIONS: sanitizeHtml.IOptions = {

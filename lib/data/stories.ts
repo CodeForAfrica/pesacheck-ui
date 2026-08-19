@@ -39,9 +39,11 @@ export type FactCheckListing = {
  */
 export const LANGUAGE_ROUTE_SLUGS = [
   "english",
-  "français",
+  "french",
   "kiswahili",
-  "african-languages",
+  "afaan-oromo",
+  "somali",
+  "amharic",
 ];
 
 export const FACT_CHECKS_PAGE_SIZE = 10;
@@ -70,7 +72,7 @@ export function getTrending(): Promise<Story[]> {
 }
 
 export function getLatest(): Promise<Story[]> {
-  return getContentListStories("Top news");
+  return getContentListStories("Homepage — Latest");
 }
 
 export function getHeroPreview(): Promise<Story[]> {

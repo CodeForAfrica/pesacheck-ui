@@ -287,10 +287,33 @@ describe("mapStory", () => {
 });
 
 describe("renderBody", () => {
-  it("rewrites publisher <img> src to MEDIA_URL + filename", () => {
+  it("rewrites staging upload-raw src (date dir, no ext) keeping the date in the key", () => {
+    // Real staging srcs are `.../upload-raw/<date>/<id>` with no file extension.
+    // The media key is `<date>_<id>` (matching swp_image.asset_id) plus an
+    // extension. Two prior bugs: matching `filename.ext` grabbed `check.org`
+    // out of the hostname; taking only the last path segment dropped the
+    // `<date>` and 404'd.
+    const html =
+      '<p><img src="https://superdesk-staging.pesacheck.org/api/upload-raw/2026081813/6a8442c47f5b7187fc090a55"/></p>';
+    expect(renderBody(html)).toContain(
+      'src="https://media.test/2026081813_6a8442c47f5b7187fc090a55.webp"',
+    );
+  });
+
+  it("rewrites local upload-raw src (id.ext, no date) preserving the extension", () => {
+    const html =
+      '<p><img src="http://localhost:8080/api/upload-raw/6a84522d02f9c19201447b02.png"/></p>';
+    expect(renderBody(html)).toContain(
+      'src="https://media.test/6a84522d02f9c19201447b02.png"',
+    );
+  });
+
+  it("leaves non-upload-raw srcs (external evidence images) untouched", () => {
     const html =
       '<p><img src="https://cdn.example.com/path/to/photo.jpg"/></p>';
-    expect(renderBody(html)).toContain('src="https://media.test/photo.jpg"');
+    expect(renderBody(html)).toContain(
+      'src="https://cdn.example.com/path/to/photo.jpg"',
+    );
   });
 
   it("preserves evidence links (the point of a fact-check)", () => {
