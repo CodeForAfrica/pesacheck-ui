@@ -49,6 +49,25 @@ type RouteClause = {
 type WhereClause = SubjectClause | LanguageClause | RouteClause;
 type SearchParams = Record<string, string | string[] | undefined>;
 
+/**
+ * Scheme carrying the editorial article type (Quick Read / Explainer /
+ * Longform). Superdesk publishes it as a metadata subject like any other
+ * taxonomy, so it filters the same way the region and topic dimensions do.
+ */
+export const CONTENT_TYPE_SCHEME = "content_type";
+
+/** Narrows a listing beyond the filter dimensions the reader controls. */
+export type FactCheckScope = {
+  /** A content-desk route (`swp_route.slug`) — backs the desk pages. */
+  routeSlug?: string;
+  /**
+   * Accepted `content_type` codes — backs the article-type pages. Several
+   * codes per type because Superdesk's vocabulary and the site's page names
+   * have drifted apart (a Quick Read is filed as `quickread` or `shortform`).
+   */
+  contentTypes?: string[];
+};
+
 export type FactCheckWhere = {
   tenant_code: { _eq: string };
   published_at: { _is_null: false };
@@ -62,15 +81,15 @@ export type FactCheckWhere = {
  * Inactive dimensions are omitted entirely — an empty `_in: []` would match
  * nothing in Hasura, so we never emit one.
  *
- * `routeSlug` (optional) scopes the listing to a single content-desk route
- * (`swp_route.slug`) — this is what powers the desk pages (`getByDesk`). Desks
- * are still fact-check listings, so the `Debunk` clause stays; the route is just
- * one more `_and` clause on top.
+ * `scope` narrows the listing further, on dimensions the page picks rather than
+ * the reader: `routeSlug` to one content desk (`getByDesk`), `contentTypes` to
+ * one article type (`getByContentType`). Both are still fact-check listings, so
+ * the `Debunk` clause stays and each is just one more `_and` clause on top.
  */
 export function buildFactCheckWhere(
   filters: FilterSelection,
   tenantCode: string,
-  routeSlug?: string,
+  scope: FactCheckScope = {},
 ): FactCheckWhere {
   const and: WhereClause[] = [
     {
@@ -80,8 +99,19 @@ export function buildFactCheckWhere(
     },
   ];
 
-  if (routeSlug) {
-    and.push({ swp_route: { slug: { _eq: routeSlug } } });
+  if (scope.routeSlug) {
+    and.push({ swp_route: { slug: { _eq: scope.routeSlug } } });
+  }
+
+  if (scope.contentTypes && scope.contentTypes.length > 0) {
+    and.push({
+      swp_article_metadata: {
+        swp_article_metadata_subjects: {
+          scheme: { _eq: CONTENT_TYPE_SCHEME },
+          code: { _in: scope.contentTypes },
+        },
+      },
+    });
   }
 
   for (const dim of ["region", "topic"] as const) {

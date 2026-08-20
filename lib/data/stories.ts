@@ -137,7 +137,28 @@ export function getByDesk(
   filters: FilterSelection = EMPTY_FILTERS,
 ): Promise<FactCheckListing> {
   return getFactCheckListing(
-    buildFactCheckWhere(filters, TENANT_CODE, slug),
+    buildFactCheckWhere(filters, TENANT_CODE, { routeSlug: slug }),
+    page,
+  );
+}
+
+/**
+ * Fact-checks of one editorial article type as a `FactCheckListing` — backs the
+ * Quick Reads, Explainers and Longform pages (`/fact-checks/<type>`). Same
+ * `Debunk` definition, pagination and reader filters as `getFactChecks`, scoped
+ * to articles Superdesk tagged with one of `codes` on the `content_type` scheme
+ * (see `lib/article-types.ts`).
+ *
+ * A type nobody has published yet simply returns no stories — the listing's
+ * empty state, not an error.
+ */
+export function getByContentType(
+  codes: string[],
+  page = 1,
+  filters: FilterSelection = EMPTY_FILTERS,
+): Promise<FactCheckListing> {
+  return getFactCheckListing(
+    buildFactCheckWhere(filters, TENANT_CODE, { contentTypes: codes }),
     page,
   );
 }
