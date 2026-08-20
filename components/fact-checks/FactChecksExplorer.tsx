@@ -24,11 +24,14 @@ export function FactChecksExplorer({
   page,
   totalPages,
   filters,
+  title = "Fact Checks",
 }: {
   stories: Story[];
   page: number;
   totalPages: number;
   filters: FilterSelection;
+  /** Section heading — the article-type pages name their own listing. */
+  title?: string;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -55,7 +58,7 @@ export function FactChecksExplorer({
       <section className="py-14 lg:py-20">
         <Container>
           {/* The listing is the page's only titled section — there is no hero. */}
-          <SectionHeading title="Fact Checks" />
+          <SectionHeading title={title} />
 
           {stories.length === 0 ? (
             <p className="py-16 text-center text-base font-medium text-neutral-500">
