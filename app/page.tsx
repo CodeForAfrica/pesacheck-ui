@@ -23,6 +23,9 @@ import {
   TRENDING,
 } from "@/lib/home-content";
 
+// Revalidate the homepage every 5 minutes instead of freezing it at build time.
+export const revalidate = 300;
+
 export default async function Home() {
   // Pages own fetching; fall back to the static content when Hasura is
   // unreachable or unconfigured. Fetched in parallel — each falls back alone.
