@@ -5,7 +5,9 @@
  * `pesacheck-pwa-app-router/services/contentListService.queries.js`.
  *
  * Difference from the reference: we also select `metadata` (jsonb) so the mapper
- * can read the `Debunk` verdict, and `body` to compute `readTime`.
+ * can read the `Debunk` verdict, `body` to compute `readTime`, and
+ * `swp_article_extra` for the Superdesk custom fields the Media Centre's event
+ * cards need (venue and dates, format, languages, cost).
  *
  * `$routeSlugs` filters items to articles published under those routes — the
  * curated lists are polluted with non-article entries (e.g. team-member
@@ -40,6 +42,10 @@ export const GET_CONTENT_LIST_ITEMS = /* GraphQL */ `
           swp_route {
             slug
             staticprefix
+          }
+          swp_article_extra {
+            field_name
+            value
           }
           swp_article_feature_media {
             description

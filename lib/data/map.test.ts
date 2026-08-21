@@ -11,7 +11,9 @@ import {
   mapArticle,
   mapNewsItem,
   mapResearchStrand,
+  mapSpotlightEvent,
   mapStory,
+  mapUpcomingEvent,
   parseMetadata,
   type RawArticle,
   type RawFullArticle,
@@ -370,6 +372,54 @@ describe("Media Centre mappers", () => {
       tone: "blue",
       href: "/fact-checks/english/global-newsrooms-credit-pesacheck",
     });
+  });
+
+  it("maps an article to the event spotlight, details from custom fields", () => {
+    const event = mapSpotlightEvent({
+      ...article,
+      swp_article_extra: [
+        { field_name: "event_meta", value: "Nairobi · 12–13 September 2026" },
+        { field_name: "event_format", value: "In person & streamed" },
+        { field_name: "event_cost", value: "Free for partner newsrooms" },
+        { field_name: "originator", value: "desk" },
+      ],
+    });
+    expect(event.meta).toBe("Nairobi · 12–13 September 2026");
+    // Only the fields that are set, in the design's order, and nothing else.
+    expect(event.details).toEqual([
+      { label: "Format", value: "In person & streamed" },
+      { label: "Cost", value: "Free for partner newsrooms" },
+    ]);
+    expect(event.cta).toEqual({
+      label: "Request an invitation",
+      href: "/fact-checks/english/global-newsrooms-credit-pesacheck",
+    });
+  });
+
+  it("drops the event meta line and details when no custom fields are set", () => {
+    const event = mapSpotlightEvent(article);
+    expect(event.meta).toBe("");
+    expect(event.details).toEqual([]);
+  });
+
+  it("maps an upcoming card, falling back to the publish date for its meta", () => {
+    expect(mapUpcomingEvent(article)).toEqual({
+      meta: "15 Jul 2026",
+      title: "Global newsrooms credit PesaCheck on cross-border debunks",
+      body: "Coverage of the network's work.",
+      kind: "International newsrooms",
+      href: "/fact-checks/english/global-newsrooms-credit-pesacheck",
+    });
+  });
+
+  it("prefers the event's own line over the publish date", () => {
+    const card = mapUpcomingEvent({
+      ...article,
+      swp_article_extra: [
+        { field_name: "event_meta", value: "08 Oct 2026 · Accra" },
+      ],
+    });
+    expect(card.meta).toBe("08 Oct 2026 · Accra");
   });
 
   it("takes a strand's accent from its position, cycling every four", () => {

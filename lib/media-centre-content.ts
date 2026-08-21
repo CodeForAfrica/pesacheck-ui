@@ -202,6 +202,12 @@ export type SpotlightEvent = {
   cta: { label: string; href: string };
 };
 
+/** The spotlight's call to action — one label for every event. */
+export const EVENT_CTA_LABEL = "Request an invitation";
+
+/** How many "Also coming up" cards sit under the spotlight. */
+export const UPCOMING_LIMIT = 3;
+
 export const EVENT: SpotlightEvent = {
   image: "/images/hero-preview-cards/story-large.png",
   alt: "",
@@ -213,7 +219,7 @@ export const EVENT: SpotlightEvent = {
     { label: "Languages", value: "English, French, Kiswahili" },
     { label: "Cost", value: "Free for partner newsrooms" },
   ],
-  cta: { label: "Request an invitation", href: "/about/contact-us" },
+  cta: { label: EVENT_CTA_LABEL, href: "/about/contact-us" },
 };
 
 export type UpcomingEvent = {
