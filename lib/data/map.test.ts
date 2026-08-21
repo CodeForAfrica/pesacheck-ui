@@ -362,13 +362,13 @@ describe("Media Centre mappers", () => {
     expect(mapAnnouncement(bare).tag).toBe("");
   });
 
-  it("maps an article to a research strand, CTA fixed to the contact page", () => {
+  it("maps an article to a research strand, CTA opening its own article", () => {
     expect(mapResearchStrand(article, 0)).toEqual({
       label: "Global newsrooms credit PesaCheck on cross-border debunks",
       kind: "International newsrooms",
       body: "Coverage of the network's work.",
       tone: "blue",
-      href: "/about/contact-us",
+      href: "/fact-checks/english/global-newsrooms-credit-pesacheck",
     });
   });
 

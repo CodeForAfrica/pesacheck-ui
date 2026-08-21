@@ -25,8 +25,8 @@ export type ResearchStrand = {
 export const RESEARCH_CTA = "Request citation list";
 
 /**
- * The CTA asks the reader to get in touch, so it points at the contact page
- * rather than at whatever article a live strand came from.
+ * Where the fallback strands send readers. A live strand links to its own
+ * article; these have none behind them, so they point at the contact page.
  */
 export const RESEARCH_CTA_HREF = "/about/contact-us";
 
@@ -47,42 +47,42 @@ export const RESEARCH_STRANDS: ResearchStrand[] = [
     kind: "Journal article",
     body: "PesaCheck fact-checks and datasets are cited in peer-reviewed studies of misinformation, media trust and electoral integrity in African contexts.",
     tone: "blue",
-    href: "/about/contact-us",
+    href: RESEARCH_CTA_HREF,
   },
   {
     label: "University centres",
     kind: "Working paper",
     body: "Media and communication departments across the continent draw on our verification archive as a primary source for teaching and published research.",
     tone: "navy",
-    href: "/about/contact-us",
+    href: RESEARCH_CTA_HREF,
   },
   {
     label: "Conference proceedings",
     kind: "Conference paper",
     body: "Our methodology and rating scale are referenced in papers presented at fact-checking and computational journalism conferences.",
     tone: "green",
-    href: "/about/contact-us",
+    href: RESEARCH_CTA_HREF,
   },
   {
     label: "Multilateral bodies",
     kind: "Policy report",
     body: "Intergovernmental and development institutions cite PesaCheck findings in reports on information integrity and public accountability.",
     tone: "red",
-    href: "/about/contact-us",
+    href: RESEARCH_CTA_HREF,
   },
   {
     label: "Election observation",
     kind: "Observation report",
     body: "Election monitors reference our verification of campaign claims and viral content when documenting information conditions around African polls.",
     tone: "blue",
-    href: "/about/contact-us",
+    href: RESEARCH_CTA_HREF,
   },
   {
     label: "Regulatory submissions",
     kind: "Consultation",
     body: "Our evidence is submitted to and quoted in consultations on platform accountability, media regulation and public-interest journalism.",
     tone: "navy",
-    href: "/about/contact-us",
+    href: RESEARCH_CTA_HREF,
   },
 ];
 

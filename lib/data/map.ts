@@ -5,7 +5,6 @@ import type { Story } from "@/lib/home-content";
 import {
   type Announcement,
   type NewsItem,
-  RESEARCH_CTA_HREF,
   RESEARCH_TONES,
   type ResearchStrand,
 } from "@/lib/media-centre-content";
@@ -328,9 +327,12 @@ export function mapNewsItem(article: RawArticle): NewsItem {
 }
 
 /**
- * Map a raw content-list article to a research strand. `index` is the article's
- * position in the curated list, which is what picks the accent — nothing in the
- * schema carries a colour.
+ * Map a raw content-list article to a research strand. The CTA opens the strand's
+ * own article; only the static fallback, which has no article behind it, sends
+ * readers to the contact page instead.
+ *
+ * `index` is the article's position in the curated list, which is what picks the
+ * accent — nothing in the schema carries a colour.
  */
 export function mapResearchStrand(
   article: RawArticle,
@@ -342,7 +344,7 @@ export function mapResearchStrand(
     kind: findSubject(meta, MEDIA_CENTRE_LABEL_SCHEME)?.name ?? "",
     body: article.lead ? stripHtml(article.lead) : "",
     tone: RESEARCH_TONES[index % RESEARCH_TONES.length],
-    href: RESEARCH_CTA_HREF,
+    href: storyHref(article),
   };
 }
 
