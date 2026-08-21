@@ -4,6 +4,19 @@ import { MediaCentreEvent } from "@/components/about/MediaCentreEvent";
 import { MediaCentreHero } from "@/components/about/MediaCentreHero";
 import { MediaCentreNews } from "@/components/about/MediaCentreNews";
 import { MediaCentreResearch } from "@/components/about/MediaCentreResearch";
+import {
+  getMediaCentreAnnouncements,
+  getMediaCentreEvents,
+  getMediaCentreNews,
+  getMediaCentreResearch,
+} from "@/lib/data/media-centre";
+import {
+  ANNOUNCEMENTS,
+  EVENT,
+  NEWS,
+  RESEARCH_STRANDS,
+  UPCOMING,
+} from "@/lib/media-centre-content";
 
 export const metadata: Metadata = {
   title: "Media Centre — PesaCheck",
@@ -11,14 +24,40 @@ export const metadata: Metadata = {
     "Where PesaCheck has been cited in research and other major publications.",
 };
 
-export default function MediaCentrePage() {
+// Revalidate every 5 minutes instead of freezing the curated lists at build
+// time, matching the homepage.
+export const revalidate = 300;
+
+/**
+ * An unreachable Hasura and a list nobody has curated yet arrive the same way
+ * here — as nothing to show — and neither section has an empty state, so both
+ * fall back to the design copy in `lib/media-centre-content`.
+ */
+function withFallback<T>(live: T[] | null, fallback: T[]): T[] {
+  return live && live.length > 0 ? live : fallback;
+}
+
+export default async function MediaCentrePage() {
+  // Each section falls back on its own, so one missing list never blanks another.
+  const [research, news, announcements, events] = await Promise.all([
+    getMediaCentreResearch().catch(() => null),
+    getMediaCentreNews().catch(() => null),
+    getMediaCentreAnnouncements().catch(() => null),
+    getMediaCentreEvents().catch(() => null),
+  ]);
+
   return (
     <>
       <MediaCentreHero />
-      <MediaCentreResearch />
-      <MediaCentreNews />
-      <MediaCentreAnnouncements />
-      <MediaCentreEvent />
+      <MediaCentreResearch strands={withFallback(research, RESEARCH_STRANDS)} />
+      <MediaCentreNews items={withFallback(news, NEWS)} />
+      <MediaCentreAnnouncements
+        announcements={withFallback(announcements, ANNOUNCEMENTS)}
+      />
+      <MediaCentreEvent
+        event={events?.spotlight ?? EVENT}
+        upcoming={withFallback(events?.upcoming ?? null, UPCOMING)}
+      />
     </>
   );
 }
