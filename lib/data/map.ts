@@ -279,12 +279,21 @@ export function mapStory(article: RawArticle): Story {
 }
 
 // ── Media Centre ─────────────────────────────────────────────────────────────
-// The clippings and announcements rows are curated content lists like the
-// homepage ones, so they arrive as the same `RawArticle`. Two fields have no
-// dedicated home in the schema yet and fall back to the topic subject: the
-// kicker above a clipping (design: "International newsrooms") and an
-// announcement's tag (design: "Network"). Both sections drop the label rather
-// than print a placeholder when an article carries no topic.
+// The three rows are curated content lists like the homepage ones, so they
+// arrive as the same `RawArticle`.
+
+/**
+ * Vocabulary naming a Media Centre entry: the kicker above a clipping (design:
+ * "International newsrooms"), an announcement's tag ("Network") and a research
+ * strand's document kind ("Journal article"). Its own scheme rather than the
+ * `01harm` harm-type taxonomy the fact-checks use — these labels say what an
+ * entry *is* on this page, which is a different question from what harm a
+ * fact-check addresses.
+ *
+ * Untagged entries drop the label rather than print a placeholder, so the
+ * sections read correctly before the vocabulary is populated.
+ */
+export const MEDIA_CENTRE_LABEL_SCHEME = "media_centre_label";
 
 /** Long form date for the announcements rail, e.g. `15 Jul 2026`. */
 export function formatLongDate(
@@ -310,7 +319,7 @@ export function mapNewsItem(article: RawArticle): NewsItem {
     ),
     alt:
       article.swp_article_feature_media?.description?.trim() || article.title,
-    outlet: findSubject(meta, "01harm")?.name ?? "",
+    outlet: findSubject(meta, MEDIA_CENTRE_LABEL_SCHEME)?.name ?? "",
     title: article.title,
     date: formatStoryDate(article.published_at) ?? "",
     readTime: computeReadTime(article.body) ?? "",
@@ -330,7 +339,7 @@ export function mapResearchStrand(
   const meta = parseMetadata(article.metadata);
   return {
     label: article.title,
-    kind: findSubject(meta, "01harm")?.name ?? "",
+    kind: findSubject(meta, MEDIA_CENTRE_LABEL_SCHEME)?.name ?? "",
     body: article.lead ? stripHtml(article.lead) : "",
     tone: RESEARCH_TONES[index % RESEARCH_TONES.length],
     href: RESEARCH_CTA_HREF,
@@ -343,7 +352,7 @@ export function mapAnnouncement(article: RawArticle): Announcement {
   const meta = parseMetadata(article.metadata);
   return {
     date: formatLongDate(article.published_at) ?? "",
-    tag: findSubject(meta, "01harm")?.name ?? "",
+    tag: findSubject(meta, MEDIA_CENTRE_LABEL_SCHEME)?.name ?? "",
     title: article.title,
     excerpt: lead,
     href: storyHref(article),

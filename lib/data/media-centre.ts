@@ -28,8 +28,8 @@ export const MEDIA_CENTRE_LISTS = {
 
 /**
  * Citation strands for the "In research" grid, in curated order. Each strand is
- * an article: the title is the label, the lead is the copy, the topic subject
- * is the document-kind pill, and the accent comes from the article's position
+ * an article: the title is the label, the lead is the copy, the Media Centre
+ * label names the document kind, and the accent comes from the article's position
  * (see `mapResearchStrand`). The CTA is fixed — it asks the reader to get in
  * touch, not to open the article.
  */

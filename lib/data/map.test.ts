@@ -314,7 +314,13 @@ describe("Media Centre mappers", () => {
     body: `<p>${"word ".repeat(200)}</p>`,
     published_at: "2026-07-15T10:00:00+00:00",
     metadata: JSON.stringify({
-      subject: [{ scheme: "01harm", code: "polit_harm", name: "Political" }],
+      subject: [
+        {
+          scheme: "media_centre_label",
+          code: "intl_newsrooms",
+          name: "International newsrooms",
+        },
+      ],
     }),
     swp_route: { slug: "english", staticprefix: "/english" },
     swp_article_feature_media: {
@@ -332,7 +338,7 @@ describe("Media Centre mappers", () => {
     expect(mapNewsItem(article)).toEqual({
       image: "https://media.test/abc.webp",
       alt: "A photo caption",
-      outlet: "Political",
+      outlet: "International newsrooms",
       title: "Global newsrooms credit PesaCheck on cross-border debunks",
       date: "Jul 15",
       readTime: "1 min",
@@ -343,14 +349,14 @@ describe("Media Centre mappers", () => {
   it("maps an article to an announcement row, with the long date", () => {
     expect(mapAnnouncement(article)).toEqual({
       date: "15 Jul 2026",
-      tag: "Political",
+      tag: "International newsrooms",
       title: "Global newsrooms credit PesaCheck on cross-border debunks",
       excerpt: "Coverage of the network's work.",
       href: "/fact-checks/english/global-newsrooms-credit-pesacheck",
     });
   });
 
-  it("drops the kicker and tag when the article carries no topic", () => {
+  it("drops the kicker and tag when the article carries no label", () => {
     const bare = { ...article, metadata: null };
     expect(mapNewsItem(bare).outlet).toBe("");
     expect(mapAnnouncement(bare).tag).toBe("");
@@ -359,7 +365,7 @@ describe("Media Centre mappers", () => {
   it("maps an article to a research strand, CTA fixed to the contact page", () => {
     expect(mapResearchStrand(article, 0)).toEqual({
       label: "Global newsrooms credit PesaCheck on cross-border debunks",
-      kind: "Political",
+      kind: "International newsrooms",
       body: "Coverage of the network's work.",
       tone: "blue",
       href: "/about/contact-us",
