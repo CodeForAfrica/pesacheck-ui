@@ -10,6 +10,7 @@ import {
   mapAnnouncement,
   mapArticle,
   mapNewsItem,
+  mapResearchStrand,
   mapStory,
   parseMetadata,
   type RawArticle,
@@ -353,6 +354,23 @@ describe("Media Centre mappers", () => {
     const bare = { ...article, metadata: null };
     expect(mapNewsItem(bare).outlet).toBe("");
     expect(mapAnnouncement(bare).tag).toBe("");
+  });
+
+  it("maps an article to a research strand, CTA fixed to the contact page", () => {
+    expect(mapResearchStrand(article, 0)).toEqual({
+      label: "Global newsrooms credit PesaCheck on cross-border debunks",
+      kind: "Political",
+      body: "Coverage of the network's work.",
+      tone: "blue",
+      href: "/about/contact-us",
+    });
+  });
+
+  it("takes a strand's accent from its position, cycling every four", () => {
+    const tones = [0, 1, 2, 3, 4, 5].map(
+      (i) => mapResearchStrand(article, i).tone,
+    );
+    expect(tones).toEqual(["blue", "navy", "green", "red", "blue", "navy"]);
   });
 });
 

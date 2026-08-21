@@ -24,6 +24,23 @@ export type ResearchStrand = {
 
 export const RESEARCH_CTA = "Request citation list";
 
+/**
+ * The CTA asks the reader to get in touch, so it points at the contact page
+ * rather than at whatever article a live strand came from.
+ */
+export const RESEARCH_CTA_HREF = "/about/contact-us";
+
+/**
+ * Accents in the order the grid cycles them. An article carries no colour, so
+ * a live strand takes its accent from its position in the list — reordering
+ * the list reshuffles the colours, which is the trade-off for editing this
+ * section in Publisher.
+ */
+export const RESEARCH_TONES: ResearchTone[] = ["blue", "navy", "green", "red"];
+
+/** How many strands the grid shows — the design's two rows of three. */
+export const RESEARCH_LIMIT = 6;
+
 export const RESEARCH_STRANDS: ResearchStrand[] = [
   {
     label: "Peer-reviewed journals",

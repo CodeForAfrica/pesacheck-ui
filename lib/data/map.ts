@@ -2,7 +2,13 @@ import type { Article } from "@/lib/article-content";
 import { renderArticleBody } from "@/lib/data/body";
 import { mediaAssetUrl } from "@/lib/data/media";
 import type { Story } from "@/lib/home-content";
-import type { Announcement, NewsItem } from "@/lib/media-centre-content";
+import {
+  type Announcement,
+  type NewsItem,
+  RESEARCH_CTA_HREF,
+  RESEARCH_TONES,
+  type ResearchStrand,
+} from "@/lib/media-centre-content";
 
 /**
  * Preference order for the card image. Staging exposes
@@ -309,6 +315,25 @@ export function mapNewsItem(article: RawArticle): NewsItem {
     date: formatStoryDate(article.published_at) ?? "",
     readTime: computeReadTime(article.body) ?? "",
     href: storyHref(article),
+  };
+}
+
+/**
+ * Map a raw content-list article to a research strand. `index` is the article's
+ * position in the curated list, which is what picks the accent — nothing in the
+ * schema carries a colour.
+ */
+export function mapResearchStrand(
+  article: RawArticle,
+  index: number,
+): ResearchStrand {
+  const meta = parseMetadata(article.metadata);
+  return {
+    label: article.title,
+    kind: findSubject(meta, "01harm")?.name ?? "",
+    body: article.lead ? stripHtml(article.lead) : "",
+    tone: RESEARCH_TONES[index % RESEARCH_TONES.length],
+    href: RESEARCH_CTA_HREF,
   };
 }
 

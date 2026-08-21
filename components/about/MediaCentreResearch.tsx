@@ -2,6 +2,7 @@ import { FiArrowUpRight } from "react-icons/fi";
 import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import {
   RESEARCH_CTA,
+  RESEARCH_LIMIT,
   RESEARCH_STRANDS,
   type ResearchStrand,
   type ResearchTone,
@@ -38,9 +39,12 @@ function Strand({ strand }: { strand: ResearchStrand }) {
           >
             {strand.label}
           </h3>
-          <span className="shrink-0 rounded-full border border-neutral-100 px-3.5 py-1 text-xs leading-[18px] text-neutral-600">
-            {strand.kind}
-          </span>
+          {/* A live strand may carry no topic to name the document kind. */}
+          {strand.kind && (
+            <span className="shrink-0 rounded-full border border-neutral-100 px-3.5 py-1 text-xs leading-[18px] text-neutral-600">
+              {strand.kind}
+            </span>
+          )}
         </div>
         <p className="mt-3 text-sm leading-6 text-neutral-800">{strand.body}</p>
         <a
@@ -55,13 +59,19 @@ function Strand({ strand }: { strand: ResearchStrand }) {
   );
 }
 
-export function MediaCentreResearch() {
+export function MediaCentreResearch({
+  strands = RESEARCH_STRANDS,
+  limit = RESEARCH_LIMIT,
+}: {
+  strands?: ResearchStrand[];
+  limit?: number;
+}) {
   return (
     <section className="py-14 lg:py-16">
       <Container>
         <SectionHeading title="In research" />
         <div className="mt-9 grid gap-x-10 gap-y-11 sm:grid-cols-2 lg:grid-cols-3">
-          {RESEARCH_STRANDS.map((strand) => (
+          {strands.slice(0, limit).map((strand) => (
             <Strand key={strand.label} strand={strand} />
           ))}
         </div>

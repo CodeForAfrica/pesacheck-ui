@@ -7,8 +7,13 @@ import { MediaCentreResearch } from "@/components/about/MediaCentreResearch";
 import {
   getMediaCentreAnnouncements,
   getMediaCentreNews,
+  getMediaCentreResearch,
 } from "@/lib/data/media-centre";
-import { ANNOUNCEMENTS, NEWS } from "@/lib/media-centre-content";
+import {
+  ANNOUNCEMENTS,
+  NEWS,
+  RESEARCH_STRANDS,
+} from "@/lib/media-centre-content";
 
 export const metadata: Metadata = {
   title: "Media Centre — PesaCheck",
@@ -30,7 +35,9 @@ function withFallback<T>(live: T[] | null, fallback: T[]): T[] {
 }
 
 export default async function MediaCentrePage() {
-  const [news, announcements] = await Promise.all([
+  // Each section falls back on its own, so one missing list never blanks another.
+  const [research, news, announcements] = await Promise.all([
+    getMediaCentreResearch().catch(() => null),
     getMediaCentreNews().catch(() => null),
     getMediaCentreAnnouncements().catch(() => null),
   ]);
@@ -38,7 +45,7 @@ export default async function MediaCentrePage() {
   return (
     <>
       <MediaCentreHero />
-      <MediaCentreResearch />
+      <MediaCentreResearch strands={withFallback(research, RESEARCH_STRANDS)} />
       <MediaCentreNews items={withFallback(news, NEWS)} />
       <MediaCentreAnnouncements
         announcements={withFallback(announcements, ANNOUNCEMENTS)}
