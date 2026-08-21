@@ -2,7 +2,7 @@ import Image from "next/image";
 import { FiCalendar, FiClock } from "react-icons/fi";
 import { TaxonomyRow } from "@/components/ui/MetaRow";
 import { Container, SectionHeading } from "@/components/ui/SectionHeading";
-import { NEWS, type NewsItem } from "@/lib/media-centre-content";
+import { NEWS, NEWS_LIMIT, type NewsItem } from "@/lib/media-centre-content";
 
 /*
  * Clippings, not fact-checks: the cards drop the verdict pill and the overlaid
@@ -42,13 +42,19 @@ function NewsCard({ item }: { item: NewsItem }) {
   );
 }
 
-export function MediaCentreNews() {
+export function MediaCentreNews({
+  items = NEWS,
+  limit = NEWS_LIMIT,
+}: {
+  items?: NewsItem[];
+  limit?: number;
+}) {
   return (
     <section className="bg-neutral-50 py-14 lg:py-16">
       <Container>
         <SectionHeading title="In the news" />
         <div className="mt-9 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {NEWS.map((item) => (
+          {items.slice(0, limit).map((item) => (
             <NewsCard key={item.title} item={item} />
           ))}
         </div>

@@ -2,6 +2,7 @@ import type { Article } from "@/lib/article-content";
 import { renderArticleBody } from "@/lib/data/body";
 import { mediaAssetUrl } from "@/lib/data/media";
 import type { Story } from "@/lib/home-content";
+import type { Announcement, NewsItem } from "@/lib/media-centre-content";
 
 /**
  * Preference order for the card image. Staging exposes
@@ -267,6 +268,59 @@ export function mapStory(article: RawArticle): Story {
     language: languageLabel(meta.language),
     date: formatStoryDate(article.published_at),
     readTime: computeReadTime(article.body),
+    href: storyHref(article),
+  };
+}
+
+// ── Media Centre ─────────────────────────────────────────────────────────────
+// The clippings and announcements rows are curated content lists like the
+// homepage ones, so they arrive as the same `RawArticle`. Two fields have no
+// dedicated home in the schema yet and fall back to the topic subject: the
+// kicker above a clipping (design: "International newsrooms") and an
+// announcement's tag (design: "Network"). Both sections drop the label rather
+// than print a placeholder when an article carries no topic.
+
+/** Long form date for the announcements rail, e.g. `15 Jul 2026`. */
+export function formatLongDate(
+  published: string | null | undefined,
+): string | undefined {
+  if (!published) return undefined;
+  const date = new Date(published);
+  if (Number.isNaN(date.getTime())) return undefined;
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(date);
+}
+
+/** Map a raw content-list article to a Media Centre clipping card. */
+export function mapNewsItem(article: RawArticle): NewsItem {
+  const meta = parseMetadata(article.metadata);
+  return {
+    image: pickStoryImage(
+      article.swp_article_feature_media?.renditions ?? undefined,
+    ),
+    alt:
+      article.swp_article_feature_media?.description?.trim() || article.title,
+    outlet: findSubject(meta, "01harm")?.name ?? "",
+    title: article.title,
+    date: formatStoryDate(article.published_at) ?? "",
+    readTime: computeReadTime(article.body) ?? "",
+    href: storyHref(article),
+  };
+}
+
+/** Map a raw content-list article to a Media Centre announcement row. */
+export function mapAnnouncement(article: RawArticle): Announcement {
+  const lead = article.lead ? stripHtml(article.lead) : "";
+  const meta = parseMetadata(article.metadata);
+  return {
+    date: formatLongDate(article.published_at) ?? "",
+    tag: findSubject(meta, "01harm")?.name ?? "",
+    title: article.title,
+    excerpt: lead,
     href: storyHref(article),
   };
 }

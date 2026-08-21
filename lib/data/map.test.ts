@@ -4,9 +4,12 @@ import {
   computeReadTime,
   findRendition,
   findSubject,
+  formatLongDate,
   formatStoryDate,
   getVerdict,
+  mapAnnouncement,
   mapArticle,
+  mapNewsItem,
   mapStory,
   parseMetadata,
   type RawArticle,
@@ -283,6 +286,73 @@ describe("mapStory", () => {
     expect(story.date).toBeUndefined();
     expect(story.readTime).toBeUndefined();
     expect(story.href).toBe("/fact-checks/bare");
+  });
+});
+
+describe("formatLongDate", () => {
+  it("formats as day, short month, year", () => {
+    expect(formatLongDate("2026-07-15T10:00:00+00:00")).toBe("15 Jul 2026");
+  });
+
+  it("pads a single-digit day", () => {
+    expect(formatLongDate("2026-07-02T10:00:00+00:00")).toBe("02 Jul 2026");
+  });
+
+  it("is undefined for a missing or unparseable date", () => {
+    expect(formatLongDate(null)).toBeUndefined();
+    expect(formatLongDate("not a date")).toBeUndefined();
+  });
+});
+
+describe("Media Centre mappers", () => {
+  const article: RawArticle = {
+    id: 12,
+    title: "Global newsrooms credit PesaCheck on cross-border debunks",
+    slug: "global-newsrooms-credit-pesacheck",
+    lead: "<p>Coverage of the network's work.</p>",
+    body: `<p>${"word ".repeat(200)}</p>`,
+    published_at: "2026-07-15T10:00:00+00:00",
+    metadata: JSON.stringify({
+      subject: [{ scheme: "01harm", code: "polit_harm", name: "Political" }],
+    }),
+    swp_route: { slug: "english", staticprefix: "/english" },
+    swp_article_feature_media: {
+      description: "A photo caption",
+      renditions: [
+        {
+          name: "viewImage",
+          image: { asset_id: "abc", file_extension: "jpg", variants: ["webp"] },
+        },
+      ],
+    },
+  };
+
+  it("maps an article to a clipping card", () => {
+    expect(mapNewsItem(article)).toEqual({
+      image: "https://media.test/abc.webp",
+      alt: "A photo caption",
+      outlet: "Political",
+      title: "Global newsrooms credit PesaCheck on cross-border debunks",
+      date: "Jul 15",
+      readTime: "1 min",
+      href: "/fact-checks/english/global-newsrooms-credit-pesacheck",
+    });
+  });
+
+  it("maps an article to an announcement row, with the long date", () => {
+    expect(mapAnnouncement(article)).toEqual({
+      date: "15 Jul 2026",
+      tag: "Political",
+      title: "Global newsrooms credit PesaCheck on cross-border debunks",
+      excerpt: "Coverage of the network's work.",
+      href: "/fact-checks/english/global-newsrooms-credit-pesacheck",
+    });
+  });
+
+  it("drops the kicker and tag when the article carries no topic", () => {
+    const bare = { ...article, metadata: null };
+    expect(mapNewsItem(bare).outlet).toBe("");
+    expect(mapAnnouncement(bare).tag).toBe("");
   });
 });
 

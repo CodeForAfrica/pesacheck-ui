@@ -80,6 +80,12 @@ export type NewsItem = {
   href: string;
 };
 
+/**
+ * How many clippings the row shows. The curated list decides *which* articles
+ * appear; this decides how many of them fit the design's single row.
+ */
+export const NEWS_LIMIT = 4;
+
 export const NEWS: NewsItem[] = [
   {
     image: "/images/hero-preview-cards/story1.png",
@@ -129,6 +135,9 @@ export type Announcement = {
   excerpt: string;
   href: string;
 };
+
+/** How many announcement rows the list shows before it gets unwieldy. */
+export const ANNOUNCEMENTS_LIMIT = 4;
 
 export const ANNOUNCEMENTS: Announcement[] = [
   {

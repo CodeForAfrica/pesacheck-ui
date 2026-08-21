@@ -48,8 +48,17 @@ export const LANGUAGE_ROUTE_SLUGS = [
 
 export const FACT_CHECKS_PAGE_SIZE = 10;
 
-/** Fetch a content list's language articles, in curated order, as `Story[]`. */
-async function getContentListStories(name: string): Promise<Story[]> {
+/**
+ * Fetch a content list's language articles, in curated order, as raw rows.
+ * Callers pick the mapper: most want `Story` (`getContentListStories`), the
+ * Media Centre maps the same rows to its own shapes.
+ *
+ * A missing list and an empty list are indistinguishable here — both return
+ * `[]`, which callers read as "nothing curated yet".
+ */
+export async function getContentListArticles(
+  name: string,
+): Promise<RawArticle[]> {
   const { list } = await gql<ContentListResponse>(GET_CONTENT_LIST_ITEMS, {
     tenant: TENANT_CODE,
     name,
@@ -59,8 +68,12 @@ async function getContentListStories(name: string): Promise<Story[]> {
   const items = list[0]?.items ?? [];
   return items
     .map((item) => item.article)
-    .filter((article): article is RawArticle => article != null)
-    .map(mapStory);
+    .filter((article): article is RawArticle => article != null);
+}
+
+/** Fetch a content list's language articles, in curated order, as `Story[]`. */
+async function getContentListStories(name: string): Promise<Story[]> {
+  return (await getContentListArticles(name)).map(mapStory);
 }
 
 export function getSpotlight(): Promise<Story[]> {
