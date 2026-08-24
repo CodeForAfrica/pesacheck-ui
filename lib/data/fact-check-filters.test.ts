@@ -112,6 +112,37 @@ describe("buildFactCheckWhere", () => {
     });
     expect(where._and).toHaveLength(3);
   });
+
+  it("scopes to an article type on the `content_type` scheme (still Debunk)", () => {
+    const where = buildFactCheckWhere(EMPTY_FILTERS, "t", {
+      contentTypes: ["quickread", "shortform"],
+    });
+    expect(where._and).toContainEqual({
+      swp_article_metadata: {
+        swp_article_metadata_subjects: {
+          scheme: { _eq: "content_type" },
+          code: { _in: ["quickread", "shortform"] },
+        },
+      },
+    });
+    expect(where._and).toHaveLength(2);
+  });
+
+  it("omits the content-type clause when no codes are given", () => {
+    for (const scope of [{}, { contentTypes: [] }]) {
+      const where = buildFactCheckWhere(EMPTY_FILTERS, "t", scope);
+      expect(JSON.stringify(where)).not.toContain("content_type");
+      expect(where._and).toHaveLength(1);
+    }
+  });
+
+  it("ANDs an article type together with a desk route and active filters", () => {
+    const where = buildFactCheckWhere(sel({ language: ["en"] }), "t", {
+      routeSlug: "elections",
+      contentTypes: ["longform"],
+    });
+    expect(where._and).toHaveLength(4);
+  });
 });
 
 describe("buildFactCheckWhere — free-text search", () => {

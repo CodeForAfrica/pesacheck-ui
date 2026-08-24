@@ -100,6 +100,30 @@ type SearchClause = {
 type WhereClause = SubjectClause | LanguageClause | RouteClause | SearchClause;
 type SearchParams = Record<string, string | string[] | undefined>;
 
+/**
+ * Scheme carrying the editorial article type (Quick Read / Explainer /
+ * Longform). Superdesk publishes it as a metadata subject like any other
+ * taxonomy, so it filters the same way the region and topic dimensions do.
+ */
+export const CONTENT_TYPE_SCHEME = "content_type";
+
+/** Narrows a listing beyond the filter dimensions the reader controls. */
+export type FactCheckScope = {
+  /** A content-desk route (`swp_route.slug`) — backs the desk pages. */
+  routeSlug?: string;
+  /**
+   * Accepted `content_type` codes — backs the article-type pages. Several
+   * codes per type because Superdesk's vocabulary and the site's page names
+   * have drifted apart (a Quick Read is filed as `quickread` or `shortform`).
+   */
+  contentTypes?: string[];
+  /**
+   * Free-text query matched against title/lead/body — backs `/search`. This is
+   * the one scope the reader types rather than the page choosing it.
+   */
+  search?: string;
+};
+
 export type FactCheckWhere = {
   tenant_code: { _eq: string };
   published_at: { _is_null: false };
@@ -119,13 +143,6 @@ function likePattern(term: string): string {
   return `%${escaped}%`;
 }
 
-export type FactCheckWhereOptions = {
-  /** Scope to one content-desk route (`swp_route.slug`) — powers desk pages. */
-  routeSlug?: string;
-  /** Free-text query matched against title/lead/body — powers `/search`. */
-  search?: string;
-};
-
 /**
  * Build the `swp_article_bool_exp` for a page of fact-checks under `tenantCode`,
  * narrowed by `filters`. The `Debunk` clause is always present (it's what makes
@@ -133,19 +150,17 @@ export type FactCheckWhereOptions = {
  * Inactive dimensions are omitted entirely — an empty `_in: []` would match
  * nothing in Hasura, so we never emit one.
  *
- * `options.routeSlug` scopes the listing to a single content-desk route
- * (`swp_route.slug`) — this is what powers the desk pages (`getByDesk`). Desks
- * are still fact-check listings, so the `Debunk` clause stays; the route is just
- * one more `_and` clause on top.
- *
- * `options.search` adds a free-text clause (`title`/`lead`/`body` `_ilike`),
- * which is what powers `/search`. It's OR-ed across those columns and AND-ed
- * with everything else, so a query and filters compose.
+ * `scope` narrows the listing further: `routeSlug` to one content desk
+ * (`getByDesk`), `contentTypes` to one article type (`getByContentType`), and
+ * `search` to a free-text query (`searchFactChecks`). All are still fact-check
+ * listings, so the `Debunk` clause stays and each is one more `_and` clause on
+ * top — the search clause being an `_or` across `title`/`lead`/`body`, so a
+ * query and the reader's filters compose.
  */
 export function buildFactCheckWhere(
   filters: FilterSelection,
   tenantCode: string,
-  options: FactCheckWhereOptions = {},
+  scope: FactCheckScope = {},
 ): FactCheckWhere {
   const and: WhereClause[] = [
     {
@@ -155,11 +170,22 @@ export function buildFactCheckWhere(
     },
   ];
 
-  if (options.routeSlug) {
-    and.push({ swp_route: { slug: { _eq: options.routeSlug } } });
+  if (scope.routeSlug) {
+    and.push({ swp_route: { slug: { _eq: scope.routeSlug } } });
   }
 
-  const search = options.search?.trim();
+  if (scope.contentTypes && scope.contentTypes.length > 0) {
+    and.push({
+      swp_article_metadata: {
+        swp_article_metadata_subjects: {
+          scheme: { _eq: CONTENT_TYPE_SCHEME },
+          code: { _in: scope.contentTypes },
+        },
+      },
+    });
+  }
+
+  const search = scope.search?.trim();
   if (search) {
     const pattern = likePattern(search);
     and.push({
