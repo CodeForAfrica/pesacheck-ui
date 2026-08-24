@@ -1,41 +1,14 @@
+import { PaginationNav } from "@/components/ui/PaginationNav";
 import { Container } from "@/components/ui/SectionHeading";
 import { StoryCard } from "@/components/ui/StoryCard";
-import type { FilterSelection } from "@/lib/data/fact-check-filters";
 import {
-  FEATURE,
-  FEATURE_SECONDARY,
-  FILTERS,
-  filterLabel,
-  STORIES,
-} from "@/lib/fact-checks-content";
+  type FilterOptions,
+  type FilterSelection,
+  hasActiveFilters,
+  selectedFilterLabels,
+} from "@/lib/data/fact-check-filters";
+import type { FactCheckListing } from "@/lib/data/stories";
 import type { Story } from "@/lib/home-content";
-
-const POOL: Story[] = [FEATURE, FEATURE_SECONDARY, ...STORIES];
-
-function matchesFilters(story: Story, applied: FilterSelection): boolean {
-  // The static search pool is tagged with display labels, while the filter bar
-  // emits taxonomy codes — resolve codes to labels before comparing.
-  return FILTERS.every(({ dimension }) => {
-    const wanted = applied[dimension];
-    if (wanted.length === 0) return true;
-    const value = story[dimension];
-    return (
-      value != null &&
-      wanted.some((code) => filterLabel(dimension, code) === value)
-    );
-  });
-}
-
-function matchesQuery(story: Story, query: string): boolean {
-  if (!query.trim()) return true;
-  const q = query.toLowerCase();
-  return (
-    story.title.toLowerCase().includes(q) ||
-    (story.topic?.toLowerCase().includes(q) ?? false) ||
-    (story.region?.toLowerCase().includes(q) ?? false) ||
-    (story.language?.toLowerCase().includes(q) ?? false)
-  );
-}
 
 function SearchIllustration() {
   return (
@@ -77,61 +50,118 @@ function SearchIllustration() {
   );
 }
 
+/** Empty/no-match state: an illustration above a headline + explanation. */
+function EmptyState({ title, message }: { title: string; message: string }) {
+  return (
+    <section className="py-16">
+      <Container>
+        <div className="flex flex-col items-center gap-8 text-center">
+          <SearchIllustration />
+          <div className="flex flex-col gap-2">
+            <p className="text-lg font-semibold text-neutral-800">{title}</p>
+            <p className="max-w-[520px] text-sm font-medium text-neutral-600">
+              {message}
+            </p>
+          </div>
+        </div>
+      </Container>
+    </section>
+  );
+}
+
+/** The live "Latest Articles" strip shown under an empty/no-match state. */
+function LatestArticles({ stories }: { stories: Story[] }) {
+  if (stories.length === 0) return null;
+  return (
+    <section className="py-14 lg:py-20">
+      <Container>
+        <div className="mb-8 border-l-[3px] border-pesacheck-black pl-4">
+          <h2 className="text-[30px] font-extrabold leading-10 text-gray-800">
+            Latest Articles
+          </h2>
+        </div>
+        <div className="mt-1 h-px w-full bg-neutral-100" />
+        <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          {stories.map((story) => (
+            <StoryCard key={story.href ?? story.title} story={story} />
+          ))}
+        </div>
+      </Container>
+    </section>
+  );
+}
+
 /**
- * Search results. Filtering is driven entirely by the URL (`query` + the
- * header search bar's applied filters) — there's no in-page filter UI; see
- * `Header`.
+ * Search results.
+ *
+ * Everything on this page is live Superdesk data: `listing` is a server-side
+ * search (free text AND'd with the region/language/topic filters, paged by
+ * `?page=`) and `latest` is the newest published fact-checks, shown under the
+ * empty and no-match states. The searched-for line reports whichever criteria
+ * were actually used, so a filter-only search reads
+ * `2 results found for: Kenya · English` instead of an empty `""`.
+ *
+ * The filter dropdowns themselves live in the header search bar (see `Header`).
  */
 export function SearchExplorer({
   query,
   filters,
+  filterOptions,
+  listing,
+  latest,
+  unavailable = false,
 }: {
   query: string;
   filters: FilterSelection;
+  filterOptions: FilterOptions;
+  listing: FactCheckListing;
+  latest: Story[];
+  /** The search itself failed (Hasura unreachable) — not "no matches". */
+  unavailable?: boolean;
 }) {
-  const results = POOL.filter(
-    (s) => matchesQuery(s, query) && matchesFilters(s, filters),
+  const trimmedQuery = query.trim();
+  const filterLabels = selectedFilterLabels(filterOptions, filters).map(
+    (f) => f.label,
   );
+  const criteria = [
+    ...(trimmedQuery ? [`“${trimmedQuery}”`] : []),
+    ...filterLabels,
+  ].join(" · ");
+  const searched = Boolean(trimmedQuery) || hasActiveFilters(filters);
 
-  const hasResults = results.length > 0;
-
-  if (!hasResults) {
+  // No query and no filters: nothing has been searched for yet.
+  if (!searched) {
     return (
       <>
-        {/* No results empty state */}
-        <section className="py-16">
-          <Container>
-            <div className="flex flex-col items-center gap-8 text-center">
-              <SearchIllustration />
-              <div className="flex flex-col gap-2">
-                <p className="text-lg font-semibold text-neutral-800">
-                  No matches found
-                </p>
-                <p className="text-sm font-medium text-neutral-600">
-                  Your search for &ldquo;{query}&rdquo; did not match any
-                  article. Please try again.
-                </p>
-              </div>
-            </div>
-          </Container>
-        </section>
+        <EmptyState
+          title="Search PesaCheck"
+          message="Search for a claim, place or topic — or use the filters in the search bar to browse by region, language and topic."
+        />
+        <LatestArticles stories={latest} />
+      </>
+    );
+  }
 
-        {/* Latest Articles fallback */}
-        <section className="py-14 lg:py-20">
-          <Container>
-            <div className="mb-8 border-l-[3px] border-pesacheck-black pl-4">
-              <h2 className="text-[30px] font-extrabold leading-10 text-gray-800">
-                Latest Articles
-              </h2>
-            </div>
-            <div className="mt-1 h-px w-full bg-neutral-100" />
-            <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-              {POOL.slice(0, 7).map((story) => (
-                <StoryCard key={story.href ?? story.title} story={story} />
-              ))}
-            </div>
-          </Container>
-        </section>
+  if (unavailable) {
+    return (
+      <>
+        <EmptyState
+          title="Search is unavailable right now"
+          message={`We couldn't search for ${criteria} — the article service didn't respond. Please try again in a moment.`}
+        />
+        <LatestArticles stories={latest} />
+      </>
+    );
+  }
+
+  if (listing.stories.length === 0) {
+    return (
+      <>
+        <EmptyState
+          title="No matches found"
+          message={`Your search for ${criteria} did not match any article. Try a different term or remove some filters.`}
+        />
+        <LatestArticles stories={latest} />
       </>
     );
   }
@@ -141,21 +171,33 @@ export function SearchExplorer({
       {/* Results summary */}
       <section className="pt-10 pb-4 text-center">
         <p className="text-sm font-medium text-neutral-700">
-          {results.length >= 20 ? "20+" : results.length} results found for:
+          {listing.total} {listing.total === 1 ? "result" : "results"} found
+          for:
         </p>
         <p className="mt-1 text-lg font-extrabold text-neutral-900">
-          &ldquo;{query}&rdquo;
+          {criteria}
         </p>
       </section>
 
       {/* Results grid */}
-      <section className="py-14 lg:py-20">
+      <section className="pb-14 pt-6 lg:pb-20">
         <Container>
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {results.map((story) => (
+            {listing.stories.map((story) => (
               <StoryCard key={story.href ?? story.title} story={story} />
             ))}
           </div>
+
+          {listing.totalPages > 1 && (
+            <div className="mt-12">
+              <PaginationNav
+                page={listing.page}
+                totalPages={listing.totalPages}
+                filters={filters}
+                query={trimmedQuery}
+              />
+            </div>
+          )}
         </Container>
       </section>
     </>

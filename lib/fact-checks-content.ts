@@ -9,10 +9,18 @@
 import type { ElementType } from "react";
 import { FiGlobe } from "react-icons/fi";
 import { LuLanguages, LuMessageCircleWarning } from "react-icons/lu";
-import type { FilterDimension } from "@/lib/data/fact-check-filters";
+import type {
+  FilterDimension,
+  FilterOption,
+  FilterOptions,
+} from "@/lib/data/fact-check-filters";
 import type { Story } from "@/lib/home-content";
 
-export type { FilterDimension } from "@/lib/data/fact-check-filters";
+export type {
+  FilterDimension,
+  FilterOption,
+  FilterOptions,
+} from "@/lib/data/fact-check-filters";
 
 const PLACEHOLDER_TITLE =
   "Subtitle - different from title in the image - 20 words Max 3 lines";
@@ -21,19 +29,14 @@ const EXCERPT =
   "Through strategic investments in technology, innovation, and workforce development, the nation is revitalizing its industrial base, creating jobs, and enhancing export opportunities in an...";
 
 // ── Filter taxonomy ────────────────────────────────────────────────────────
-// The "Filter By" dropdowns expose these option sets. Each option is a
-// `{ code, label }`: the `code` is the real Superdesk taxonomy key sent to the
-// server (region → `countries` ISO3, topic → `01harm`, language → ISO language
-// code), and the `label` is what the reader sees. Filtering is server-side (see
-// `lib/data/fact-check-filters.ts`); these option lists are editorial, like
-// `LANGUAGE_ROUTE_SLUGS` in `lib/data/stories.ts` — the normalized relation
-// carries no display `name`, and the full controlled vocabularies aren't
-// queryable, so the curated set should be revisited as the data matures.
-
-export type FilterOption = { code: string; label: string };
+// The dropdown *contents* are live: they're derived from the taxonomy published
+// fact-checks actually carry (`lib/data/filter-options.ts`). What stays here is
+// (a) how each dimension is presented (label + icon) and (b) a curated fallback
+// used only in degraded mode, when Hasura is unreachable — the same
+// `?? fallback` convention as the rest of `lib/*-content.ts`.
 
 /** Region → subject scheme `countries` (ISO3). PesaCheck's core coverage. */
-export const REGIONS: FilterOption[] = [
+const FALLBACK_REGIONS: FilterOption[] = [
   { code: "KEN", label: "Kenya" },
   { code: "NGA", label: "Nigeria" },
   { code: "UGA", label: "Uganda" },
@@ -47,7 +50,7 @@ export const REGIONS: FilterOption[] = [
 ];
 
 /** Language → `swp_article_metadata.language` (ISO code). */
-export const LANGUAGES: FilterOption[] = [
+const FALLBACK_LANGUAGES: FilterOption[] = [
   { code: "en", label: "English" },
   { code: "fr", label: "French" },
   { code: "sw", label: "Swahili" },
@@ -57,7 +60,7 @@ export const LANGUAGES: FilterOption[] = [
 ];
 
 /** Topic → subject scheme `01harm` (the full harm vocabulary on staging). */
-export const TOPICS: FilterOption[] = [
+const FALLBACK_TOPICS: FilterOption[] = [
   { code: "polit_harm", label: "Political" },
   { code: "finan_harm", label: "Financial" },
   { code: "environ_harm", label: "Environment" },
@@ -65,32 +68,32 @@ export const TOPICS: FilterOption[] = [
   { code: "phys_harm", label: "Physical" },
 ];
 
-export const FILTERS: {
+/**
+ * Dropdown contents for degraded mode only — used when the live taxonomy read
+ * fails (`getFilterOptions()` throws). In normal operation the options come
+ * from Superdesk, so adding a language/region/topic there needs no edit here.
+ */
+export const FALLBACK_FILTER_OPTIONS: FilterOptions = {
+  region: FALLBACK_REGIONS,
+  language: FALLBACK_LANGUAGES,
+  topic: FALLBACK_TOPICS,
+};
+
+/**
+ * How each filter dimension is presented (dropdown label + icon). Presentation
+ * only — the options themselves are fetched. Kept in dimension order; the icons
+ * are React components, so this is imported directly by the client components
+ * rather than passed through props.
+ */
+export const FILTER_META: {
   dimension: FilterDimension;
   label: string;
   icon: ElementType;
-  options: FilterOption[];
 }[] = [
-  { dimension: "region", label: "Region", icon: FiGlobe, options: REGIONS },
-  {
-    dimension: "language",
-    label: "Language",
-    icon: LuLanguages,
-    options: LANGUAGES,
-  },
-  {
-    dimension: "topic",
-    label: "Topic",
-    icon: LuMessageCircleWarning,
-    options: TOPICS,
-  },
+  { dimension: "region", label: "Region", icon: FiGlobe },
+  { dimension: "language", label: "Language", icon: LuLanguages },
+  { dimension: "topic", label: "Topic", icon: LuMessageCircleWarning },
 ];
-
-/** Resolve an option code to its display label within a dimension. */
-export function filterLabel(dimension: FilterDimension, code: string): string {
-  const dim = FILTERS.find((f) => f.dimension === dimension);
-  return dim?.options.find((o) => o.code === code)?.label ?? code;
-}
 
 // ── Hero ─────────────────────────────────────────────────────────────────--
 // The hero spotlights a single content desk (Climate Change) with a carousel

@@ -24,6 +24,8 @@ export type FactCheckListing = {
   stories: Story[];
   page: number;
   totalPages: number;
+  /** Unpaged number of matches — what the search page's "N results" reports. */
+  total: number;
 };
 
 /**
@@ -137,7 +139,25 @@ export function getByDesk(
   filters: FilterSelection = EMPTY_FILTERS,
 ): Promise<FactCheckListing> {
   return getFactCheckListing(
-    buildFactCheckWhere(filters, TENANT_CODE, slug),
+    buildFactCheckWhere(filters, TENANT_CODE, { routeSlug: slug }),
+    page,
+  );
+}
+
+/**
+ * Search results as a `FactCheckListing` — backs `/search`. Same corpus and
+ * definition as `getFactChecks` (published fact-checks), narrowed by a free-text
+ * `query` (matched case-insensitively against title/lead/body) and by the same
+ * region/language/topic filters, both **server-side**. An empty `query` degrades
+ * to the plain filtered listing, so applying filters alone is a valid search.
+ */
+export function searchFactChecks(
+  query: string,
+  page = 1,
+  filters: FilterSelection = EMPTY_FILTERS,
+): Promise<FactCheckListing> {
+  return getFactCheckListing(
+    buildFactCheckWhere(filters, TENANT_CODE, { search: query }),
     page,
   );
 }
@@ -160,11 +180,12 @@ async function getFactCheckListing(
     });
 
   let { total, items } = await fetchPage(page);
-  const pages = totalPages(total.aggregate.totalCount, FACT_CHECKS_PAGE_SIZE);
+  const count = total.aggregate.totalCount;
+  const pages = totalPages(count, FACT_CHECKS_PAGE_SIZE);
   const current = clampPage(page, pages);
 
   // Requested page overran a non-empty result set → re-fetch the last real page.
-  if (current !== page && total.aggregate.totalCount > 0) {
+  if (current !== page && count > 0) {
     ({ items } = await fetchPage(current));
   }
 
@@ -172,5 +193,6 @@ async function getFactCheckListing(
     stories: items.map(mapStory),
     page: current,
     totalPages: pages,
+    total: count,
   };
 }
