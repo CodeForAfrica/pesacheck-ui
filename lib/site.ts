@@ -9,6 +9,7 @@ import { FaXTwitter } from "react-icons/fa6";
 import {
   FiBookOpen,
   FiFacebook,
+  FiFileText,
   FiGlobe,
   FiGrid,
   FiLinkedin,
@@ -29,6 +30,12 @@ import {
   LuScale,
   LuSearch,
 } from "react-icons/lu";
+import {
+  articleTypeHref,
+  EXPLAINERS,
+  LONGFORM,
+  QUICK_READS,
+} from "@/lib/article-types";
 import type { FilterDimension } from "@/lib/data/fact-check-filters";
 
 export type NavMenuItem = {
@@ -94,8 +101,17 @@ export const FACT_CHECKS_MENU_ITEMS: NavMenuItem[] = [
     icon: LuMessageCircleWarning,
     filterDimension: "topic",
   },
-  { label: "Quick Reads", href: "/fact-checks", icon: FiBookOpen },
-  { label: "Explainers", href: "/fact-checks", icon: FiPlay },
+  {
+    label: QUICK_READS.title,
+    href: articleTypeHref(QUICK_READS),
+    icon: FiBookOpen,
+  },
+  {
+    label: EXPLAINERS.title,
+    href: articleTypeHref(EXPLAINERS),
+    icon: FiPlay,
+  },
+  { label: LONGFORM.title, href: articleTypeHref(LONGFORM), icon: FiFileText },
   {
     label: "By Country",
     href: "/fact-checks",
