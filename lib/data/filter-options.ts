@@ -5,7 +5,7 @@
  * published fact-checks actually carry (`metadata.subject[]` for region/topic,
  * `swp_article_metadata.language` for language). Tag an article in Superdesk
  * with a new country, harm topic or language and the option appears in the
- * dropdowns on the next revalidation — no code change (issue #60, AC 1 & 4).
+ * dropdowns on the next revalidation — no code change (issue #60).
  *
  * The read is bounded (`TAXONOMY_SAMPLE_SIZE` newest fact-checks) and cached for
  * `FILTER_OPTIONS_TTL_SECONDS`, so it costs one query per TTL rather than one

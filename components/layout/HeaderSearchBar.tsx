@@ -173,7 +173,7 @@ export function HeaderSearchBar({
    * "Clear filters" resets the *page*, not just the dropdowns: the staged
    * selection and query are cleared and the search params are stripped from the
    * current URL, so whatever page the search happened on returns to its
-   * pre-search state (issue #60, AC 6). Any unrelated params are preserved.
+   * pre-search state (issue #60). Any unrelated params are preserved.
    */
   const clearFilters = () => {
     setSelection(EMPTY_FILTERS);
