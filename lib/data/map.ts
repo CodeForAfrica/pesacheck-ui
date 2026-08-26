@@ -103,7 +103,9 @@ const LANGUAGE_LABELS: Record<string, string> = {
   sw: "Swahili",
 };
 
-function languageLabel(code: string | null | undefined): string | undefined {
+export function languageLabel(
+  code: string | null | undefined,
+): string | undefined {
   if (!code) return undefined;
   return LANGUAGE_LABELS[code] ?? code;
 }

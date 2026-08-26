@@ -10,9 +10,12 @@ export default defineConfig({
   },
   test: {
     environment: "node",
-    // map.ts reads NEXT_PUBLIC_MEDIA_URL at module load — set it before import.
+    // The data layer reads these at module load — set them before import.
+    // `map.ts` needs the media base; `client.ts` throws without an API URL.
     env: {
       NEXT_PUBLIC_MEDIA_URL: "https://media.test/",
+      NEXT_PUBLIC_API_URL: "https://graphql.test/v1/graphql",
+      NEXT_PUBLIC_TENANT_CODE: "test",
     },
   },
 });

@@ -256,7 +256,8 @@ Heavier: client-component data lifting.
       `pnpm test` (60), tsc, biome clean.
 
 **Notes:**
-- **Why editorial options (not live-derived, contra the original plan item):** the
+- **Why editorial options (not live-derived, contra the original plan item)** —
+  *superseded by PR 7, which derives them from article `metadata`:* the
   normalized subject relation exposes only `scheme`/`code` — no display `name`
   (jsonb-only), no reverse relation to article, no tenant scope — so a scoped,
   labeled option list can't be queried. Codes/labels are curated like
@@ -341,6 +342,85 @@ Heavier: client-component data lifting.
       hero). Rendered `/fact-checks/climate-change` shows the title + empty-state
       line with **zero** `swiper-wrapper`/`swiper-slide` DOM nodes. tsc, biome, 73
       tests clean.
+
+## PR 7 — Live filters + live search (issue #60) ✅
+PR 4 made filtering server-side but kept the **option lists** editorial, and left
+`/search` on the static pool. Issue #60 (and its review recap) closes both gaps.
+- [x] `lib/data/queries/taxonomy.ts` + `lib/data/filter-options.ts` (NEW) —
+      `getFilterOptions()` derives the Region/Language/Topic dropdown contents
+      from the taxonomy published fact-checks actually carry: `metadata.subject[]`
+      (`countries` → region, `01harm` → topic) for `{code,label}` pairs, and
+      `swp_article_metadata.language` (jsonb `language` as fallback) for language.
+      Bounded to the newest `TAXONOMY_SAMPLE_SIZE` (300) fact-checks, wrapped in
+      `unstable_cache` with a 1h TTL, so it's one cheap query per hour rather than
+      per request. Options only ever describe articles the grid can show (same
+      `Debunk` + tenant + published `where`), so no option returns an empty grid.
+- [x] `app/layout.tsx` is now async and fetches the options with the usual
+      `?? FALLBACK_FILTER_OPTIONS` degraded-mode fallback, passing them to
+      `Header` → `HeaderSearchBar` → `SearchFilterPanel`. `lib/fact-checks-content`
+      keeps only the dimension **presentation** (`FILTER_META`: label + icon,
+      client-imported since icons aren't serializable) and the curated
+      `FALLBACK_FILTER_OPTIONS`. `REGIONS`/`LANGUAGES`/`TOPICS`/`FILTERS`/
+      `filterLabel` are gone; `filterLabel(options, dim, code)` now lives in
+      `lib/data/fact-check-filters.ts` and resolves against the live lists.
+- [x] `components/layout/HeaderSearchBar.tsx` (NEW) — the search field + filter
+      panel extracted out of `Header`, **seeded from the URL** (`useSearchParams`,
+      inside a `<Suspense>` boundary so prerendered routes keep their static
+      shell) and re-synced on every navigation. That's what makes the applied
+      state visible (filter count badge, query text) and makes "Clear filters"
+      able to reset the page: it strips `q`/`page`/`region`/`language`/`topic`
+      from the current URL and navigates, preserving unrelated params (AC 6).
+      Desktop/mobile are independent instances — only one is reachable per
+      viewport and both seed from the same URL.
+- [x] `searchFactChecks(query, page, filters)` in `lib/data/stories.ts` +
+      `buildFactCheckWhere`'s new `options.search` — free text is matched
+      case-insensitively across `title`/`lead`/`body` (`_or`) and AND-ed with the
+      filters, so `/search` is the same server-side, paged pipeline as the grid.
+      Wildcards in the term are escaped. `buildFactCheckWhere`'s third argument is
+      now an options object (`{ routeSlug?, search? }`).
+- [x] `FactCheckListing` gained `total` (unpaged count) — the search page reports
+      the real total, not the length of the current page.
+- [x] `app/search/page.tsx` + `SearchExplorer` are live: results, the count, and
+      the "Latest Articles" strip under the empty states all come from Superdesk
+      (recap items 1 & 3). The searched-for line lists whichever criteria were
+      used — `2 results found for: Ghana · English` for a filter-only search
+      instead of the old empty `""` (recap item 4). Three distinct states:
+      nothing searched yet (prompt + latest), no matches (message + latest), and
+      search unavailable (Hasura down — never mislabelled as "no matches").
+      Results paginate via the new URL-driven `components/ui/PaginationNav`.
+- [x] Deleted `components/fact-checks/FilterBar.tsx` — dead since PR 4 moved the
+      dropdowns into the header search bar, and the only other consumer of the
+      hardcoded `FILTERS`.
+- [x] Verified: 90 Vitest tests (17 new — search clause + escaping, the selection
+      helpers, and 8 for `deriveFilterOptions`), tsc + biome clean, `next build`
+      green with the static routes still prerendered. Behaviour was driven
+      end-to-end against a **stub Hasura** (Playwright): dropdowns show only
+      live-derived options (including a `cyber_harm` topic absent from the curated
+      list — AC 4), region + language apply together and AND correctly, the query
+      composes on top, the empty result shows the no-match message with live
+      latest articles, and Clear resets `/search` and `/fact-checks` to their
+      pre-search state.
+
+**Notes / carry-overs:**
+- **Not verified against staging (AC 7):** the sandbox this was written in can't
+  reach `*.pesacheck.org`/`*.superdesk.org`, so the queries are typed against the
+  schema the existing queries already exercise (`metadata`,
+  `swp_article_metadata.language`, `title`/`lead`/`body`) but ran only against a
+  stub. **Smoke-test on staging before go-live**: dropdown contents, a term that
+  only appears in an article body, and multi-dimension filtering.
+- **`_ilike '%term%'` can't use a btree index.** Fine at staging size and fine
+  early in production, but the search clause is the one thing here that scales
+  with corpus size — add a `pg_trgm` GIN index on `title`/`lead` (and consider
+  dropping `body` from the OR) if search latency shows up.
+- **Sampling window:** a taxonomy value used only by an article older than the
+  newest 300 fact-checks won't appear as an option (and a hand-typed code still
+  filters correctly — `filterLabel` falls back to the code). Raise
+  `TAXONOMY_SAMPLE_SIZE`, or move to a `distinct_on` aggregate over the subject
+  relation, if that becomes a real gap; the relation carries no display names,
+  which is why the article sample is the source today.
+- `unstable_cache` is deprecated in favour of the `use cache` directive, which
+  needs `cacheComponents` enabled app-wide — a separate decision, so this uses
+  `unstable_cache` for now.
 
 ## PR 6 — Marketing pages (optional) — Phase 6
 - [ ] Fetch `type:"content"` routes (About, Methodology, Principles, Contact)

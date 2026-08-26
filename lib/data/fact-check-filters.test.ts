@@ -1,10 +1,15 @@
 import { describe, expect, it } from "vitest";
 import {
   buildFactCheckWhere,
+  countActiveFilters,
   EMPTY_FILTERS,
+  type FilterOptions,
   type FilterSelection,
+  filterLabel,
   filtersToQuery,
+  hasActiveFilters,
   parseFilterParams,
+  selectedFilterLabels,
 } from "@/lib/data/fact-check-filters";
 
 const sel = (over: Partial<FilterSelection> = {}): FilterSelection => ({
@@ -75,7 +80,9 @@ describe("buildFactCheckWhere", () => {
   });
 
   it("scopes to a desk route when routeSlug is given (still Debunk)", () => {
-    const where = buildFactCheckWhere(EMPTY_FILTERS, "t", "climate-change");
+    const where = buildFactCheckWhere(EMPTY_FILTERS, "t", {
+      routeSlug: "climate-change",
+    });
     expect(where._and).toContainEqual({
       swp_route: { slug: { _eq: "climate-change" } },
     });
@@ -89,11 +96,9 @@ describe("buildFactCheckWhere", () => {
   });
 
   it("ANDs a desk route together with active filters", () => {
-    const where = buildFactCheckWhere(
-      sel({ topic: ["polit_harm"] }),
-      "t",
-      "elections",
-    );
+    const where = buildFactCheckWhere(sel({ topic: ["polit_harm"] }), "t", {
+      routeSlug: "elections",
+    });
     expect(where._and).toContainEqual({
       swp_route: { slug: { _eq: "elections" } },
     });
@@ -106,6 +111,108 @@ describe("buildFactCheckWhere", () => {
       },
     });
     expect(where._and).toHaveLength(3);
+  });
+
+  it("scopes to an article type on the `content_type` scheme (still Debunk)", () => {
+    const where = buildFactCheckWhere(EMPTY_FILTERS, "t", {
+      contentTypes: ["quickread", "shortform"],
+    });
+    expect(where._and).toContainEqual({
+      swp_article_metadata: {
+        swp_article_metadata_subjects: {
+          scheme: { _eq: "content_type" },
+          code: { _in: ["quickread", "shortform"] },
+        },
+      },
+    });
+    expect(where._and).toHaveLength(2);
+  });
+
+  it("omits the content-type clause when no codes are given", () => {
+    for (const scope of [{}, { contentTypes: [] }]) {
+      const where = buildFactCheckWhere(EMPTY_FILTERS, "t", scope);
+      expect(JSON.stringify(where)).not.toContain("content_type");
+      expect(where._and).toHaveLength(1);
+    }
+  });
+
+  it("ANDs an article type together with a desk route and active filters", () => {
+    const where = buildFactCheckWhere(sel({ language: ["en"] }), "t", {
+      routeSlug: "elections",
+      contentTypes: ["longform"],
+    });
+    expect(where._and).toHaveLength(4);
+  });
+});
+
+describe("buildFactCheckWhere — free-text search", () => {
+  it("ORs the query across title, lead and body", () => {
+    const where = buildFactCheckWhere(EMPTY_FILTERS, "t", { search: "Ghana" });
+    expect(where._and).toContainEqual({
+      _or: [
+        { title: { _ilike: "%Ghana%" } },
+        { lead: { _ilike: "%Ghana%" } },
+        { body: { _ilike: "%Ghana%" } },
+      ],
+    });
+    // Debunk clause kept; search is one additional AND clause.
+    expect(where._and).toHaveLength(2);
+  });
+
+  it("escapes LIKE wildcards in the query", () => {
+    const where = buildFactCheckWhere(EMPTY_FILTERS, "t", {
+      search: "100%_off\\now",
+    });
+    expect(JSON.stringify(where)).toContain("%100\\\\%\\\\_off\\\\\\\\now%");
+  });
+
+  it("ignores a blank/whitespace-only query", () => {
+    for (const search of ["", "   ", undefined]) {
+      const where = buildFactCheckWhere(EMPTY_FILTERS, "t", { search });
+      expect(where._and).toHaveLength(1);
+    }
+  });
+
+  it("ANDs the query with active filters and a desk route", () => {
+    const where = buildFactCheckWhere(sel({ language: ["en"] }), "t", {
+      routeSlug: "elections",
+      search: "vote",
+    });
+    // Debunk + route + search + language
+    expect(where._and).toHaveLength(4);
+  });
+});
+
+describe("filter selection helpers", () => {
+  const options: FilterOptions = {
+    region: [{ code: "KEN", label: "Kenya" }],
+    language: [{ code: "en", label: "English" }],
+    topic: [],
+  };
+
+  it("resolves a code to its live label", () => {
+    expect(filterLabel(options, "region", "KEN")).toBe("Kenya");
+  });
+
+  it("falls back to the code when it isn't among the options", () => {
+    expect(filterLabel(options, "topic", "polit_harm")).toBe("polit_harm");
+  });
+
+  it("lists selected options in dimension order", () => {
+    expect(
+      selectedFilterLabels(options, sel({ language: ["en"], region: ["KEN"] })),
+    ).toEqual([
+      { dimension: "region", code: "KEN", label: "Kenya" },
+      { dimension: "language", code: "en", label: "English" },
+    ]);
+  });
+
+  it("reports whether anything is selected", () => {
+    expect(hasActiveFilters(EMPTY_FILTERS)).toBe(false);
+    expect(countActiveFilters(EMPTY_FILTERS)).toBe(0);
+    const some = sel({ region: ["KEN", "UGA"], topic: ["polit_harm"] });
+    expect(hasActiveFilters(some)).toBe(true);
+    expect(countActiveFilters(some)).toBe(3);
   });
 });
 

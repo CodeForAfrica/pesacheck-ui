@@ -36,6 +36,7 @@ function staticPage(page: number): FactCheckListing {
     stories: STATIC_POOL.slice(start, start + FACT_CHECKS_PAGE_SIZE),
     page: current,
     totalPages: pages,
+    total: STATIC_POOL.length,
   };
 }
 

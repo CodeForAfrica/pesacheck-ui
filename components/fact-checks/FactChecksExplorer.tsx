@@ -8,8 +8,8 @@ import { StoryCard } from "@/components/ui/StoryCard";
 import {
   type FilterSelection,
   filtersToQuery,
+  hasActiveFilters,
 } from "@/lib/data/fact-check-filters";
-import { FILTERS } from "@/lib/fact-checks-content";
 import type { Story } from "@/lib/home-content";
 
 /**
@@ -24,19 +24,20 @@ export function FactChecksExplorer({
   page,
   totalPages,
   filters,
+  title = "Fact Checks",
 }: {
   stories: Story[];
   page: number;
   totalPages: number;
   filters: FilterSelection;
+  /** Section heading — the article-type pages name their own listing. */
+  title?: string;
 }) {
   const router = useRouter();
   const pathname = usePathname();
   const [, startTransition] = useTransition();
 
-  const chips = FILTERS.flatMap(({ dimension }) =>
-    filters[dimension].map((value) => ({ dimension, value })),
-  );
+  const filtered = hasActiveFilters(filters);
 
   // Pagination keeps the applied filters; only the page changes.
   const goToPage = (nextPage: number) => {
@@ -55,12 +56,12 @@ export function FactChecksExplorer({
       <section className="py-14 lg:py-20">
         <Container>
           {/* The listing is the page's only titled section — there is no hero. */}
-          <SectionHeading title="Fact Checks" />
+          <SectionHeading title={title} />
 
           {stories.length === 0 ? (
             <p className="py-16 text-center text-base font-medium text-neutral-500">
-              {chips.length > 0
-                ? "No fact-checks match your filters. Try removing some."
+              {filtered
+                ? "No fact-checks match your filters. Try removing some, or use “Clear filters” in the search bar."
                 : "No fact-checks have been published here yet."}
             </p>
           ) : (
