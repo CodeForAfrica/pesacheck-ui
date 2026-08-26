@@ -19,6 +19,9 @@ import {
 /** URL params owned by the search bar — the ones "Clear" resets. */
 const SEARCH_PARAMS = ["q", "page", ...FILTER_DIMENSIONS];
 
+/** sessionStorage key holding the page a `/search` visit was launched from. */
+const SEARCH_ORIGIN_KEY = "search-origin";
+
 function Chevron({ open }: { open: boolean }) {
   return (
     <svg
@@ -148,6 +151,17 @@ export function HeaderSearchBar({
   const goToSearch = () => {
     const params = new URLSearchParams(filtersToQuery(selection));
     if (query.trim()) params.set("q", query.trim());
+    // Remember where the search started so "Clear filters" can return there
+    // instead of stranding the reader on the empty `/search` screen. A search
+    // refined from `/search` itself keeps the original origin.
+    if (pathname !== "/search") {
+      try {
+        sessionStorage.setItem(
+          SEARCH_ORIGIN_KEY,
+          `${pathname}${urlKey ? `?${urlKey}` : ""}`,
+        );
+      } catch {}
+    }
     const qs = params.toString();
     close();
     onNavigate?.();
@@ -170,15 +184,28 @@ export function HeaderSearchBar({
   };
 
   /**
-   * "Clear filters" resets the *page*, not just the dropdowns: the staged
-   * selection and query are cleared and the search params are stripped from the
-   * current URL, so whatever page the search happened on returns to its
-   * pre-search state (issue #60). Any unrelated params are preserved.
+   * "Clear filters" resets the *page*, not just the dropdowns (issue #60). On
+   * `/search` that means leaving the search entirely: the reader is sent back to
+   * the page they searched from (or home, if that's unknown) rather than being
+   * left on the empty search screen. On any other page the search params are
+   * stripped in place, preserving unrelated ones.
    */
   const clearFilters = () => {
     setSelection(EMPTY_FILTERS);
     setQuery("");
     setOpenDropdown(null);
+
+    if (pathname === "/search") {
+      let origin = "/";
+      try {
+        origin = sessionStorage.getItem(SEARCH_ORIGIN_KEY) ?? "/";
+        sessionStorage.removeItem(SEARCH_ORIGIN_KEY);
+      } catch {}
+      close();
+      onNavigate?.();
+      router.push(origin);
+      return;
+    }
 
     const params = new URLSearchParams(urlKey);
     const applied = SEARCH_PARAMS.filter((key) => params.has(key));
