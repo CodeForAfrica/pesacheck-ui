@@ -160,10 +160,50 @@ function pickStoryImage(renditions: Rendition[] | undefined): string {
   return STORY_IMAGE_FALLBACK;
 }
 
-/** Strip HTML tags and collapse whitespace — `lead`/`body` may carry markup. */
+/**
+ * The named entities Superdesk's editor actually emits. Anything unrecognised
+ * is left as written rather than guessed at, so an author who typed "&foo;"
+ * sees "&foo;".
+ */
+const HTML_ENTITIES: Record<string, string> = {
+  lt: "<",
+  gt: ">",
+  quot: '"',
+  apos: "'",
+  nbsp: " ",
+  hellip: "…",
+  mdash: "—",
+  ndash: "–",
+  lsquo: "‘",
+  rsquo: "’",
+  ldquo: "“",
+  rdquo: "”",
+};
+
+/**
+ * Decode character references. `&amp;` goes last: decoding it first would turn
+ * the encoded text `&amp;lt;` into a real `<` instead of the literal "&lt;".
+ */
+function decodeEntities(text: string): string {
+  return text
+    .replace(/&#x([0-9a-f]+);/gi, (_, hex) =>
+      String.fromCodePoint(Number.parseInt(hex, 16)),
+    )
+    .replace(/&#(\d+);/g, (_, dec) => String.fromCodePoint(Number(dec)))
+    .replace(
+      /&([a-z]+);/gi,
+      (match, name: string) => HTML_ENTITIES[name.toLowerCase()] ?? match,
+    )
+    .replace(/&amp;/g, "&");
+}
+
+/**
+ * Strip HTML tags and collapse whitespace — `lead`/`body` and the Superdesk
+ * custom fields all carry markup, the last of which arrive wrapped in a `<p>`
+ * however plain the author's input was.
+ */
 function stripHtml(html: string): string {
-  return html
-    .replace(/<[^>]*>/g, " ")
+  return decodeEntities(html.replace(/<[^>]*>/g, " "))
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -378,19 +418,51 @@ export function mapAnnouncement(article: RawArticle): Announcement {
  * missing one drops its row rather than printing a blank.
  */
 export const EVENT_FIELDS = {
-  /** Venue and dates as one line, e.g. "Nairobi · 12–13 September 2026". */
+  /** Where it happens, e.g. "Nairobi" or "Online". */
+  venue: "event_venue",
+  /** When it happens, as the author wants it read: "12–13 September 2026". */
+  dates: "event_dates",
+  /**
+   * Venue and dates pre-composed. Superseded by the two fields above; still
+   * read so events authored before the split keep their line.
+   */
   meta: "event_meta",
   format: "event_format",
   languages: "event_languages",
   cost: "event_cost",
 } as const;
 
-/** A custom field's value, trimmed. Undefined when unset or empty. */
+/** The separator between venue and dates, matching the design. */
+const META_SEPARATOR = " · ";
+
+/**
+ * A custom field's value as text. Superdesk stores these as HTML however plain
+ * the input — "In person & streamed" arrives as `<p>In person &amp; streamed</p>`
+ * — so this strips the wrapper rather than printing it. Undefined when unset or
+ * empty, which is what lets a missing field drop its row.
+ */
 function extraValue(article: RawArticle, field: string): string | undefined {
   const match = article.swp_article_extra?.find(
     (extra) => extra.field_name === field,
   );
-  return match?.value?.trim() || undefined;
+  const value = match?.value;
+  return (value ? stripHtml(value) : "") || undefined;
+}
+
+/**
+ * The line above the headline: "Nairobi · 12–13 September 2026". Either half
+ * may be missing, and one on its own reads fine, so the separator only appears
+ * between two present values.
+ */
+function eventMeta(article: RawArticle): string | undefined {
+  const parts = [
+    extraValue(article, EVENT_FIELDS.venue),
+    extraValue(article, EVENT_FIELDS.dates),
+  ].filter((part): part is string => Boolean(part));
+
+  return parts.length > 0
+    ? parts.join(META_SEPARATOR)
+    : extraValue(article, EVENT_FIELDS.meta);
 }
 
 /** Map a raw content-list article to the featured event. */
@@ -409,7 +481,7 @@ export function mapSpotlightEvent(article: RawArticle): SpotlightEvent {
     ),
     alt:
       article.swp_article_feature_media?.description?.trim() || article.title,
-    meta: extraValue(article, EVENT_FIELDS.meta) ?? "",
+    meta: eventMeta(article) ?? "",
     title: article.title,
     body: article.lead ? stripHtml(article.lead) : "",
     details,
@@ -423,10 +495,7 @@ export function mapUpcomingEvent(article: RawArticle): UpcomingEvent {
   return {
     // Falls back to the publish date, which is at least a real date, when the
     // event's own line is unset.
-    meta:
-      extraValue(article, EVENT_FIELDS.meta) ??
-      formatLongDate(article.published_at) ??
-      "",
+    meta: eventMeta(article) ?? formatLongDate(article.published_at) ?? "",
     title: article.title,
     body: article.lead ? stripHtml(article.lead) : "",
     kind: findSubject(meta, MEDIA_CENTRE_LABEL_SCHEME)?.name ?? "",

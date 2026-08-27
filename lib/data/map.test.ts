@@ -422,6 +422,53 @@ describe("Media Centre mappers", () => {
     expect(card.meta).toBe("08 Oct 2026 · Accra");
   });
 
+  it("unwraps the markup Superdesk stores custom fields in", () => {
+    // Publisher hands these back as HTML however plain the author's input was.
+    const event = mapSpotlightEvent({
+      ...article,
+      swp_article_extra: [
+        { field_name: "event_venue", value: "<p>Nairobi</p>" },
+        {
+          field_name: "event_format",
+          value: "<p>In person &amp; streamed</p>",
+        },
+      ],
+    });
+    expect(event.meta).toBe("Nairobi");
+    expect(event.details).toEqual([
+      { label: "Format", value: "In person & streamed" },
+    ]);
+  });
+
+  it("composes the event line from venue and dates", () => {
+    const extra = (venue?: string, dates?: string) =>
+      [
+        venue ? { field_name: "event_venue", value: venue } : null,
+        dates ? { field_name: "event_dates", value: dates } : null,
+      ].filter((f): f is { field_name: string; value: string } => Boolean(f));
+
+    const meta = (venue?: string, dates?: string) =>
+      mapSpotlightEvent({ ...article, swp_article_extra: extra(venue, dates) })
+        .meta;
+
+    expect(meta("Nairobi", "12–13 September 2026")).toBe(
+      "Nairobi · 12–13 September 2026",
+    );
+    // Either half stands alone rather than trailing a separator.
+    expect(meta("Online")).toBe("Online");
+    expect(meta(undefined, "08 Oct 2026")).toBe("08 Oct 2026");
+  });
+
+  it("falls back to the pre-split meta field for older events", () => {
+    const event = mapSpotlightEvent({
+      ...article,
+      swp_article_extra: [
+        { field_name: "event_meta", value: "Accra · 08 Oct 2026" },
+      ],
+    });
+    expect(event.meta).toBe("Accra · 08 Oct 2026");
+  });
+
   it("takes a strand's accent from its position, cycling every four", () => {
     const tones = [0, 1, 2, 3, 4, 5].map(
       (i) => mapResearchStrand(article, i).tone,
