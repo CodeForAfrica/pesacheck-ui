@@ -2,6 +2,15 @@ import type { Article } from "@/lib/article-content";
 import { renderArticleBody } from "@/lib/data/body";
 import { mediaAssetUrl } from "@/lib/data/media";
 import type { Story } from "@/lib/home-content";
+import {
+  type Announcement,
+  EVENT_CTA_LABEL,
+  type NewsItem,
+  RESEARCH_TONES,
+  type ResearchStrand,
+  type SpotlightEvent,
+  type UpcomingEvent,
+} from "@/lib/media-centre-content";
 
 /**
  * Preference order for the card image. Staging exposes
@@ -125,6 +134,13 @@ export type RawArticle = {
   published_at?: string | null;
   metadata?: string | null;
   swp_route?: { slug?: string | null; staticprefix?: string | null } | null;
+  /** Superdesk custom fields, as `field_name` / `value` pairs. */
+  swp_article_extra?:
+    | {
+        field_name?: string | null;
+        value?: string | null;
+      }[]
+    | null;
   swp_article_feature_media?: {
     description?: string | null;
     renditions?: Rendition[] | null;
@@ -144,10 +160,50 @@ function pickStoryImage(renditions: Rendition[] | undefined): string {
   return STORY_IMAGE_FALLBACK;
 }
 
-/** Strip HTML tags and collapse whitespace — `lead`/`body` may carry markup. */
+/**
+ * The named entities Superdesk's editor actually emits. Anything unrecognised
+ * is left as written rather than guessed at, so an author who typed "&foo;"
+ * sees "&foo;".
+ */
+const HTML_ENTITIES: Record<string, string> = {
+  lt: "<",
+  gt: ">",
+  quot: '"',
+  apos: "'",
+  nbsp: " ",
+  hellip: "…",
+  mdash: "—",
+  ndash: "–",
+  lsquo: "‘",
+  rsquo: "’",
+  ldquo: "“",
+  rdquo: "”",
+};
+
+/**
+ * Decode character references. `&amp;` goes last: decoding it first would turn
+ * the encoded text `&amp;lt;` into a real `<` instead of the literal "&lt;".
+ */
+function decodeEntities(text: string): string {
+  return text
+    .replace(/&#x([0-9a-f]+);/gi, (_, hex) =>
+      String.fromCodePoint(Number.parseInt(hex, 16)),
+    )
+    .replace(/&#(\d+);/g, (_, dec) => String.fromCodePoint(Number(dec)))
+    .replace(
+      /&([a-z]+);/gi,
+      (match, name: string) => HTML_ENTITIES[name.toLowerCase()] ?? match,
+    )
+    .replace(/&amp;/g, "&");
+}
+
+/**
+ * Strip HTML tags and collapse whitespace — `lead`/`body` and the Superdesk
+ * custom fields all carry markup, the last of which arrive wrapped in a `<p>`
+ * however plain the author's input was.
+ */
 function stripHtml(html: string): string {
-  return html
-    .replace(/<[^>]*>/g, " ")
+  return decodeEntities(html.replace(/<[^>]*>/g, " "))
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -267,6 +323,182 @@ export function mapStory(article: RawArticle): Story {
     language: languageLabel(meta.language),
     date: formatStoryDate(article.published_at),
     readTime: computeReadTime(article.body),
+    href: storyHref(article),
+  };
+}
+
+// ── Media Centre ─────────────────────────────────────────────────────────────
+// The three rows are curated content lists like the homepage ones, so they
+// arrive as the same `RawArticle`.
+
+/**
+ * Vocabulary naming a Media Centre entry: the kicker above a clipping (design:
+ * "International newsrooms"), an announcement's tag ("Network") and a research
+ * strand's document kind ("Journal article"). Its own scheme rather than the
+ * `01harm` harm-type taxonomy the fact-checks use — these labels say what an
+ * entry *is* on this page, which is a different question from what harm a
+ * fact-check addresses.
+ *
+ * Untagged entries drop the label rather than print a placeholder, so the
+ * sections read correctly before the vocabulary is populated.
+ */
+export const MEDIA_CENTRE_LABEL_SCHEME = "media_centre_label";
+
+/** Long form date for the announcements rail, e.g. `15 Jul 2026`. */
+export function formatLongDate(
+  published: string | null | undefined,
+): string | undefined {
+  if (!published) return undefined;
+  const date = new Date(published);
+  if (Number.isNaN(date.getTime())) return undefined;
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(date);
+}
+
+/** Map a raw content-list article to a Media Centre clipping card. */
+export function mapNewsItem(article: RawArticle): NewsItem {
+  const meta = parseMetadata(article.metadata);
+  return {
+    image: pickStoryImage(
+      article.swp_article_feature_media?.renditions ?? undefined,
+    ),
+    alt:
+      article.swp_article_feature_media?.description?.trim() || article.title,
+    outlet: findSubject(meta, MEDIA_CENTRE_LABEL_SCHEME)?.name ?? "",
+    title: article.title,
+    date: formatStoryDate(article.published_at) ?? "",
+    readTime: computeReadTime(article.body) ?? "",
+    href: storyHref(article),
+  };
+}
+
+/**
+ * Map a raw content-list article to a research strand. The CTA opens the strand's
+ * own article; only the static fallback, which has no article behind it, sends
+ * readers to the contact page instead.
+ *
+ * `index` is the article's position in the curated list, which is what picks the
+ * accent — nothing in the schema carries a colour.
+ */
+export function mapResearchStrand(
+  article: RawArticle,
+  index: number,
+): ResearchStrand {
+  const meta = parseMetadata(article.metadata);
+  return {
+    label: article.title,
+    kind: findSubject(meta, MEDIA_CENTRE_LABEL_SCHEME)?.name ?? "",
+    body: article.lead ? stripHtml(article.lead) : "",
+    tone: RESEARCH_TONES[index % RESEARCH_TONES.length],
+    href: storyHref(article),
+  };
+}
+
+/** Map a raw content-list article to a Media Centre announcement row. */
+export function mapAnnouncement(article: RawArticle): Announcement {
+  const lead = article.lead ? stripHtml(article.lead) : "";
+  const meta = parseMetadata(article.metadata);
+  return {
+    date: formatLongDate(article.published_at) ?? "",
+    tag: findSubject(meta, MEDIA_CENTRE_LABEL_SCHEME)?.name ?? "",
+    title: article.title,
+    excerpt: lead,
+    href: storyHref(article),
+  };
+}
+
+/**
+ * Superdesk custom fields carrying what an event is, beyond what any article
+ * has: where and when it runs, and the three facts in the detail row. Add them
+ * to the content profile under exactly these names; each is optional, and a
+ * missing one drops its row rather than printing a blank.
+ */
+export const EVENT_FIELDS = {
+  /** Where it happens, e.g. "Nairobi" or "Online". */
+  venue: "event_venue",
+  /** When it happens, as the author wants it read: "12–13 September 2026". */
+  dates: "event_dates",
+  /**
+   * Venue and dates pre-composed. Superseded by the two fields above; still
+   * read so events authored before the split keep their line.
+   */
+  meta: "event_meta",
+  format: "event_format",
+  languages: "event_languages",
+  cost: "event_cost",
+} as const;
+
+/** The separator between venue and dates, matching the design. */
+const META_SEPARATOR = " · ";
+
+/**
+ * A custom field's value as text. Superdesk stores these as HTML however plain
+ * the input — "In person & streamed" arrives as `<p>In person &amp; streamed</p>`
+ * — so this strips the wrapper rather than printing it. Undefined when unset or
+ * empty, which is what lets a missing field drop its row.
+ */
+function extraValue(article: RawArticle, field: string): string | undefined {
+  const match = article.swp_article_extra?.find(
+    (extra) => extra.field_name === field,
+  );
+  const value = match?.value;
+  return (value ? stripHtml(value) : "") || undefined;
+}
+
+/**
+ * The line above the headline: "Nairobi · 12–13 September 2026". Either half
+ * may be missing, and one on its own reads fine, so the separator only appears
+ * between two present values.
+ */
+function eventMeta(article: RawArticle): string | undefined {
+  const parts = [
+    extraValue(article, EVENT_FIELDS.venue),
+    extraValue(article, EVENT_FIELDS.dates),
+  ].filter((part): part is string => Boolean(part));
+
+  return parts.length > 0
+    ? parts.join(META_SEPARATOR)
+    : extraValue(article, EVENT_FIELDS.meta);
+}
+
+/** Map a raw content-list article to the featured event. */
+export function mapSpotlightEvent(article: RawArticle): SpotlightEvent {
+  const details = [
+    { label: "Format", value: extraValue(article, EVENT_FIELDS.format) },
+    { label: "Languages", value: extraValue(article, EVENT_FIELDS.languages) },
+    { label: "Cost", value: extraValue(article, EVENT_FIELDS.cost) },
+  ].filter((detail): detail is { label: string; value: string } =>
+    Boolean(detail.value),
+  );
+
+  return {
+    image: pickStoryImage(
+      article.swp_article_feature_media?.renditions ?? undefined,
+    ),
+    alt:
+      article.swp_article_feature_media?.description?.trim() || article.title,
+    meta: eventMeta(article) ?? "",
+    title: article.title,
+    body: article.lead ? stripHtml(article.lead) : "",
+    details,
+    cta: { label: EVENT_CTA_LABEL, href: storyHref(article) },
+  };
+}
+
+/** Map a raw content-list article to an "Also coming up" card. */
+export function mapUpcomingEvent(article: RawArticle): UpcomingEvent {
+  const meta = parseMetadata(article.metadata);
+  return {
+    // Falls back to the publish date, which is at least a real date, when the
+    // event's own line is unset.
+    meta: eventMeta(article) ?? formatLongDate(article.published_at) ?? "",
+    title: article.title,
+    body: article.lead ? stripHtml(article.lead) : "",
+    kind: findSubject(meta, MEDIA_CENTRE_LABEL_SCHEME)?.name ?? "",
     href: storyHref(article),
   };
 }

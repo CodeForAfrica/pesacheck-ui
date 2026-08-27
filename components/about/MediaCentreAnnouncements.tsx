@@ -1,15 +1,25 @@
 import { FiArrowUpRight } from "react-icons/fi";
 import { Container, SectionHeading } from "@/components/ui/SectionHeading";
-import { ANNOUNCEMENTS } from "@/lib/media-centre-content";
+import {
+  ANNOUNCEMENTS,
+  ANNOUNCEMENTS_LIMIT,
+  type Announcement,
+} from "@/lib/media-centre-content";
 
-export function MediaCentreAnnouncements() {
+export function MediaCentreAnnouncements({
+  announcements = ANNOUNCEMENTS,
+  limit = ANNOUNCEMENTS_LIMIT,
+}: {
+  announcements?: Announcement[];
+  limit?: number;
+}) {
   return (
     <section className="py-14 lg:py-16">
       <Container>
         <SectionHeading title="Announcements" />
 
         <ul className="mt-9">
-          {ANNOUNCEMENTS.map((item) => (
+          {announcements.slice(0, limit).map((item) => (
             <li
               key={item.title}
               className="border-b border-neutral-100 first:border-t"
@@ -19,9 +29,12 @@ export function MediaCentreAnnouncements() {
                   <p className="text-xs leading-[18px] text-neutral-600">
                     {item.date}
                   </p>
-                  <span className="mt-3 inline-block rounded-full border border-neutral-100 px-3.5 py-1 text-xs leading-[18px] text-neutral-600">
-                    {item.tag}
-                  </span>
+                  {/* Live announcements may carry no topic to tag with. */}
+                  {item.tag && (
+                    <span className="mt-3 inline-block rounded-full border border-neutral-100 px-3.5 py-1 text-xs leading-[18px] text-neutral-600">
+                      {item.tag}
+                    </span>
+                  )}
                 </div>
 
                 <div className="flex-1">
