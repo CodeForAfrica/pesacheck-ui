@@ -250,11 +250,21 @@ function storyHref(article: RawArticle): string {
  * Centre entries publish to the same language routes fact-checks do, because
  * `LANGUAGE_ROUTE_SLUGS` is what content lists are filtered to.
  */
-const MEDIA_CENTRE_PROFILES = new Set([
-  "Event",
-  "Announcement",
-  "Research Citations",
-]);
+const MEDIA_CENTRE_PROFILES = ["Event", "Announcement", "Research Citations"];
+
+/**
+ * Profile names are compared loosely because Publisher reports Superdesk's
+ * internal name, not the label an editor sees: "Research Citations" arrives as
+ * "ResearchCitations". Matching the exact string would work for single-word
+ * profiles and silently fail for the rest.
+ */
+function normaliseProfile(name: string): string {
+  return name.replace(/[^a-z0-9]/gi, "").toLowerCase();
+}
+
+const MEDIA_CENTRE_PROFILE_KEYS = new Set(
+  MEDIA_CENTRE_PROFILES.map(normaliseProfile),
+);
 
 /** Where Media Centre entries live, one flat segment under the section page. */
 const MEDIA_CENTRE_BASE = "/about/media-centre";
@@ -263,7 +273,10 @@ const MEDIA_CENTRE_BASE = "/about/media-centre";
 export function isMediaCentreProfile(
   profile: string | null | undefined,
 ): boolean {
-  return Boolean(profile) && MEDIA_CENTRE_PROFILES.has(profile as string);
+  return (
+    Boolean(profile) &&
+    MEDIA_CENTRE_PROFILE_KEYS.has(normaliseProfile(profile as string))
+  );
 }
 
 /** Whether an article was authored against one of the Media Centre profiles. */

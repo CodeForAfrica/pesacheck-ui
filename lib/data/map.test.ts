@@ -476,7 +476,7 @@ describe("Media Centre mappers", () => {
       metadata: JSON.stringify({ subject: [], profile }),
     });
 
-    for (const profile of ["Event", "Announcement", "Research Citations"]) {
+    for (const profile of ["Event", "Announcement", "ResearchCitations"]) {
       const entry = withProfile(profile);
       const href = "/about/media-centre/global-newsrooms-credit-pesacheck";
       expect(mapAnnouncement(entry).href).toBe(href);
@@ -732,11 +732,13 @@ describe("isMediaCentreProfile", () => {
     expect(isMediaCentreProfile("Event")).toBe(true);
     expect(isMediaCentreProfile("Announcement")).toBe(true);
     expect(isMediaCentreProfile("Research Citations")).toBe(true);
+    // Publisher reports Superdesk's internal name, which drops the space.
+    expect(isMediaCentreProfile("ResearchCitations")).toBe(true);
   });
 
   it("rejects the fact-check profile, unknown names and absent values", () => {
     expect(isMediaCentreProfile("Article")).toBe(false);
-    expect(isMediaCentreProfile("event")).toBe(false); // names are exact
+    expect(isMediaCentreProfile("Articles")).toBe(false);
     expect(isMediaCentreProfile(undefined)).toBe(false);
     expect(isMediaCentreProfile(null)).toBe(false);
     expect(isMediaCentreProfile("")).toBe(false);
