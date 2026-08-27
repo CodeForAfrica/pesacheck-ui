@@ -68,6 +68,8 @@ export type ArticleMetadata = {
   subject?: Subject[];
   byline?: string | null;
   language?: string | null;
+  /** Name of the Superdesk content profile the item was authored against. */
+  profile?: string | null;
   [key: string]: unknown;
 };
 
@@ -241,6 +243,47 @@ function storyHref(article: RawArticle): string {
     : `/fact-checks/${article.slug}`;
 }
 
+/**
+ * Superdesk content profiles whose articles belong to the Media Centre rather
+ * than the fact-check archive. Publisher reports the profile by name in
+ * `metadata.profile`, which is the only signal distinguishing the two: Media
+ * Centre entries publish to the same language routes fact-checks do, because
+ * `LANGUAGE_ROUTE_SLUGS` is what content lists are filtered to.
+ */
+const MEDIA_CENTRE_PROFILES = new Set([
+  "Event",
+  "Announcement",
+  "Research Citations",
+]);
+
+/** Where Media Centre entries live, one flat segment under the section page. */
+const MEDIA_CENTRE_BASE = "/about/media-centre";
+
+/** Whether a content profile name is one the Media Centre owns. */
+export function isMediaCentreProfile(
+  profile: string | null | undefined,
+): boolean {
+  return Boolean(profile) && MEDIA_CENTRE_PROFILES.has(profile as string);
+}
+
+/** Whether an article was authored against one of the Media Centre profiles. */
+export function isMediaCentreEntry(
+  metadata: string | null | undefined,
+): boolean {
+  return isMediaCentreProfile(parseMetadata(metadata).profile);
+}
+
+/**
+ * Link to an entry's own page. A Media Centre entry is not a fact-check and
+ * reads wrongly under `/fact-checks`, so it gets its own URL; anything else
+ * keeps the archive's.
+ */
+function entryHref(article: RawArticle): string {
+  return isMediaCentreEntry(article.metadata)
+    ? `${MEDIA_CENTRE_BASE}/${article.slug}`
+    : storyHref(article);
+}
+
 // ── Article (single fact-check) ──────────────────────────────────────────────
 
 /** Extra relations selected only by the single-article query. */
@@ -294,6 +337,7 @@ export function mapArticle(raw: RawFullArticle): Article {
       raw.swp_article_metadata?.byline?.trim() ||
       "PesaCheck",
     desk: raw.swp_route?.slug ?? undefined,
+    profile: typeof meta.profile === "string" ? meta.profile : undefined,
     // The body is rendered as HTML; the structured paragraph fields are unused.
     leadParagraphs: [],
     bodyParagraphs: [],
@@ -372,7 +416,7 @@ export function mapNewsItem(article: RawArticle): NewsItem {
     title: article.title,
     date: formatStoryDate(article.published_at) ?? "",
     readTime: computeReadTime(article.body) ?? "",
-    href: storyHref(article),
+    href: entryHref(article),
   };
 }
 
@@ -394,7 +438,7 @@ export function mapResearchStrand(
     kind: findSubject(meta, MEDIA_CENTRE_LABEL_SCHEME)?.name ?? "",
     body: article.lead ? stripHtml(article.lead) : "",
     tone: RESEARCH_TONES[index % RESEARCH_TONES.length],
-    href: storyHref(article),
+    href: entryHref(article),
   };
 }
 
@@ -407,7 +451,7 @@ export function mapAnnouncement(article: RawArticle): Announcement {
     tag: findSubject(meta, MEDIA_CENTRE_LABEL_SCHEME)?.name ?? "",
     title: article.title,
     excerpt: lead,
-    href: storyHref(article),
+    href: entryHref(article),
   };
 }
 
@@ -485,7 +529,7 @@ export function mapSpotlightEvent(article: RawArticle): SpotlightEvent {
     title: article.title,
     body: article.lead ? stripHtml(article.lead) : "",
     details,
-    cta: { label: EVENT_CTA_LABEL, href: storyHref(article) },
+    cta: { label: EVENT_CTA_LABEL, href: entryHref(article) },
   };
 }
 
@@ -499,6 +543,6 @@ export function mapUpcomingEvent(article: RawArticle): UpcomingEvent {
     title: article.title,
     body: article.lead ? stripHtml(article.lead) : "",
     kind: findSubject(meta, MEDIA_CENTRE_LABEL_SCHEME)?.name ?? "",
-    href: storyHref(article),
+    href: entryHref(article),
   };
 }
