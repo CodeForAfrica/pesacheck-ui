@@ -9,6 +9,8 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This started as a Figma-built UI with all copy hardcoded in `lib/*-content.ts`.
 Content is migrating to live Superdesk data, served as GraphQL by Hasura.
 Plan: `docs/migration-plan.md`. Progress tracker: `docs/track-a-tasks.md`.
+Superdesk side (vocabularies, content profiles, content lists, and how a field
+reaches the site): `docs/superdesk-setup.md`.
 
 - **Data-access layer:** `lib/data/` (graphql-request client + queries + mappers).
   Server Components fetch by `await`-ing these functions — there is **no
