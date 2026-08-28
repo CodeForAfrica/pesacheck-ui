@@ -33,40 +33,53 @@ describe("buildFactCheckWhere", () => {
     ]);
   });
 
-  it("adds a region clause on the `countries` scheme with _in (OR within)", () => {
+  it("adds a region clause on the `countrymention1` scheme with _in (OR within)", () => {
     const where = buildFactCheckWhere(sel({ region: ["UGA", "ZAF"] }), "t");
     expect(where._and).toContainEqual({
       swp_article_metadata: {
         swp_article_metadata_subjects: {
-          scheme: { _eq: "countries" },
+          scheme: { _eq: "countrymention1" },
           code: { _in: ["UGA", "ZAF"] },
         },
       },
     });
   });
 
-  it("adds a topic clause on the `01harm` scheme", () => {
-    const where = buildFactCheckWhere(sel({ topic: ["polit_harm"] }), "t");
+  it("adds a topic clause on the `Harm_type` scheme", () => {
+    const where = buildFactCheckWhere(sel({ topic: ["elections"] }), "t");
     expect(where._and).toContainEqual({
       swp_article_metadata: {
         swp_article_metadata_subjects: {
-          scheme: { _eq: "01harm" },
-          code: { _in: ["polit_harm"] },
+          scheme: { _eq: "Harm_type" },
+          code: { _in: ["elections"] },
         },
       },
     });
   });
 
-  it("filters language on the metadata.language column", () => {
-    const where = buildFactCheckWhere(sel({ language: ["en", "fr"] }), "t");
+  it("matches language on the article column OR the Debunklang subject", () => {
+    const where = buildFactCheckWhere(
+      sel({ language: ["en", "debunkful"] }),
+      "t",
+    );
     expect(where._and).toContainEqual({
-      swp_article_metadata: { language: { _in: ["en", "fr"] } },
+      _or: [
+        { swp_article_metadata: { language: { _in: ["en", "debunkful"] } } },
+        {
+          swp_article_metadata: {
+            swp_article_metadata_subjects: {
+              scheme: { _eq: "Debunklang" },
+              code: { _in: ["en", "debunkful"] },
+            },
+          },
+        },
+      ],
     });
   });
 
   it("ANDs dimensions as separate clauses (Debunk + region + topic + lang)", () => {
     const where = buildFactCheckWhere(
-      sel({ region: ["UGA"], topic: ["polit_harm"], language: ["en"] }),
+      sel({ region: ["UGA"], topic: ["elections"], language: ["en"] }),
       "t",
     );
     expect(where._and).toHaveLength(4);
@@ -96,7 +109,7 @@ describe("buildFactCheckWhere", () => {
   });
 
   it("ANDs a desk route together with active filters", () => {
-    const where = buildFactCheckWhere(sel({ topic: ["polit_harm"] }), "t", {
+    const where = buildFactCheckWhere(sel({ topic: ["elections"] }), "t", {
       routeSlug: "elections",
     });
     expect(where._and).toContainEqual({
@@ -105,8 +118,8 @@ describe("buildFactCheckWhere", () => {
     expect(where._and).toContainEqual({
       swp_article_metadata: {
         swp_article_metadata_subjects: {
-          scheme: { _eq: "01harm" },
-          code: { _in: ["polit_harm"] },
+          scheme: { _eq: "Harm_type" },
+          code: { _in: ["elections"] },
         },
       },
     });

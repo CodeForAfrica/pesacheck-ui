@@ -49,14 +49,15 @@ systems and are reconciled at the presentation layer:
 | values | English, Fulani, Oromo, … | the 6 desk languages |
 
 Contract:
-- **One list, normalized by language identity (display name), not code.**
-  `debunkeng` and `en` both mean "English" → one option. (A shared ISO code
-  isn't available because `Debunklang` is non-ISO.)
-- **Per-article fallback:** an article's effective language = its `Debunklang`
-  value if tagged, else its article `language`.
-- **Filter match:** selecting a language matches `Debunklang = <lang>` **OR**
-  `(no Debunklang AND article language = <lang>)`.
-- Debunk-only languages (e.g. Fulani) come solely from `Debunklang`.
+- **One list, deduped by language identity (display name), not code.**
+  A debunk language whose label already appears as a desk language (e.g.
+  "English") is dropped in favour of the ISO option, so its option keeps the
+  fully-populated column code. Debunk-only languages (e.g. Fulani) keep their
+  vocabulary code.
+- **Filter match:** a selected code matches the article `language` column **OR**
+  the `Debunklang` subject code. The two code systems don't overlap, so a
+  desk-language code (`en`) only ever hits the column and a debunk-only code
+  (`debunkful`) only ever hits the subject.
 
 ## How options are derived
 

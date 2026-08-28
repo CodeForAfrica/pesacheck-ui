@@ -26,8 +26,8 @@ describe("deriveFilterOptions", () => {
         {
           subject: [
             subject("Debunk", "false", "False"),
-            subject("countries", "KEN", "Kenya"),
-            subject("01harm", "polit_harm", "Political"),
+            subject("countrymention1", "KEN", "Kenya"),
+            subject("Harm_type", "elections", "Elections"),
           ],
         },
         "en",
@@ -35,15 +35,15 @@ describe("deriveFilterOptions", () => {
     ]);
 
     expect(options.region).toEqual([{ code: "KEN", label: "Kenya" }]);
-    expect(options.topic).toEqual([{ code: "polit_harm", label: "Political" }]);
+    expect(options.topic).toEqual([{ code: "elections", label: "Elections" }]);
     expect(options.language).toEqual([{ code: "en", label: "English" }]);
   });
 
   it("dedupes codes across articles and sorts by label", () => {
     const options = deriveFilterOptions([
-      row({ subject: [subject("countries", "UGA", "Uganda")] }, "en"),
-      row({ subject: [subject("countries", "KEN", "Kenya")] }, "fr"),
-      row({ subject: [subject("countries", "UGA", "Uganda")] }, "en"),
+      row({ subject: [subject("countrymention1", "UGA", "Uganda")] }, "en"),
+      row({ subject: [subject("countrymention1", "KEN", "Kenya")] }, "fr"),
+      row({ subject: [subject("countrymention1", "UGA", "Uganda")] }, "en"),
     ]);
 
     expect(options.region).toEqual([
@@ -59,7 +59,7 @@ describe("deriveFilterOptions", () => {
   it("picks up a vocabulary addition with no code change", () => {
     // A scheme value that appears in no curated list still becomes an option.
     const options = deriveFilterOptions([
-      row({ subject: [subject("countries", "MWI", "Malawi")] }, "ny"),
+      row({ subject: [subject("countrymention1", "MWI", "Malawi")] }, "ny"),
     ]);
     expect(options.region).toEqual([{ code: "MWI", label: "Malawi" }]);
     // Unknown language codes have no label map entry — the code stands in.
@@ -68,11 +68,28 @@ describe("deriveFilterOptions", () => {
 
   it("falls back to the code when a subject carries no display name", () => {
     const options = deriveFilterOptions([
-      row({ subject: [{ scheme: "01harm", code: "cyber_harm", name: "" }] }),
+      row({ subject: [{ scheme: "Harm_type", code: "gender", name: "" }] }),
       // A later article naming the same code upgrades the label.
-      row({ subject: [subject("01harm", "cyber_harm", "Cyber")] }),
+      row({ subject: [subject("Harm_type", "gender", "Gender")] }),
     ]);
-    expect(options.topic).toEqual([{ code: "cyber_harm", label: "Cyber" }]);
+    expect(options.topic).toEqual([{ code: "gender", label: "Gender" }]);
+  });
+
+  it("adds a debunk-only language as an option keyed by its vocabulary code", () => {
+    const options = deriveFilterOptions([
+      row({ subject: [subject("Debunklang", "debunkful", "Fulani")] }, "en"),
+    ]);
+    expect(options.language).toEqual([
+      { code: "en", label: "English" },
+      { code: "debunkful", label: "Fulani" },
+    ]);
+  });
+
+  it("drops a debunk language that names a desk language (keeps the ISO code)", () => {
+    const options = deriveFilterOptions([
+      row({ subject: [subject("Debunklang", "debunkeng", "English")] }, "en"),
+    ]);
+    expect(options.language).toEqual([{ code: "en", label: "English" }]);
   });
 
   it("prefers the normalized language column over the jsonb copy", () => {

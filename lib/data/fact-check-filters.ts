@@ -76,9 +76,16 @@ export function selectedFilterLabels(
 
 /** Subject schemes backing the relation-based dimensions. */
 export const SUBJECT_SCHEME: Record<"region" | "topic", string> = {
-  region: "countries",
-  topic: "01harm",
+  region: "countrymention1",
+  topic: "Harm_type",
 };
+
+/**
+ * Scheme carrying the debunk language, the primary source for the language
+ * filter (`swp_article_metadata.language` is the fallback). Its codes are the
+ * vocabulary's own (`debunkeng`, …), not ISO.
+ */
+export const DEBUNK_LANG_SCHEME = "Debunklang";
 
 type SubjectClause = {
   swp_article_metadata: {
@@ -88,9 +95,10 @@ type SubjectClause = {
     };
   };
 };
-type LanguageClause = {
+type LanguageColumnClause = {
   swp_article_metadata: { language: { _in: string[] } };
 };
+type LanguageClause = { _or: (LanguageColumnClause | SubjectClause)[] };
 type RouteClause = {
   swp_route: { slug: { _eq: string } };
 };
@@ -208,8 +216,22 @@ export function buildFactCheckWhere(
   }
 
   if (filters.language.length > 0) {
+    // Language matches the debunk language or the article language: desk-language
+    // codes (`en`) resolve on the column, debunk-only codes (`debunkful`) on the
+    // `Debunklang` subject. The two code systems don't overlap, so each selected
+    // code only ever hits the side it belongs to.
     and.push({
-      swp_article_metadata: { language: { _in: filters.language } },
+      _or: [
+        { swp_article_metadata: { language: { _in: filters.language } } },
+        {
+          swp_article_metadata: {
+            swp_article_metadata_subjects: {
+              scheme: { _eq: DEBUNK_LANG_SCHEME },
+              code: { _in: filters.language },
+            },
+          },
+        },
+      ],
     });
   }
 
