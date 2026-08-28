@@ -422,33 +422,25 @@ PR 4 made filtering server-side but kept the **option lists** editorial, and lef
   needs `cacheComponents` enabled app-wide — a separate decision, so this uses
   `unstable_cache` for now.
 
-### Review follow-up (PR #97) — taxonomy corrections
+### Taxonomy mapping
 
-Reviewed against **real staging data** (11,429 published fact-checks) and the
-superproject ingest plan. The mappings above were built on assumptions that the
-data disproves. Full detail + decisions in [`docs/fact-check-filters.md`](fact-check-filters.md).
+Filter dimensions map to the Superdesk taxonomy fact-checks actually carry — full
+mapping in [`docs/fact-check-filters.md`](fact-check-filters.md).
 
-- **Region** was `countries`; correct field is **`countrymention1`** ("First
-  country mentioned", single, ISO3).
-- **Topic** was `01harm`; correct field is **`Harm_type`** ("Claim Topic", multi).
-  `01harm` is the legacy "Harm Type" field.
-- **Language** was the article language alone; decision (thread r3871863426) is to
-  use **`Debunklang`** ("Debunk language") and **fall back to the article
-  language** when absent. The two use different code systems (`Debunklang` is
-  non-ISO) and must be merged into one list normalized by display-name identity.
-- **Sparsity is a data limit, not a bug:** the correct fields sit on ~2 test
-  articles today; backfill is deferred (forward-only) per superproject PR #6, so
-  Region/Language fill in over time and **Topic stays sparse (~6.6% projected)**.
-- **Options source:** the authoritative source is the Superdesk vocabulary, which
-  **this GraphQL API does not expose** (no vocabulary table; the subject relation
-  has no display names). Correcting the mappings + config now (option A); exposing
-  the vocabulary to the frontend is a tracked follow-up.
-- **Config:** `TAXONOMY_SAMPLE_SIZE` + `FILTER_OPTIONS_TTL_SECONDS` to become
+- **Region** → `countrymention1` ("First country mentioned", single, ISO3).
+- **Topic** → `Harm_type` ("Claim Topic", multi).
+- **Language** → `Debunklang` ("Debunk language"), falling back to the article
+  language when absent. The two use different code systems (`Debunklang` is
+  non-ISO), so they're merged into one list normalized by display-name identity.
+- **Options** come from the taxonomy applied to content and grow as more content
+  is tagged; the controlled vocabularies aren't exposed by the GraphQL API, so a
+  vocabulary source (Hasura view or Superdesk REST proxy) is the path to complete
+  lists. Country/language populate widely; Claim Topic stays short until more
+  content carries it.
+- **Config:** `TAXONOMY_SAMPLE_SIZE` and `FILTER_OPTIONS_TTL_SECONDS` are
   env-tunable.
-- **Deferred (DB-side / cross-repo):** search precision + scale (`_ilike` on
-  `body` HTML matches link URLs; 11,429-row sequential scan), backfill, and three
-  upstream data defects (unknown verdict qcodes, `countrymention1` DRC=`COG`,
-  `countries` Côte d'Ivoire mojibake). See the doc.
+- **Scaling path (search):** `_ilike` on `body` matches HTML, and the pattern is a
+  sequential scan; a plain-text column and trigram/FTS index are the fix.
 
 ## PR 6 — Marketing pages (optional) — Phase 6
 - [ ] Fetch `type:"content"` routes (About, Methodology, Principles, Contact)
