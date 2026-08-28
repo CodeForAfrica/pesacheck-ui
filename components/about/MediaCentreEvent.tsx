@@ -4,8 +4,10 @@ import { FiArrowUpRight } from "react-icons/fi";
 import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import {
   EVENT,
+  type SpotlightEvent,
   UPCOMING,
   UPCOMING_LABEL,
+  UPCOMING_LIMIT,
   type UpcomingEvent,
 } from "@/lib/media-centre-content";
 
@@ -43,7 +45,15 @@ function UpcomingCard({ event }: { event: UpcomingEvent }) {
   );
 }
 
-export function MediaCentreEvent() {
+export function MediaCentreEvent({
+  event = EVENT,
+  upcoming = UPCOMING,
+  limit = UPCOMING_LIMIT,
+}: {
+  event?: SpotlightEvent;
+  upcoming?: UpcomingEvent[];
+  limit?: number;
+}) {
   return (
     <section className="py-14 lg:py-16">
       <Container>
@@ -52,8 +62,8 @@ export function MediaCentreEvent() {
         <div className="mt-9 grid gap-8 lg:grid-cols-[546px_1fr] lg:items-center lg:gap-11">
           <div className="relative aspect-[13/9] w-full overflow-hidden rounded-lg">
             <Image
-              src={EVENT.image}
-              alt={EVENT.alt}
+              src={event.image}
+              alt={event.alt}
               fill
               sizes="(max-width: 1024px) 100vw, 546px"
               className="object-cover"
@@ -61,34 +71,38 @@ export function MediaCentreEvent() {
           </div>
 
           <div>
-            <p className="text-xs leading-[18px] text-[#8b9099]">
-              {EVENT.meta}
-            </p>
+            {event.meta && (
+              <p className="text-xs leading-[18px] text-[#8b9099]">
+                {event.meta}
+              </p>
+            )}
             <h3 className="mt-3 text-[26px] font-extrabold leading-[1.2] text-pesacheck-black sm:text-[30px]">
-              {EVENT.title}
+              {event.title}
             </h3>
             <p className="mt-4 max-w-[510px] text-md font-medium leading-[26px] text-neutral-800">
-              {EVENT.body}
+              {event.body}
             </p>
 
-            <dl className="mt-6 grid grid-cols-2 gap-6 sm:grid-cols-3">
-              {EVENT.details.map((detail) => (
-                <div key={detail.label}>
-                  <dt className="text-xs leading-[18px] text-neutral-500">
-                    {detail.label}
-                  </dt>
-                  <dd className="mt-1 text-sm leading-5 text-neutral-800">
-                    {detail.value}
-                  </dd>
-                </div>
-              ))}
-            </dl>
+            {event.details.length > 0 && (
+              <dl className="mt-6 grid grid-cols-2 gap-6 sm:grid-cols-3">
+                {event.details.map((detail) => (
+                  <div key={detail.label}>
+                    <dt className="text-xs leading-[18px] text-neutral-500">
+                      {detail.label}
+                    </dt>
+                    <dd className="mt-1 text-sm leading-5 text-neutral-800">
+                      {detail.value}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            )}
 
             <Link
-              href={EVENT.cta.href}
+              href={event.cta.href}
               className="mt-8 inline-flex items-center gap-1.5 text-sm font-semibold text-pesacheck-blue transition-colors hover:text-pesacheck-black"
             >
-              {EVENT.cta.label}
+              {event.cta.label}
               <FiArrowUpRight size={14} aria-hidden />
             </Link>
           </div>
@@ -100,8 +114,8 @@ export function MediaCentreEvent() {
           {UPCOMING_LABEL}
         </h3>
         <div className="mt-5 grid gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:gap-4">
-          {UPCOMING.map((event) => (
-            <UpcomingCard key={event.title} event={event} />
+          {upcoming.slice(0, limit).map((item) => (
+            <UpcomingCard key={item.title} event={item} />
           ))}
         </div>
       </Container>

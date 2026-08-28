@@ -24,48 +24,65 @@ export type ResearchStrand = {
 
 export const RESEARCH_CTA = "Request citation list";
 
+/**
+ * Where the fallback strands send readers. A live strand links to its own
+ * article; these have none behind them, so they point at the contact page.
+ */
+export const RESEARCH_CTA_HREF = "/about/contact-us";
+
+/**
+ * Accents in the order the grid cycles them. An article carries no colour, so
+ * a live strand takes its accent from its position in the list — reordering
+ * the list reshuffles the colours, which is the trade-off for editing this
+ * section in Publisher.
+ */
+export const RESEARCH_TONES: ResearchTone[] = ["blue", "navy", "green", "red"];
+
+/** How many strands the grid shows — the design's two rows of three. */
+export const RESEARCH_LIMIT = 6;
+
 export const RESEARCH_STRANDS: ResearchStrand[] = [
   {
     label: "Peer-reviewed journals",
     kind: "Journal article",
     body: "PesaCheck fact-checks and datasets are cited in peer-reviewed studies of misinformation, media trust and electoral integrity in African contexts.",
     tone: "blue",
-    href: "/about/contact-us",
+    href: RESEARCH_CTA_HREF,
   },
   {
     label: "University centres",
     kind: "Working paper",
     body: "Media and communication departments across the continent draw on our verification archive as a primary source for teaching and published research.",
     tone: "navy",
-    href: "/about/contact-us",
+    href: RESEARCH_CTA_HREF,
   },
   {
     label: "Conference proceedings",
     kind: "Conference paper",
     body: "Our methodology and rating scale are referenced in papers presented at fact-checking and computational journalism conferences.",
     tone: "green",
-    href: "/about/contact-us",
+    href: RESEARCH_CTA_HREF,
   },
   {
     label: "Multilateral bodies",
     kind: "Policy report",
     body: "Intergovernmental and development institutions cite PesaCheck findings in reports on information integrity and public accountability.",
     tone: "red",
-    href: "/about/contact-us",
+    href: RESEARCH_CTA_HREF,
   },
   {
     label: "Election observation",
     kind: "Observation report",
     body: "Election monitors reference our verification of campaign claims and viral content when documenting information conditions around African polls.",
     tone: "blue",
-    href: "/about/contact-us",
+    href: RESEARCH_CTA_HREF,
   },
   {
     label: "Regulatory submissions",
     kind: "Consultation",
     body: "Our evidence is submitted to and quoted in consultations on platform accountability, media regulation and public-interest journalism.",
     tone: "navy",
-    href: "/about/contact-us",
+    href: RESEARCH_CTA_HREF,
   },
 ];
 
@@ -79,6 +96,12 @@ export type NewsItem = {
   readTime: string;
   href: string;
 };
+
+/**
+ * How many clippings the row shows. The curated list decides *which* articles
+ * appear; this decides how many of them fit the design's single row.
+ */
+export const NEWS_LIMIT = 4;
 
 export const NEWS: NewsItem[] = [
   {
@@ -130,6 +153,9 @@ export type Announcement = {
   href: string;
 };
 
+/** How many announcement rows the list shows before it gets unwieldy. */
+export const ANNOUNCEMENTS_LIMIT = 4;
+
 export const ANNOUNCEMENTS: Announcement[] = [
   {
     date: "15 Jul 2026",
@@ -176,6 +202,12 @@ export type SpotlightEvent = {
   cta: { label: string; href: string };
 };
 
+/** The spotlight's call to action — one label for every event. */
+export const EVENT_CTA_LABEL = "Request an invitation";
+
+/** How many "Also coming up" cards sit under the spotlight. */
+export const UPCOMING_LIMIT = 3;
+
 export const EVENT: SpotlightEvent = {
   image: "/images/hero-preview-cards/story-large.png",
   alt: "",
@@ -187,7 +219,7 @@ export const EVENT: SpotlightEvent = {
     { label: "Languages", value: "English, French, Kiswahili" },
     { label: "Cost", value: "Free for partner newsrooms" },
   ],
-  cta: { label: "Request an invitation", href: "/about/contact-us" },
+  cta: { label: EVENT_CTA_LABEL, href: "/about/contact-us" },
 };
 
 export type UpcomingEvent = {

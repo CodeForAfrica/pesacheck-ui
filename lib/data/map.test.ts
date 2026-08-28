@@ -4,10 +4,16 @@ import {
   computeReadTime,
   findRendition,
   findSubject,
+  formatLongDate,
   formatStoryDate,
   getVerdict,
+  mapAnnouncement,
   mapArticle,
+  mapNewsItem,
+  mapResearchStrand,
+  mapSpotlightEvent,
   mapStory,
+  mapUpcomingEvent,
   parseMetadata,
   type RawArticle,
   type RawFullArticle,
@@ -283,6 +289,191 @@ describe("mapStory", () => {
     expect(story.date).toBeUndefined();
     expect(story.readTime).toBeUndefined();
     expect(story.href).toBe("/fact-checks/bare");
+  });
+});
+
+describe("formatLongDate", () => {
+  it("formats as day, short month, year", () => {
+    expect(formatLongDate("2026-07-15T10:00:00+00:00")).toBe("15 Jul 2026");
+  });
+
+  it("pads a single-digit day", () => {
+    expect(formatLongDate("2026-07-02T10:00:00+00:00")).toBe("02 Jul 2026");
+  });
+
+  it("is undefined for a missing or unparseable date", () => {
+    expect(formatLongDate(null)).toBeUndefined();
+    expect(formatLongDate("not a date")).toBeUndefined();
+  });
+});
+
+describe("Media Centre mappers", () => {
+  const article: RawArticle = {
+    id: 12,
+    title: "Global newsrooms credit PesaCheck on cross-border debunks",
+    slug: "global-newsrooms-credit-pesacheck",
+    lead: "<p>Coverage of the network's work.</p>",
+    body: `<p>${"word ".repeat(200)}</p>`,
+    published_at: "2026-07-15T10:00:00+00:00",
+    metadata: JSON.stringify({
+      subject: [
+        {
+          scheme: "media_centre_label",
+          code: "intl_newsrooms",
+          name: "International newsrooms",
+        },
+      ],
+    }),
+    swp_route: { slug: "english", staticprefix: "/english" },
+    swp_article_feature_media: {
+      description: "A photo caption",
+      renditions: [
+        {
+          name: "viewImage",
+          image: { asset_id: "abc", file_extension: "jpg", variants: ["webp"] },
+        },
+      ],
+    },
+  };
+
+  it("maps an article to a clipping card", () => {
+    expect(mapNewsItem(article)).toEqual({
+      image: "https://media.test/abc.webp",
+      alt: "A photo caption",
+      outlet: "International newsrooms",
+      title: "Global newsrooms credit PesaCheck on cross-border debunks",
+      date: "Jul 15",
+      readTime: "1 min",
+      href: "/fact-checks/english/global-newsrooms-credit-pesacheck",
+    });
+  });
+
+  it("maps an article to an announcement row, with the long date", () => {
+    expect(mapAnnouncement(article)).toEqual({
+      date: "15 Jul 2026",
+      tag: "International newsrooms",
+      title: "Global newsrooms credit PesaCheck on cross-border debunks",
+      excerpt: "Coverage of the network's work.",
+      href: "/fact-checks/english/global-newsrooms-credit-pesacheck",
+    });
+  });
+
+  it("drops the kicker and tag when the article carries no label", () => {
+    const bare = { ...article, metadata: null };
+    expect(mapNewsItem(bare).outlet).toBe("");
+    expect(mapAnnouncement(bare).tag).toBe("");
+  });
+
+  it("maps an article to a research strand, CTA opening its own article", () => {
+    expect(mapResearchStrand(article, 0)).toEqual({
+      label: "Global newsrooms credit PesaCheck on cross-border debunks",
+      kind: "International newsrooms",
+      body: "Coverage of the network's work.",
+      tone: "blue",
+      href: "/fact-checks/english/global-newsrooms-credit-pesacheck",
+    });
+  });
+
+  it("maps an article to the event spotlight, details from custom fields", () => {
+    const event = mapSpotlightEvent({
+      ...article,
+      swp_article_extra: [
+        { field_name: "event_meta", value: "Nairobi · 12–13 September 2026" },
+        { field_name: "event_format", value: "In person & streamed" },
+        { field_name: "event_cost", value: "Free for partner newsrooms" },
+        { field_name: "originator", value: "desk" },
+      ],
+    });
+    expect(event.meta).toBe("Nairobi · 12–13 September 2026");
+    // Only the fields that are set, in the design's order, and nothing else.
+    expect(event.details).toEqual([
+      { label: "Format", value: "In person & streamed" },
+      { label: "Cost", value: "Free for partner newsrooms" },
+    ]);
+    expect(event.cta).toEqual({
+      label: "Request an invitation",
+      href: "/fact-checks/english/global-newsrooms-credit-pesacheck",
+    });
+  });
+
+  it("drops the event meta line and details when no custom fields are set", () => {
+    const event = mapSpotlightEvent(article);
+    expect(event.meta).toBe("");
+    expect(event.details).toEqual([]);
+  });
+
+  it("maps an upcoming card, falling back to the publish date for its meta", () => {
+    expect(mapUpcomingEvent(article)).toEqual({
+      meta: "15 Jul 2026",
+      title: "Global newsrooms credit PesaCheck on cross-border debunks",
+      body: "Coverage of the network's work.",
+      kind: "International newsrooms",
+      href: "/fact-checks/english/global-newsrooms-credit-pesacheck",
+    });
+  });
+
+  it("prefers the event's own line over the publish date", () => {
+    const card = mapUpcomingEvent({
+      ...article,
+      swp_article_extra: [
+        { field_name: "event_meta", value: "08 Oct 2026 · Accra" },
+      ],
+    });
+    expect(card.meta).toBe("08 Oct 2026 · Accra");
+  });
+
+  it("unwraps the markup Superdesk stores custom fields in", () => {
+    // Publisher hands these back as HTML however plain the author's input was.
+    const event = mapSpotlightEvent({
+      ...article,
+      swp_article_extra: [
+        { field_name: "event_venue", value: "<p>Nairobi</p>" },
+        {
+          field_name: "event_format",
+          value: "<p>In person &amp; streamed</p>",
+        },
+      ],
+    });
+    expect(event.meta).toBe("Nairobi");
+    expect(event.details).toEqual([
+      { label: "Format", value: "In person & streamed" },
+    ]);
+  });
+
+  it("composes the event line from venue and dates", () => {
+    const extra = (venue?: string, dates?: string) =>
+      [
+        venue ? { field_name: "event_venue", value: venue } : null,
+        dates ? { field_name: "event_dates", value: dates } : null,
+      ].filter((f): f is { field_name: string; value: string } => Boolean(f));
+
+    const meta = (venue?: string, dates?: string) =>
+      mapSpotlightEvent({ ...article, swp_article_extra: extra(venue, dates) })
+        .meta;
+
+    expect(meta("Nairobi", "12–13 September 2026")).toBe(
+      "Nairobi · 12–13 September 2026",
+    );
+    // Either half stands alone rather than trailing a separator.
+    expect(meta("Online")).toBe("Online");
+    expect(meta(undefined, "08 Oct 2026")).toBe("08 Oct 2026");
+  });
+
+  it("falls back to the pre-split meta field for older events", () => {
+    const event = mapSpotlightEvent({
+      ...article,
+      swp_article_extra: [
+        { field_name: "event_meta", value: "Accra · 08 Oct 2026" },
+      ],
+    });
+    expect(event.meta).toBe("Accra · 08 Oct 2026");
+  });
+
+  it("takes a strand's accent from its position, cycling every four", () => {
+    const tones = [0, 1, 2, 3, 4, 5].map(
+      (i) => mapResearchStrand(article, i).tone,
+    );
+    expect(tones).toEqual(["blue", "navy", "green", "red", "blue", "navy"]);
   });
 });
 
