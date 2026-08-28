@@ -2,62 +2,30 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { FiSearch } from "react-icons/fi";
-import { LuSlidersHorizontal } from "react-icons/lu";
-import { SearchFilterPanel } from "@/components/layout/SearchFilterPanel";
+import { Suspense, useEffect, useRef, useState } from "react";
 import {
-  EMPTY_FILTERS,
-  type FilterDimension,
-  type FilterSelection,
-  filtersToQuery,
+  type DimensionRequest,
+  HeaderSearchBar,
+} from "@/components/layout/HeaderSearchBar";
+import type {
+  FilterDimension,
+  FilterOptions,
 } from "@/lib/data/fact-check-filters";
 import { NAV_LINKS } from "@/lib/site";
 
-function Chevron({ open }: { open: boolean }) {
-  return (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      aria-hidden
-      className={`shrink-0 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
-    >
-      <path
-        d="M6 9l6 6 6-6"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function cloneSelection(sel: FilterSelection): FilterSelection {
-  return {
-    region: [...sel.region],
-    language: [...sel.language],
-    topic: [...sel.topic],
-  };
-}
-
-export function Header() {
+/**
+ * Site header. The search bar + filter panel live in `HeaderSearchBar`; its
+ * dropdown contents (`filterOptions`) are fetched from Superdesk by the root
+ * layout, so the filters are live rather than hardcoded.
+ */
+export function Header({ filterOptions }: { filterOptions: FilterOptions }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [openMobile, setOpenMobile] = useState<string | null>(null);
-  const [searchFocused, setSearchFocused] = useState(false);
-  const [filterPanelOpen, setFilterPanelOpen] = useState(false);
-  const [query, setQuery] = useState("");
-  const [selection, setSelection] = useState<FilterSelection>(EMPTY_FILTERS);
-  const [openDropdown, setOpenDropdown] = useState<FilterDimension | null>(
-    null,
-  );
+  const [overlayOpen, setOverlayOpen] = useState(false);
+  const [dimensionRequest, setDimensionRequest] =
+    useState<DimensionRequest | null>(null);
   const navRef = useRef<HTMLElement | null>(null);
-  const searchRef = useRef<HTMLDivElement | null>(null);
-  const router = useRouter();
 
   // Close the click-opened mega-menu when clicking anywhere outside the nav.
   useEffect(() => {
@@ -71,86 +39,23 @@ export function Header() {
     return () => document.removeEventListener("mousedown", onDocClick);
   }, [openMenu]);
 
-  const closeSearch = useCallback(() => {
-    setSearchFocused(false);
-    setFilterPanelOpen(false);
-    setOpenDropdown(null);
-  }, []);
-
-  // Close the search + filter panel on any click outside it. (Not `onBlur` —
-  // that fires before a filter option's `onClick`, closing the panel before
-  // the click can register.)
-  useEffect(() => {
-    if (!searchFocused && !filterPanelOpen) return;
-    const onDocMouseDown = (e: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
-        closeSearch();
-      }
-    };
-    document.addEventListener("mousedown", onDocMouseDown);
-    return () => document.removeEventListener("mousedown", onDocMouseDown);
-  }, [searchFocused, filterPanelOpen, closeSearch]);
-
-  // Every header search action — typing a query, applying filters, or both —
-  // lands on `/search` with whichever params are set.
-  const goToSearch = () => {
-    const params = new URLSearchParams(filtersToQuery(selection));
-    if (query.trim()) params.set("q", query.trim());
-    const qs = params.toString();
-    setMenuOpen(false);
-    closeSearch();
-    router.push(qs ? `/search?${qs}` : "/search");
-  };
-
-  const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (query.trim() || activeFilterCount > 0) goToSearch();
-  };
-
-  // Filters only take effect once applied.
-  const applyFilters = goToSearch;
-
-  const toggleFilterOption = (dimension: FilterDimension, value: string) => {
-    setSelection((cur) => {
-      const next = cloneSelection(cur);
-      next[dimension] = next[dimension].includes(value)
-        ? next[dimension].filter((v) => v !== value)
-        : [...next[dimension], value];
-      return next;
-    });
-  };
-
-  const clearFilters = () => setSelection(EMPTY_FILTERS);
-
-  const toggleDropdown = (dimension: FilterDimension) =>
-    setOpenDropdown((cur) => (cur === dimension ? null : dimension));
-
-  const activeFilterCount =
-    selection.region.length +
-    selection.language.length +
-    selection.topic.length;
-
-  const toggleFilterPanel = () =>
-    setFilterPanelOpen((v) => {
-      if (v) setOpenDropdown(null);
-      return !v;
-    });
-
   // "By Language"/"By Topic"/"By Country" mega-menu links: open the search
   // bar's filter panel with the matching dropdown expanded, rather than
-  // navigating straight to a listing page (filters now live only in the
-  // header search bar, and apply by landing on `/search`).
+  // navigating straight to a listing page (filters live only in the header
+  // search bar, and apply by landing on `/search`). The nonce re-triggers the
+  // request when the same dimension is picked twice.
   const openFilterDimension = (dimension: FilterDimension) => {
     setOpenMenu(null);
-    setMenuOpen(false);
-    setOpenDropdown(dimension);
-    setFilterPanelOpen(true);
+    setDimensionRequest((cur) => ({
+      dimension,
+      nonce: (cur?.nonce ?? 0) + 1,
+    }));
   };
 
   return (
     <>
       {/* Dark overlay when search or the filter panel is open */}
-      {(searchFocused || filterPanelOpen) && (
+      {overlayOpen && (
         <div className="fixed inset-0 z-40 bg-black/30" aria-hidden />
       )}
       <header className="sticky top-0 z-50 h-[90px] w-full border-b border-white/40 bg-white/80 backdrop-blur-md">
@@ -172,63 +77,24 @@ export function Header() {
           </Link>
 
           {/* Search (centered, grows) */}
-          <div
-            ref={searchRef}
-            className="relative z-50 mx-auto hidden w-full max-w-[640px] md:block"
+          {/*
+            `HeaderSearchBar` reads the URL (`useSearchParams`), which
+            client-renders the subtree up to the nearest Suspense boundary — the
+            fallback keeps the header's layout stable while it hydrates.
+          */}
+          <Suspense
+            fallback={
+              <div className="mx-auto hidden h-[60px] w-full max-w-[640px] rounded-xl border border-neutral-300 bg-gradient-to-r from-[#f5f5f5] to-[#f5f5f5]/60 md:block" />
+            }
           >
-            <form
-              onSubmit={handleSearchSubmit}
-              className={`flex h-[60px] w-full items-center gap-1 rounded-xl border bg-gradient-to-r from-[#f5f5f5] to-[#f5f5f5]/60 px-5 backdrop-blur-[5px] transition-colors duration-200 ${
-                searchFocused || filterPanelOpen
-                  ? "border-pesacheck-blue"
-                  : "border-neutral-300"
-              }`}
-            >
-              <FiSearch size={16} className="shrink-0 opacity-60" aria-hidden />
-              <input
-                type="search"
-                name="q"
-                placeholder="Quick Search"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onFocus={() => setSearchFocused(true)}
-                className="w-full bg-transparent text-sm font-medium text-neutral-900 placeholder:text-neutral-400 focus:outline-none"
-              />
-              <button
-                type="button"
-                onClick={toggleFilterPanel}
-                aria-haspopup="true"
-                aria-expanded={filterPanelOpen}
-                className={`flex shrink-0 items-center gap-1.5 border-l border-neutral-300 pl-3 text-sm font-semibold transition-colors ${
-                  activeFilterCount > 0
-                    ? "text-pesacheck-blue"
-                    : "text-neutral-700 hover:text-pesacheck-blue"
-                }`}
-              >
-                <LuSlidersHorizontal size={16} aria-hidden />
-                Filter
-                {activeFilterCount > 0 && (
-                  <span className="flex size-5 items-center justify-center rounded-full bg-pesacheck-blue text-xs font-semibold text-white">
-                    {activeFilterCount}
-                  </span>
-                )}
-                <Chevron open={filterPanelOpen} />
-              </button>
-            </form>
-
-            {filterPanelOpen && (
-              <div className="absolute left-0 top-full z-50 mt-3 w-full">
-                <SearchFilterPanel
-                  selected={selection}
-                  openDropdown={openDropdown}
-                  onToggleDropdown={toggleDropdown}
-                  onToggleOption={toggleFilterOption}
-                  onClear={clearFilters}
-                  onApply={applyFilters}
-                />
-              </div>
-            )}
-          </div>
+            <HeaderSearchBar
+              options={filterOptions}
+              variant="desktop"
+              dimensionRequest={dimensionRequest}
+              onOverlayChange={setOverlayOpen}
+              onNavigate={() => setMenuOpen(false)}
+            />
+          </Suspense>
 
           {/* Desktop nav */}
           <nav
@@ -370,52 +236,18 @@ export function Header() {
         {/* Mobile dropdown */}
         {menuOpen && (
           <div className="border-t border-neutral-100 bg-white px-5 py-4 lg:hidden">
-            <form
-              onSubmit={handleSearchSubmit}
-              className="flex h-12 items-center gap-2 rounded-xl border border-neutral-300 bg-neutral-50 px-4 md:hidden"
+            <Suspense
+              fallback={
+                <div className="h-12 rounded-xl border border-neutral-300 bg-neutral-50 md:hidden" />
+              }
             >
-              <FiSearch size={16} className="opacity-60" aria-hidden />
-              <input
-                type="search"
-                name="q"
-                placeholder="Quick Search"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                className="w-full bg-transparent text-sm font-medium placeholder:text-neutral-400 focus:outline-none"
+              <HeaderSearchBar
+                options={filterOptions}
+                variant="mobile"
+                dimensionRequest={dimensionRequest}
+                onNavigate={() => setMenuOpen(false)}
               />
-              <button
-                type="button"
-                onClick={toggleFilterPanel}
-                aria-haspopup="true"
-                aria-expanded={filterPanelOpen}
-                className={`flex shrink-0 items-center gap-1.5 border-l border-neutral-300 pl-3 text-sm font-semibold transition-colors ${
-                  activeFilterCount > 0
-                    ? "text-pesacheck-blue"
-                    : "text-neutral-700 hover:text-pesacheck-blue"
-                }`}
-              >
-                <LuSlidersHorizontal size={16} aria-hidden />
-                Filter
-                {activeFilterCount > 0 && (
-                  <span className="flex size-5 items-center justify-center rounded-full bg-pesacheck-blue text-xs font-semibold text-white">
-                    {activeFilterCount}
-                  </span>
-                )}
-                <Chevron open={filterPanelOpen} />
-              </button>
-            </form>
-            {filterPanelOpen && (
-              <div className="mb-4 mt-4 md:hidden">
-                <SearchFilterPanel
-                  selected={selection}
-                  openDropdown={openDropdown}
-                  onToggleDropdown={toggleDropdown}
-                  onToggleOption={toggleFilterOption}
-                  onClear={clearFilters}
-                  onApply={applyFilters}
-                />
-              </div>
-            )}
+            </Suspense>
             <nav className="flex flex-col gap-3 text-sm font-semibold text-neutral-900">
               {NAV_LINKS.map((l) =>
                 l.menu ? (
@@ -457,8 +289,7 @@ export function Header() {
                                 onClick={(e) => {
                                   if (item.filterDimension) {
                                     e.preventDefault();
-                                    setOpenDropdown(item.filterDimension);
-                                    setFilterPanelOpen(true);
+                                    openFilterDimension(item.filterDimension);
                                   } else {
                                     setMenuOpen(false);
                                   }

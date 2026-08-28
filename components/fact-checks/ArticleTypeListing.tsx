@@ -29,7 +29,7 @@ export async function ArticleTypeListing({
 
   const listing = (await getByContentType(type.codes, page, filters).catch(
     () => null,
-  )) ?? { stories: [], page: 1, totalPages: 1 };
+  )) ?? { stories: [], page: 1, totalPages: 1, total: 0 };
 
   return (
     <FactChecksExplorer

@@ -5,9 +5,11 @@ import { FiX } from "react-icons/fi";
 import { LuCheck } from "react-icons/lu";
 import type {
   FilterDimension,
+  FilterOption,
+  FilterOptions,
   FilterSelection,
 } from "@/lib/data/fact-check-filters";
-import { FILTERS, type FilterOption } from "@/lib/fact-checks-content";
+import { FILTER_META } from "@/lib/fact-checks-content";
 
 function Chevron({ open }: { open: boolean }) {
   return (
@@ -105,6 +107,16 @@ function Dropdown({
           aria-label={label}
           className="absolute left-0 top-full z-30 mt-2 max-h-72 w-56 overflow-auto rounded-xl border border-neutral-200 bg-white p-1.5 shadow-[0px_10px_20px_0px_rgba(0,0,0,0.1)]"
         >
+          {/*
+            Options are derived from the taxonomy published fact-checks carry, so
+            a dimension nothing is tagged with legitimately has none — say so
+            rather than showing an empty panel.
+          */}
+          {options.length === 0 && (
+            <p className="px-2.5 py-2 text-sm font-medium text-neutral-500">
+              No {label.toLowerCase()} options yet
+            </p>
+          )}
           {options.map((opt) => {
             const checked = selected.includes(opt.code);
             return (
@@ -140,8 +152,12 @@ function Dropdown({
  * The header search bar's filter panel — dropdowns to stage a selection, plus
  * explicit "Clear filters" / "Apply filters" actions (filters only take
  * effect, navigating to `/search`, once applied).
+ *
+ * `options` are the live dropdown contents fetched from Superdesk (see
+ * `lib/data/filter-options.ts`); only the dimension label + icon are local.
  */
 export function SearchFilterPanel({
+  options,
   selected,
   openDropdown,
   onToggleDropdown,
@@ -149,6 +165,7 @@ export function SearchFilterPanel({
   onClear,
   onApply,
 }: {
+  options: FilterOptions;
   selected: FilterSelection;
   openDropdown: FilterDimension | null;
   onToggleDropdown: (dimension: FilterDimension) => void;
@@ -159,13 +176,13 @@ export function SearchFilterPanel({
   return (
     <div className="w-full rounded-xl border border-neutral-200 bg-white p-6 shadow-[0px_20px_40px_0px_rgba(2,29,51,0.12)]">
       <div className="flex flex-wrap items-center gap-3">
-        {FILTERS.map((f) => (
+        {FILTER_META.map((f) => (
           <Dropdown
             key={f.dimension}
             dimension={f.dimension}
             label={f.label}
             icon={f.icon}
-            options={f.options}
+            options={options[f.dimension]}
             selected={selected[f.dimension]}
             open={openDropdown === f.dimension}
             onToggleOpen={() => onToggleDropdown(f.dimension)}

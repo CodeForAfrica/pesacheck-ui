@@ -4,6 +4,8 @@ import "./globals.css";
 import { BackToTop } from "@/components/layout/BackToTop";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
+import { getFilterOptions } from "@/lib/data/filter-options";
+import { FALLBACK_FILTER_OPTIONS } from "@/lib/fact-checks-content";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -39,11 +41,17 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // The header's Region/Language/Topic dropdowns are live: their contents come
+  // from the taxonomy published fact-checks carry (cached — see
+  // `lib/data/filter-options.ts`). The curated set is degraded-mode only.
+  const filterOptions =
+    (await getFilterOptions().catch(() => null)) ?? FALLBACK_FILTER_OPTIONS;
+
   return (
     <html
       lang="en"
@@ -51,7 +59,7 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
     >
       <body className="flex min-h-full flex-col bg-white font-sans text-pesacheck-black">
-        <Header />
+        <Header filterOptions={filterOptions} />
         <main className="flex-1">{children}</main>
         <Footer />
         <BackToTop />
