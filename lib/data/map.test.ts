@@ -7,6 +7,7 @@ import {
   formatLongDate,
   formatStoryDate,
   getVerdict,
+  isMediaCentreProfile,
   mapAnnouncement,
   mapArticle,
   mapNewsItem,
@@ -469,6 +470,42 @@ describe("Media Centre mappers", () => {
     expect(event.meta).toBe("Accra · 08 Oct 2026");
   });
 
+  it("sends entries authored on a Media Centre profile to their own URL", () => {
+    const withProfile = (profile: string): RawArticle => ({
+      ...article,
+      metadata: JSON.stringify({ subject: [], profile }),
+    });
+
+    for (const profile of ["Event", "Announcement", "ResearchCitations"]) {
+      const entry = withProfile(profile);
+      const href = "/about/media-centre/global-newsrooms-credit-pesacheck";
+      expect(mapAnnouncement(entry).href).toBe(href);
+      expect(mapNewsItem(entry).href).toBe(href);
+      expect(mapResearchStrand(entry, 0).href).toBe(href);
+      expect(mapUpcomingEvent(entry).href).toBe(href);
+      expect(mapSpotlightEvent(entry).cta.href).toBe(href);
+    }
+  });
+
+  it("leaves fact-checks and untagged entries on the archive URL", () => {
+    // The fixture carries no profile — as every article did before the Media
+    // Centre profiles existed.
+    expect(mapAnnouncement(article).href).toBe(
+      "/fact-checks/english/global-newsrooms-credit-pesacheck",
+    );
+    const factCheck = {
+      ...article,
+      metadata: JSON.stringify({ subject: [], profile: "Article" }),
+    };
+    expect(mapNewsItem(factCheck).href).toBe(
+      "/fact-checks/english/global-newsrooms-credit-pesacheck",
+    );
+    // mapStory always points at the archive, whatever the profile.
+    expect(mapStory(factCheck).href).toBe(
+      "/fact-checks/english/global-newsrooms-credit-pesacheck",
+    );
+  });
+
   it("takes a strand's accent from its position, cycling every four", () => {
     const tones = [0, 1, 2, 3, 4, 5].map(
       (i) => mapResearchStrand(article, i).tone,
@@ -687,5 +724,23 @@ describe("mapArticle", () => {
       swp_article_metadata: { byline: "Relation Byline" },
     });
     expect(article.author).toBe("Metadata Byline");
+  });
+});
+
+describe("isMediaCentreProfile", () => {
+  it("recognises the three Media Centre profiles", () => {
+    expect(isMediaCentreProfile("Event")).toBe(true);
+    expect(isMediaCentreProfile("Announcement")).toBe(true);
+    expect(isMediaCentreProfile("Research Citations")).toBe(true);
+    // Publisher reports Superdesk's internal name, which drops the space.
+    expect(isMediaCentreProfile("ResearchCitations")).toBe(true);
+  });
+
+  it("rejects the fact-check profile, unknown names and absent values", () => {
+    expect(isMediaCentreProfile("Article")).toBe(false);
+    expect(isMediaCentreProfile("Articles")).toBe(false);
+    expect(isMediaCentreProfile(undefined)).toBe(false);
+    expect(isMediaCentreProfile(null)).toBe(false);
+    expect(isMediaCentreProfile("")).toBe(false);
   });
 });

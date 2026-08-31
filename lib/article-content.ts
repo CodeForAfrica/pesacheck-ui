@@ -21,6 +21,13 @@ export type Article = {
   author: string;
   /** Content desk slug for back-links and "you're reading" context. */
   desk?: string;
+  /**
+   * Superdesk content profile the item was authored against ("Event",
+   * "Announcement", …). Decides which route owns the article: Media Centre
+   * entries and fact-checks share the same language routes, so this is the only
+   * thing telling them apart. Undefined for the static fallback articles.
+   */
+  profile?: string;
   /** Intro paragraphs before the inline image. */
   leadParagraphs: string[];
   inlineImage?: { src: string; alt: string };
