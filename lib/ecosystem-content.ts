@@ -43,6 +43,15 @@ const ANCIR_LOGO: EcosystemLogo = {
   height: 80,
 };
 
+/**
+ * Accent cycle for the entry cards, in the design's order. Applied by position
+ * (see `mapEcosystemItem`) because nothing in the schema carries a colour.
+ */
+export const ECOSYSTEM_TONES: EcosystemTone[] = ["blue", "green", "ink", "red"];
+
+/** Shown when a partner has no logo attached, rather than a broken image. */
+export const ECOSYSTEM_LOGO_FALLBACK = "/images/our-ecosystem/code-for-africa.png";
+
 export const ECOSYSTEM_INTRO =
   "PesaCheck does more than publish fact-checks. We help build the infrastructure that African fact-checking depends on — convening networks, training newsrooms, and sharing tooling and data with peers across the continent. These are the alliances and networks we belong to.";
 

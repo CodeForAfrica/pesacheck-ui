@@ -26,7 +26,14 @@ export const ABOUT_INTRO_IMAGES = [
 export type TeamMember = {
   name: string;
   role: string;
+  /** Short bio for the card. The full one lives on the member's own page. */
   bio: string;
+  /** Portrait. Undefined falls back to the design's grey circle. */
+  image?: string;
+  /** The member's own page. Undefined leaves "See more" as plain text. */
+  href?: string;
+  /** Undefined hides the LinkedIn badge rather than linking nowhere. */
+  linkedin?: string;
 };
 
 const TEAM_BIO =

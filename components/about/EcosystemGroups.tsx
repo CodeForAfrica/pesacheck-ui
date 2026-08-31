@@ -5,6 +5,7 @@ import { Container } from "@/components/ui/SectionHeading";
 import {
   ECOSYSTEM_GROUPS,
   ECOSYSTEM_INTRO,
+  type EcosystemGroup,
   type EcosystemTone,
 } from "@/lib/ecosystem-content";
 
@@ -29,7 +30,11 @@ function GroupHeading({ title }: { title: string }) {
   );
 }
 
-export function EcosystemGroups() {
+export function EcosystemGroups({
+  groups = ECOSYSTEM_GROUPS,
+}: {
+  groups?: EcosystemGroup[];
+}) {
   return (
     <>
       <section className="pt-20 pb-0">
@@ -40,13 +45,13 @@ export function EcosystemGroups() {
         </Container>
       </section>
 
-      {ECOSYSTEM_GROUPS.map((group, i) => (
+      {groups.map((group, i) => (
         <section
           key={group.title}
           className={i % 2 ? "bg-[#f6f7f9] py-16" : "py-16"}
         >
           <Container>
-            <GroupHeading title={group.title} />
+            {group.title && <GroupHeading title={group.title} />}
             <div className="grid grid-cols-1 gap-x-10 gap-y-11 md:grid-cols-2 lg:grid-cols-3">
               {group.items.map((item) => (
                 <article key={item.name} className="flex flex-col">
