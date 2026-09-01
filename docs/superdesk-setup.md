@@ -156,14 +156,31 @@ show no image, so only the featured event's media is ever used.
 
 ### FAQ
 
-| Pane | Fields |
-| --- | --- |
-| Header | slugline, **FAQ Group** |
-| Content | headline, abstract, body_html |
+| Pane | Field | Labelled | Holds |
+| --- | --- | --- | --- |
+| Header | slugline | — | the URL-safe id, unused by the page |
+| Header | `ecosystem_group`-style CV | **FAQ Group** | the group heading |
+| Content | `headline` | **Question** | the question |
+| Content | `abstract` | **Answer** | the answer, and the only copy rendered |
 
-The headline is the question and the abstract is the answer — the only copy the
-page renders. Headline allows 120 characters rather than the 64 the other
-profiles use, because questions are sentences rather than headlines.
+Headline allows 120 characters rather than the 64 the other profiles use,
+because questions are sentences rather than headlines; the answer is capped at
+400, which is about as much as the three-column grid takes before the rows go
+ragged.
+
+**`body_html` is deliberately disabled.** An FAQ answer is one paragraph of
+plain text — the page renders it into a `<dd>` and strips any markup — so a
+second copy of the same text in the article body is a field authors have to
+ignore, and a way for the page and the archive to disagree. `mapFaqItem` still
+reads the body when the abstract is empty, but that is now a safety net for
+entries authored before this profile existed rather than a supported path.
+
+**The field ids cannot be renamed.** `headline` and `abstract` are Superdesk
+built-ins, not custom fields, so `question` and `answer` are not available as
+ids — an item with no `headline` has no title anywhere in Superdesk's own lists
+and search. What *is* settable is the label an author sees, through
+`editor.<field>.field_name` in the profile, which is why the table above lists
+both.
 
 Unlike the Media Centre profiles, this one carries no routing weight: FAQ
 entries are not linked anywhere, so nothing depends on `metadata.profile` for

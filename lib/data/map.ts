@@ -374,8 +374,12 @@ export function formatLongDate(
 
 /**
  * Map a raw content-list article to one FAQ entry: the headline is the
- * question, the lead is the answer. Falls back to the body for a question
- * answered in the editor's main field rather than its abstract.
+ * question, the lead is the answer.
+ *
+ * The FAQ profile does not expose a body — an answer is one paragraph, and a
+ * second copy of it is a field authors have to ignore. The body is still read
+ * when the lead is empty, which covers entries authored before that profile
+ * existed; it is a safety net, not a supported way to write an answer.
  */
 export function mapFaqItem(article: RawArticle): FaqItem {
   return {
