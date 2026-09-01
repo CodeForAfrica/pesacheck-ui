@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getEcosystemGroups } from "@/lib/data/ecosystem";
+import { getEcosystemGroups, getEcosystemRoles } from "@/lib/data/ecosystem";
 import type { RawArticle } from "@/lib/data/map";
 
 const getContentListArticles = vi.hoisted(() => vi.fn());
@@ -67,5 +67,65 @@ describe("getEcosystemGroups", () => {
   it("returns nothing when the list is missing or empty", async () => {
     getContentListArticles.mockResolvedValue([]);
     expect(await getEcosystemGroups()).toEqual([]);
+  });
+});
+
+describe("getEcosystemRoles", () => {
+  beforeEach(() => getContentListArticles.mockReset());
+
+  function role(title: string, icon?: string): RawArticle {
+    return {
+      id: title,
+      title,
+      slug: title.toLowerCase().replace(/\W+/g, "-"),
+      lead: `<p>What ${title} means.</p>`,
+      metadata: JSON.stringify({
+        subject: icon
+          ? [{ scheme: "ecosystem_role_icon", code: icon, name: icon }]
+          : [],
+      }),
+    };
+  }
+
+  it("maps roles, taking the icon from its vocabulary code", async () => {
+    getContentListArticles.mockResolvedValue([
+      role("We convene", "announce"),
+      role("We build tools", "server"),
+    ]);
+
+    expect(await getEcosystemRoles()).toEqual([
+      {
+        icon: "announce",
+        title: "We convene",
+        description: "What We convene means.",
+      },
+      {
+        icon: "server",
+        title: "We build tools",
+        description: "What We build tools means.",
+      },
+    ]);
+  });
+
+  it("falls back to the default icon when untagged or unknown", async () => {
+    // A build only has the icons in ECOSYSTEM_ROLE_ICONS; an editor picking
+    // one this build lacks gets the default rather than an empty badge.
+    getContentListArticles.mockResolvedValue([
+      role("Untagged"),
+      role("Unknown icon", "telescope"),
+    ]);
+
+    const roles = await getEcosystemRoles();
+    expect(roles.map((r) => r.icon)).toEqual(["announce", "announce"]);
+  });
+
+  it("does not cap the list — a fourth role wraps onto a second row", async () => {
+    getContentListArticles.mockResolvedValue([
+      role("One", "announce"),
+      role("Two", "hand"),
+      role("Three", "server"),
+      role("Four", "hand"),
+    ]);
+    expect(await getEcosystemRoles()).toHaveLength(4);
   });
 });

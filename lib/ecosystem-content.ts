@@ -123,11 +123,26 @@ export const ECOSYSTEM_GROUPS: EcosystemGroup[] = [
   },
 ];
 
-export const ECOSYSTEM_ROLES: {
-  icon: "announce" | "hand" | "server";
+/**
+ * The icons a role can carry. A CMS cannot ship a React component, so the set
+ * is fixed here and an editor picks one by qcode through the
+ * `ecosystem_role_icon` vocabulary — a role needing a new icon still needs a
+ * change to `ROLE_ICONS` in `components/about/EcosystemRoles.tsx`.
+ */
+export const ECOSYSTEM_ROLE_ICONS = ["announce", "hand", "server"] as const;
+
+export type EcosystemRoleIcon = (typeof ECOSYSTEM_ROLE_ICONS)[number];
+
+export type EcosystemRole = {
+  icon: EcosystemRoleIcon;
   title: string;
   description: string;
-}[] = [
+};
+
+/** Shown for a role whose icon tag is missing or names an icon we do not have. */
+export const ECOSYSTEM_ROLE_ICON_FALLBACK: EcosystemRoleIcon = "announce";
+
+export const ECOSYSTEM_ROLES: EcosystemRole[] = [
   {
     icon: "announce",
     title: "We convene",

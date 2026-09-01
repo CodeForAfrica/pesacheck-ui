@@ -71,6 +71,38 @@ A subject vocabulary used by `/fact-checks/quick-reads`, `/explainers` and
 > has nothing to match and renders empty. It existed before the staging content
 > reset. Add it back if that route is meant to work.
 
+### `ecosystem_group` and `ecosystem_role_icon`
+
+Two subject vocabularies for the Our Ecosystem page.
+
+`ecosystem_group` names the group an organisation sits under ("Fact-checking
+networks", "Research & investigation"), derived and ordered exactly like the FAQ
+groups.
+
+`ecosystem_role_icon` chooses the icon on a "How we build the ecosystem" card.
+**Its qcodes are not free text** — they must match `ECOSYSTEM_ROLE_ICONS` in
+`lib/ecosystem-content.ts`, currently `announce`, `hand` and `server`. An icon
+is a React component and cannot come from Superdesk, so an editor picks from
+the set this build ships; a role tagged with anything else falls back to the
+default rather than rendering an empty badge. **Adding a fourth icon is a code
+change**, and that is the one part of these pages an editor cannot do alone.
+
+### Team and ecosystem custom fields
+
+All `field_type: "text"`, so each is its own field and lands in
+`swp_article_extra`.
+
+| Field id | Label | Used by |
+| --- | --- | --- |
+| `team_role` | Role | the job title under a staff member's name |
+| `linkedin_url` | LinkedIn | turns the card's badge into a link; absent hides it |
+| `partner_role` | Partner role | the pill on an ecosystem card ("Verified signatory") |
+| `partner_url` | Partner website | where an entry's "Learn More" goes |
+
+`partner_url` matters more than it looks: an entry without one falls back to
+linking to its own article under `/fact-checks/`, which renders an organisation
+as though it were a fact-check. Fill it in.
+
 ### Event custom fields
 
 All `field_type: "text"`, so each is its own field and lands in
@@ -134,6 +166,32 @@ Headline is required (80 chars), abstract is required (400 — wider than the
 other profiles because the spotlight body is a full paragraph), and feature
 media is required because the spotlight is an image-led layout. Upcoming cards
 show no image, so only the featured event's media is ever used.
+
+### Team Member
+
+| Pane | Fields |
+| --- | --- |
+| Header | slugline, **Role**, **LinkedIn** |
+| Content | headline (the name), abstract (the card bio), body_html (the full biography), feature media (portrait) |
+
+Staff have their own pages at `/about/team/<slug>`, rendered from the body —
+the card's "See more" links there. The fact-check route declines this profile,
+the same guard Media Centre entries have, because articles are looked up by
+slug alone.
+
+No portrait falls back to the design's grey circle rather than a stock photo.
+
+### Ecosystem Partner
+
+| Pane | Fields |
+| --- | --- |
+| Header | slugline, **Ecosystem Group**, **Partner role**, **Partner website** |
+| Content | headline (the name, 60 chars), abstract (the description), feature media (the logo) |
+
+The accent stripe comes from the entry's **position** across the whole list,
+cycling blue → green → ink → red. The cycle deliberately does not restart per
+group: that would open every group on blue and put identical colours either
+side of a group boundary where groups are uneven.
 
 ## Content lists
 

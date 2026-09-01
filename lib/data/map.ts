@@ -4,8 +4,11 @@ import { renderArticleBody } from "@/lib/data/body";
 import { mediaAssetUrl } from "@/lib/data/media";
 import {
   ECOSYSTEM_LOGO_FALLBACK,
+  ECOSYSTEM_ROLE_ICON_FALLBACK,
+  ECOSYSTEM_ROLE_ICONS,
   ECOSYSTEM_TONES,
   type EcosystemItem,
+  type EcosystemRole,
 } from "@/lib/ecosystem-content";
 import type { Story } from "@/lib/home-content";
 import {
@@ -528,6 +531,34 @@ export function mapEcosystemItem(
     },
     description: article.lead ? stripHtml(article.lead) : "",
     href: articleExtra(article, ECOSYSTEM_FIELDS.url) ?? storyHref(article),
+  };
+}
+
+/**
+ * Vocabulary naming which icon a "How we build the ecosystem" card carries.
+ * The qcodes are the icon ids in `ECOSYSTEM_ROLE_ICONS` — the icons themselves
+ * are React components and cannot come from Superdesk, so an editor chooses
+ * from the fixed set rather than supplying one.
+ */
+export const ECOSYSTEM_ROLE_ICON_SCHEME = "ecosystem_role_icon";
+
+/**
+ * Map a raw content-list article to a role card: headline is the title, lead
+ * is the copy. An untagged role, or one tagged with an icon this build does
+ * not have, falls back to the default rather than rendering an empty badge.
+ */
+export function mapEcosystemRole(article: RawArticle): EcosystemRole {
+  const code = findSubject(
+    parseMetadata(article.metadata),
+    ECOSYSTEM_ROLE_ICON_SCHEME,
+  )?.code;
+
+  const icon = ECOSYSTEM_ROLE_ICONS.find((name) => name === code);
+
+  return {
+    icon: icon ?? ECOSYSTEM_ROLE_ICON_FALLBACK,
+    title: article.title,
+    description: article.lead ? stripHtml(article.lead) : "",
   };
 }
 

@@ -2,16 +2,24 @@ import {
   ECOSYSTEM_GROUP_SCHEME,
   findSubject,
   mapEcosystemItem,
+  mapEcosystemRole,
   parseMetadata,
 } from "@/lib/data/map";
 import { getContentListArticles } from "@/lib/data/stories";
-import type { EcosystemGroup } from "@/lib/ecosystem-content";
+import type { EcosystemGroup, EcosystemRole } from "@/lib/ecosystem-content";
 
 /**
  * Curated list backing the Our Ecosystem page. Create it in Publisher under
  * exactly this name, one article per organisation.
  */
 export const ECOSYSTEM_LIST = "About — Ecosystem";
+
+/**
+ * Curated list backing the "How we build the ecosystem" cards. Separate from
+ * the partner list because these are not organisations — they are what
+ * PesaCheck does for the ecosystem, and the two are curated independently.
+ */
+export const ECOSYSTEM_ROLES_LIST = "About — Ecosystem Roles";
 
 /**
  * Ecosystem entries, grouped by the `ecosystem_group` vocabulary.
@@ -43,4 +51,17 @@ export async function getEcosystemGroups(): Promise<EcosystemGroup[]> {
   });
 
   return [...groups.values()];
+}
+
+/**
+ * The "How we build the ecosystem" cards, in curated order.
+ *
+ * Not capped: the grid is three columns and wraps, so a fourth role reads as a
+ * second row rather than being silently dropped. What a fourth role does need
+ * is an icon — see `ECOSYSTEM_ROLE_ICONS`.
+ */
+export async function getEcosystemRoles(): Promise<EcosystemRole[]> {
+  return (await getContentListArticles(ECOSYSTEM_ROLES_LIST)).map(
+    mapEcosystemRole,
+  );
 }
