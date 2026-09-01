@@ -71,6 +71,24 @@ A subject vocabulary used by `/fact-checks/quick-reads`, `/explainers` and
 > has nothing to match and renders empty. It existed before the staging content
 > reset. Add it back if that route is meant to work.
 
+### `faq_group` — which group a question sits in on the FAQs page
+
+A subject vocabulary (single selection). Its items are the group headings on
+`/about/faqs`:
+
+- Questions about our fact-checks
+- Questions about our policies
+- Questions about using the site
+
+Groups are not configured anywhere else, and nothing sorts them. The page
+derives them from the questions themselves, in the order their first question
+appears in the curated list — so adding a group means adding a vocabulary item
+and tagging a question with it, and list position is the only thing an editor
+arranges. Dragging a question to the top of the list promotes its whole group.
+
+Questions carrying no group tag collect in one leading group that renders
+without a heading, so the page works before the vocabulary is populated.
+
 ### `ecosystem_group` and `ecosystem_role_icon`
 
 Two subject vocabularies for the Our Ecosystem page.
@@ -127,9 +145,10 @@ than printing a blank, and an event with none reads as a plain feature.
 
 ## Content profiles
 
-`Article` is the original fact-check profile and is unchanged. Three were added
-for the Media Centre so authors get the fields that kind of entry actually needs
-and none of the fact-check vocabularies it does not.
+`Article` is the original fact-check profile and is unchanged. Six were added —
+three for the Media Centre, and one each for the FAQs, team and ecosystem
+pages — so authors get the fields that kind of entry actually needs and none of
+the fact-check vocabularies it does not.
 
 ### Announcement
 
@@ -167,6 +186,39 @@ other profiles because the spotlight body is a full paragraph), and feature
 media is required because the spotlight is an image-led layout. Upcoming cards
 show no image, so only the featured event's media is ever used.
 
+### FAQ
+
+| Pane | Field | Labelled | Holds |
+| --- | --- | --- | --- |
+| Header | slugline | — | the URL-safe id, unused by the page |
+| Header | `ecosystem_group`-style CV | **FAQ Group** | the group heading |
+| Content | `headline` | **Question** | the question |
+| Content | `abstract` | **Answer** | the answer, and the only copy rendered |
+
+Headline allows 120 characters rather than the 64 the other profiles use,
+because questions are sentences rather than headlines; the answer is capped at
+400, which is about as much as the three-column grid takes before the rows go
+ragged.
+
+**`body_html` is deliberately disabled.** An FAQ answer is one paragraph of
+plain text — the page renders it into a `<dd>` and strips any markup — so a
+second copy of the same text in the article body is a field authors have to
+ignore, and a way for the page and the archive to disagree. `mapFaqItem` still
+reads the body when the abstract is empty, but that is now a safety net for
+entries authored before this profile existed rather than a supported path.
+
+**The field ids cannot be renamed.** `headline` and `abstract` are Superdesk
+built-ins, not custom fields, so `question` and `answer` are not available as
+ids — an item with no `headline` has no title anywhere in Superdesk's own lists
+and search. What *is* settable is the label an author sees, through
+`editor.<field>.field_name` in the profile, which is why the table above lists
+both.
+
+Unlike the Media Centre profiles, this one carries no routing weight: FAQ
+entries are not linked anywhere, so nothing depends on `metadata.profile` for
+them. The profile exists for the authoring form and to keep the fact-check
+vocabularies out of it.
+
 ### Team Member
 
 | Pane | Fields |
@@ -196,7 +248,9 @@ side of a group boundary where groups are uneven.
 ## Content lists
 
 Publisher content lists are the curation layer. Names are matched **exactly** —
-`MEDIA_CENTRE_LISTS` in `lib/data/media-centre.ts` and the homepage equivalents
+`MEDIA_CENTRE_LISTS` in `lib/data/media-centre.ts`, `FAQ_LIST` in
+`lib/data/faqs.ts`, `TEAM_LIST` in `lib/data/team.ts`, `ECOSYSTEM_LIST` and
+`ECOSYSTEM_ROLES_LIST` in `lib/data/ecosystem.ts`, and the homepage equivalents
 look them up by string, so renaming a list in Publisher silently drops the
 section back to its static fallback.
 
@@ -210,8 +264,12 @@ section back to its static fallback.
 | `Media Centre — In the News` | press clippings |
 | `Media Centre — Announcements` | announcements list |
 | `Media Centre — Spotlight` | event spotlight **and** "Also coming up" |
+| `About — FAQs` | every question on the FAQs page |
+| `About — Team` | the "Our team" grid on the About page |
+| `About — Ecosystem` | the partner cards on Our Ecosystem |
+| `About — Ecosystem Roles` | the "How we build the ecosystem" cards |
 
-Three things about how lists behave:
+Four things about how lists behave:
 
 - **The events list carries the whole rail.** Its first item is the featured
   event; the rest become the cards beneath it. Promoting an event is a drag to
@@ -219,6 +277,10 @@ Three things about how lists behave:
 - **Position is the only ordering.** Nothing sorts by date, so a finished event
   stays in the spotlight until somebody moves it. Making that self-maintaining
   needs real date fields rather than the free-text line.
+- **The FAQs list carries its own grouping.** One article per question, grouped
+  by `faq_group`, with group order following whichever group's question sits
+  highest. Keeping a group's questions together in the list is not required,
+  but interleaving them makes the order hard to predict from the list view.
 - **Items are filtered to the six language routes** (`english`, `french`,
   `kiswahili`, `afaan-oromo`, `somali`, `amharic` — see `LANGUAGE_ROUTE_SLUGS`
   in `lib/data/stories.ts`). Curated lists get polluted with non-article entries
@@ -241,6 +303,10 @@ For a Media Centre entry to appear:
    reaches the content-list picker.
 6. Add it to the matching content list, in the position you want it read.
 
+For a FAQ entry, the same steps with fewer fields: create it from the **FAQ**
+profile, write the question as the headline and the answer as the abstract, pick
+an **FAQ Group**, publish, and add it to `About — FAQs`.
+
 Sections revalidate every 5 minutes (`export const revalidate = 300`); nothing
 needs deploying.
 
@@ -259,11 +325,22 @@ suspecting the code.
 Recorded because they cost time to diagnose, and they are infrastructure rather
 than code:
 
-- **Bare `PATCH` requests to the Superdesk API return a generic 400** ("the
-  browser (or proxy) sent a request that this server could not understand")
-  regardless of payload — Flask failing to parse a body that never arrived.
-  Sending the same request as `POST` with `X-HTTP-Method-Override: PATCH` gets
-  through. Suggests a proxy or WAF rule in front of the instance.
+- **Content profiles cannot be edited through the API.** Every write shape was
+  tried against `content_types/<id>`:
+
+  | Request | Result |
+  | --- | --- |
+  | `PATCH` | 400, "the browser (or proxy) sent a request that this server could not understand" — Flask failing to parse a body that never arrived |
+  | `POST` + `X-HTTP-Method-Override: PATCH` | 405, POST is not allowed on the item endpoint |
+  | `PATCH` + `X-HTTP-Method-Override: PATCH` | reaches etag validation with a one-key body; 400 with a full profile document |
+  | `PUT` | 403 for the admin user |
+
+  The size-dependent behaviour of the last two points at a request-size limit on
+  `PATCH` somewhere in front of the app rather than the method being blocked.
+  Either way there is no way through: Eve replaces the whole `editor` object, so
+  a profile edit is always a large body. **Create profiles via the API — a
+  `POST` to the collection works and carries any number of fields — and make
+  every later change in the Superdesk UI.**
 - **Much of the Publisher REST API returns 500** on staging:
   `/api/v2/content/lists/{id}/items/`, `/api/v2/content/articles/`,
   `/api/v2/tenants/`. Content lists can be created via `POST
@@ -289,7 +366,12 @@ a template cannot reference a profile that does not exist yet:
    `{"name": …, "type": "manual"}` as JSON (form-encoded is rejected with 400),
    then populate them in the UI.
 
-`metadata.profile` arrives in Publisher carrying the profile's **name** (for
-example `"Event"`). That is a viable filter, and would let the sections select
-by profile rather than depending on curated lists — same mappers, different
-`where`, with lists demoted to ordering. Not implemented yet.
+`metadata.profile` arrives in Publisher carrying the profile's **internal name**,
+not the label an editor sees — and the two differ whenever the label contains a
+space, so "Research Citations" arrives as `"ResearchCitations"`. Anything
+matching on it must normalise, or it will work for single-word profiles and
+silently fail for the rest.
+
+That makes it a viable filter, and it would let sections select by profile
+rather than depending on curated lists — same mappers, different `where`, with
+lists demoted to ordering. Not implemented yet.
