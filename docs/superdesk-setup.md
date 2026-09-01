@@ -263,11 +263,22 @@ suspecting the code.
 Recorded because they cost time to diagnose, and they are infrastructure rather
 than code:
 
-- **Bare `PATCH` requests to the Superdesk API return a generic 400** ("the
-  browser (or proxy) sent a request that this server could not understand")
-  regardless of payload — Flask failing to parse a body that never arrived.
-  Sending the same request as `POST` with `X-HTTP-Method-Override: PATCH` gets
-  through. Suggests a proxy or WAF rule in front of the instance.
+- **Content profiles cannot be edited through the API.** Every write shape was
+  tried against `content_types/<id>`:
+
+  | Request | Result |
+  | --- | --- |
+  | `PATCH` | 400, "the browser (or proxy) sent a request that this server could not understand" — Flask failing to parse a body that never arrived |
+  | `POST` + `X-HTTP-Method-Override: PATCH` | 405, POST is not allowed on the item endpoint |
+  | `PATCH` + `X-HTTP-Method-Override: PATCH` | reaches etag validation with a one-key body; 400 with a full profile document |
+  | `PUT` | 403 for the admin user |
+
+  The size-dependent behaviour of the last two points at a request-size limit on
+  `PATCH` somewhere in front of the app rather than the method being blocked.
+  Either way there is no way through: Eve replaces the whole `editor` object, so
+  a profile edit is always a large body. **Create profiles via the API — a
+  `POST` to the collection works and carries any number of fields — and make
+  every later change in the Superdesk UI.**
 - **Much of the Publisher REST API returns 500** on staging:
   `/api/v2/content/lists/{id}/items/`, `/api/v2/content/articles/`,
   `/api/v2/tenants/`. Content lists can be created via `POST
