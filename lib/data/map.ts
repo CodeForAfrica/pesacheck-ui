@@ -1,6 +1,7 @@
 import type { Article } from "@/lib/article-content";
 import { renderArticleBody } from "@/lib/data/body";
 import { mediaAssetUrl } from "@/lib/data/media";
+import type { FaqItem } from "@/lib/faqs-content";
 import type { Story } from "@/lib/home-content";
 import {
   type Announcement,
@@ -403,6 +404,18 @@ export function mapStory(article: RawArticle): Story {
  */
 export const MEDIA_CENTRE_LABEL_SCHEME = "media_centre_label";
 
+/**
+ * Vocabulary naming the group a question belongs to on the FAQs page
+ * ("Questions about Policy"). Groups are not configured anywhere: the page
+ * derives them from the questions themselves, in the order they first appear
+ * in the curated list, so adding a group is adding a vocabulary item and
+ * tagging a question with it.
+ *
+ * An untagged question still renders — it falls into a leading group with no
+ * heading rather than being dropped.
+ */
+export const FAQ_GROUP_SCHEME = "faq_group";
+
 /** Long form date for the announcements rail, e.g. `15 Jul 2026`. */
 export function formatLongDate(
   published: string | null | undefined,
@@ -416,6 +429,22 @@ export function formatLongDate(
     year: "numeric",
     timeZone: "UTC",
   }).format(date);
+}
+
+/**
+ * Map a raw content-list article to one FAQ entry: the headline is the
+ * question, the lead is the answer.
+ *
+ * The FAQ profile does not expose a body — an answer is one paragraph, and a
+ * second copy of it is a field authors have to ignore. The body is still read
+ * when the lead is empty, which covers entries authored before that profile
+ * existed; it is a safety net, not a supported way to write an answer.
+ */
+export function mapFaqItem(article: RawArticle): FaqItem {
+  return {
+    question: article.title,
+    answer: stripHtml(article.lead?.trim() || article.body || ""),
+  };
 }
 
 /** Map a raw content-list article to a Media Centre clipping card. */
