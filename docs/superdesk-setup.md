@@ -33,15 +33,29 @@ Two consequences worth knowing before authoring:
   `In person & streamed` comes back as `<p>In person &amp; streamed</p>`. The
   mappers run every custom field through `stripHtml`, which also decodes
   character references. Do not try to strip it upstream.
-- **A profile enables a field only when it appears in both `editor` and
-  `schema`,** keyed by the same id. `editor` is presentation (pane, order,
-  width, visible label); `schema` is validation (type, required, nullable).
+- **What makes a field appear on the authoring form is not `editor.enabled`.**
+  Two different rules apply, and getting them wrong leaves fields on a form
+  that nobody put there:
+
+  | Kind of field | Renders when |
+  | --- | --- |
+  | regular (`place`, `authors`, `body_html`, …) | its **`schema` entry is non-null**. `enabled: false` does **not** suppress it. |
+  | vocabulary (`faq_group`, `media_centre_label`, …) | it is merely **present in `editor`**, even disabled with a null schema. |
+
+  So to keep a field off a profile: null its `schema` entry, and for a
+  vocabulary remove it from `editor` altogether. `editor` otherwise governs
+  presentation (pane, order, width, visible label) and needs to carry the full
+  field list — a profile holding only its own fields leaves Superdesk's
+  profile-editor modal with nothing to list.
 
 ## Vocabularies
 
-### `media_centre_label` — what an entry *is* on the Media Centre
+### `media_centre_label` — labelled **Entry Type**
 
-A subject vocabulary (single selection). It supplies the kicker above a press
+A subject vocabulary (single selection). The id and the label deliberately
+differ: the id is the `scheme` written into every tagged article and read by
+`MEDIA_CENTRE_LABEL_SCHEME` in `lib/data/map.ts`, so renaming it would orphan
+existing tags, while the label is only what an author sees. It supplies the kicker above a press
 clipping, the tag on an announcement, the document kind on a research strand,
 and the pill on an upcoming event.
 
@@ -154,7 +168,7 @@ the fact-check vocabularies it does not.
 
 | Pane | Fields |
 | --- | --- |
-| Header | slugline, genre, place, priority, urgency, anpa_category, subject, ednote, authors, **Media Centre Label** |
+| Header | slugline, genre, place, priority, urgency, anpa_category, subject, ednote, authors, **Entry Type** |
 | Content | headline, abstract, byline, dateline, body_html, sign_off |
 
 The card renders five things: publish date, label, headline, **abstract**, and a
@@ -166,7 +180,7 @@ image, whatever is attached.
 
 | Pane | Fields |
 | --- | --- |
-| Header | slugline, place, authors, **Media Centre Label** |
+| Header | slugline, place, authors, **Entry Type** |
 | Content | headline, abstract, body_html, sign_off |
 
 The strand's headline becomes the label, the abstract becomes the copy, and the
@@ -178,8 +192,8 @@ the schema carries a colour, so reordering the list reshuffles them.
 
 | Pane | Fields |
 | --- | --- |
-| Header | slugline, **Media Centre Label**, event fields (see above) |
-| Content | headline, abstract, body_html, feature media, sign_off |
+| Header | slugline, **Entry Type**, event fields (see above) |
+| Content | headline, abstract, body_html, feature media |
 
 Headline is required (80 chars), abstract is required (400 — wider than the
 other profiles because the spotlight body is a full paragraph), and feature
@@ -221,10 +235,13 @@ vocabularies out of it.
 
 ### Team Member
 
-| Pane | Fields |
-| --- | --- |
-| Header | slugline, **Role**, **LinkedIn** |
-| Content | headline (the name), abstract (the card bio), body_html (the full biography), feature media (portrait) |
+| Pane | Field | Labelled |
+| --- | --- | --- |
+| Header | slugline, `team_role`, `linkedin_url` | — / **Role** / **LinkedIn** |
+| Content | `headline` | **Name** |
+| Content | `abstract` (card bio, 200 chars) | **Short bio** |
+| Content | `body_html` | **Biography** |
+| Content | feature media (portrait) | — |
 
 Staff have their own pages at `/about/team/<slug>`, rendered from the body —
 the card's "See more" links there. The fact-check route declines this profile,
@@ -239,6 +256,10 @@ No portrait falls back to the design's grey circle rather than a stock photo.
 | --- | --- |
 | Header | slugline, **Ecosystem Group**, **Partner role**, **Partner website** |
 | Content | headline (the name, 60 chars), abstract (the description), feature media (the logo) |
+
+No body, sign-off, place or authors: an ecosystem card is a logo, a name, one
+paragraph and a link out, and there is no partner detail page for a body to
+appear on.
 
 The accent stripe comes from the entry's **position** across the whole list,
 cycling blue → green → ink → red. The cycle deliberately does not restart per
@@ -295,7 +316,7 @@ For a Media Centre entry to appear:
 
 1. Create the item from the right content profile.
 2. Fill headline and abstract; the abstract is the visible copy, not a summary.
-3. Pick a **Media Centre Label**.
+3. Pick an **Entry Type**.
 4. For events, fill venue and dates, plus whichever detail fields apply, and
    attach feature media if it is going in the spotlight.
 5. **Publish** to one of the six language routes. Saving to a desk is not
@@ -338,9 +359,11 @@ than code:
   The size-dependent behaviour of the last two points at a request-size limit on
   `PATCH` somewhere in front of the app rather than the method being blocked.
   Either way there is no way through: Eve replaces the whole `editor` object, so
-  a profile edit is always a large body. **Create profiles via the API — a
-  `POST` to the collection works and carries any number of fields — and make
-  every later change in the Superdesk UI.**
+  a profile edit is always a large body. **Editing a profile through the API
+  means deleting it and POSTing a replacement** — `DELETE` needs an `If-Match`
+  header (without it, 428) and the create frequently answers `409` having
+  succeeded anyway, so verify the result rather than trusting the status code.
+  Vocabularies are unaffected: `PATCH /vocabularies/<id>` works normally.
 - **Much of the Publisher REST API returns 500** on staging:
   `/api/v2/content/lists/{id}/items/`, `/api/v2/content/articles/`,
   `/api/v2/tenants/`. Content lists can be created via `POST
