@@ -2,9 +2,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { FooterAllySection } from "@/components/layout/FooterAllySection";
 import { Container } from "@/components/ui/SectionHeading";
+import type { FooterLink } from "@/lib/data/navigation";
 import { FOOTER_ABOUT, FOOTER_NAV, LEGAL, SOCIAL_ICONS } from "@/lib/site";
 
-export function Footer() {
+export function Footer({
+  navLinks = FOOTER_NAV,
+  legalLinks = LEGAL,
+}: {
+  navLinks?: FooterLink[];
+  legalLinks?: FooterLink[];
+} = {}) {
   return (
     <footer className="bg-white">
       <FooterAllySection />
@@ -53,7 +60,7 @@ export function Footer() {
         <div className="mt-8 h-px w-full bg-neutral-100" />
 
         <nav className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold text-neutral-900">
-          {FOOTER_NAV.map((l) => (
+          {navLinks.map((l) => (
             <Link
               key={l.label}
               href={l.href}
@@ -90,7 +97,7 @@ export function Footer() {
           </div>
           <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm font-semibold text-neutral-900">
             <span>Copyright {new Date().getFullYear()} PesaCheck</span>
-            {LEGAL.map((item) => {
+            {legalLinks.map((item) => {
               const external = item.href.startsWith("http");
               return (
                 <Link

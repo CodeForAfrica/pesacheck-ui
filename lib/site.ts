@@ -38,10 +38,97 @@ import {
 } from "@/lib/article-types";
 import type { FilterDimension } from "@/lib/data/fact-check-filters";
 
+/**
+ * Icons a nav item can carry. A CMS cannot ship a React component, so the set
+ * is fixed here and Superdesk chooses one by key — an item asking for a key
+ * this build does not have falls back to `NAV_ICON_FALLBACK`.
+ *
+ * Keys are the contract with the `icon` field in a menu item's `extras`.
+ */
+export const NAV_ICONS = {
+  grid: FiGrid,
+  users: FiUsers,
+  hand: LuHand,
+  coins: LuCoins,
+  globe: FiGlobe,
+  question: LuMessageCircleQuestion,
+  refresh: FiRefreshCw,
+  phone: FiPhone,
+  server: FiServer,
+  scale: LuScale,
+  megaphone: LuMegaphone,
+  book: FiBookOpen,
+  play: FiPlay,
+  file: FiFileText,
+  languages: LuLanguages,
+  warning: LuMessageCircleWarning,
+  search: LuSearch,
+} as const;
+
+export type NavIconKey = keyof typeof NAV_ICONS;
+
+export const NAV_ICON_FALLBACK: NavIconKey = "grid";
+
+/**
+ * Which icon a nav item gets, by destination. Publisher's menu API accepts
+ * only `name`, `label`, `uri`, `parent` and `route` — there is nowhere to
+ * store an icon — so the CMS controls which links exist and where they point,
+ * and the icon is resolved here from the href. A destination not listed falls
+ * back to `NAV_ICON_FALLBACK`.
+ */
+export const NAV_ICON_BY_HREF: Record<string, NavIconKey> = {
+  "/about": "grid",
+  "/about#our-team": "users",
+  "/about#our-impact": "globe",
+  "/about/partners": "hand",
+  "/about/funding": "coins",
+  "/about/faqs": "question",
+  "/about/methodology": "refresh",
+  "/about/contact-us": "phone",
+  "/about/our-ecosystem": "server",
+  "/about/principles": "scale",
+  "/about/media-centre": "megaphone",
+  "/fact-checks": "grid",
+  "/fact-checks/quick-reads": "book",
+  "/fact-checks/explainers": "play",
+  "/fact-checks/longform": "file",
+};
+
+/** Icons for the filter-panel entries, which all point at `/fact-checks`. */
+export const NAV_ICON_BY_FILTER: Record<string, NavIconKey> = {
+  language: "languages",
+  topic: "warning",
+  region: "globe",
+};
+
+/**
+ * The blurb and grid height for a mega-menu, by its top-level destination.
+ * Same reason as the icons: presentation the menu API cannot carry.
+ */
+export const NAV_MENU_META: Record<
+  string,
+  { description: string; rows?: 2 | 3 }
+> = {
+  "/about": {
+    description:
+      "PesaCheck verifies public statements and viral claims across Africa. Learn who we are and how we work.",
+  },
+  "/fact-checks": {
+    description:
+      "Every claim we have checked, by language, topic, country and format.",
+    rows: 2,
+  },
+};
+
 export type NavMenuItem = {
   label: string;
   href: string;
-  icon: ElementType;
+  /**
+   * Key into `NAV_ICONS`, not the component itself: these items are built on
+   * the server and handed to the client `Header`, and a function cannot cross
+   * that boundary. The client resolves the key when it renders.
+   */
+  icon: NavIconKey;
   /**
    * When present, this item opens the header search bar's filter panel with
    * the matching dropdown expanded, instead of navigating to `href` — the
@@ -68,18 +155,18 @@ export type NavLink = {
  * (mirrors the Figma "Group 34738225" dropdown, node 2866:4472).
  */
 export const ABOUT_MENU_ITEMS: NavMenuItem[] = [
-  { label: "About Us", href: "/about", icon: FiGrid },
-  { label: "Who We Are", href: "/about#our-team", icon: FiUsers },
-  { label: "Our Partners", href: "/about/partners", icon: LuHand },
-  { label: "Funding", href: "/about/funding", icon: LuCoins },
-  { label: "Our Impact", href: "/about#our-impact", icon: FiGlobe },
-  { label: "FAQs", href: "/about/faqs", icon: LuMessageCircleQuestion },
-  { label: "Methodology", href: "/about/methodology", icon: FiRefreshCw },
-  { label: "Contact Us", href: "/about/contact-us", icon: FiPhone },
-  { label: "Our Ecosystem", href: "/about/our-ecosystem", icon: FiServer },
-  { label: "Principles", href: "/about/principles", icon: LuScale },
-  { label: "Our Staff + Expertise", href: "/about#our-team", icon: FiUsers },
-  { label: "Media Centre", href: "/about/media-centre", icon: LuMegaphone },
+  { label: "About Us", href: "/about", icon: "grid" },
+  { label: "Who We Are", href: "/about#our-team", icon: "users" },
+  { label: "Our Partners", href: "/about/partners", icon: "hand" },
+  { label: "Funding", href: "/about/funding", icon: "coins" },
+  { label: "Our Impact", href: "/about#our-impact", icon: "globe" },
+  { label: "FAQs", href: "/about/faqs", icon: "question" },
+  { label: "Methodology", href: "/about/methodology", icon: "refresh" },
+  { label: "Contact Us", href: "/about/contact-us", icon: "phone" },
+  { label: "Our Ecosystem", href: "/about/our-ecosystem", icon: "server" },
+  { label: "Principles", href: "/about/principles", icon: "scale" },
+  { label: "Our Staff + Expertise", href: "/about#our-team", icon: "users" },
+  { label: "Media Centre", href: "/about/media-centre", icon: "megaphone" },
 ];
 
 /**
@@ -88,34 +175,34 @@ export const ABOUT_MENU_ITEMS: NavMenuItem[] = [
  * 4–5 column 3 (mirrors the Figma "Fact Checks" dropdown, node 2866:7355).
  */
 export const FACT_CHECKS_MENU_ITEMS: NavMenuItem[] = [
-  { label: "All fact-checks", href: "/fact-checks", icon: FiGrid },
+  { label: "All fact-checks", href: "/fact-checks", icon: "grid" },
   {
     label: "By Language",
     href: "/fact-checks",
-    icon: LuLanguages,
+    icon: "languages",
     filterDimension: "language",
   },
   {
     label: "By Topic",
     href: "/fact-checks",
-    icon: LuMessageCircleWarning,
+    icon: "warning",
     filterDimension: "topic",
   },
   {
     label: QUICK_READS.title,
     href: articleTypeHref(QUICK_READS),
-    icon: FiBookOpen,
+    icon: "book",
   },
   {
     label: EXPLAINERS.title,
     href: articleTypeHref(EXPLAINERS),
-    icon: FiPlay,
+    icon: "play",
   },
-  { label: LONGFORM.title, href: articleTypeHref(LONGFORM), icon: FiFileText },
+  { label: LONGFORM.title, href: articleTypeHref(LONGFORM), icon: "file" },
   {
     label: "By Country",
     href: "/fact-checks",
-    icon: FiGlobe,
+    icon: "globe",
     filterDimension: "region",
   },
 ];

@@ -5,7 +5,9 @@ import { BackToTop } from "@/components/layout/BackToTop";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { getFilterOptions } from "@/lib/data/filter-options";
+import { getSiteMenus } from "@/lib/data/navigation";
 import { FALLBACK_FILTER_OPTIONS } from "@/lib/fact-checks-content";
+import { FOOTER_NAV, LEGAL, NAV_LINKS } from "@/lib/site";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -49,8 +51,17 @@ export default async function RootLayout({
   // The header's Region/Language/Topic dropdowns are live: their contents come
   // from the taxonomy published fact-checks carry (cached — see
   // `lib/data/filter-options.ts`). The curated set is degraded-mode only.
-  const filterOptions =
-    (await getFilterOptions().catch(() => null)) ?? FALLBACK_FILTER_OPTIONS;
+  //
+  // The chrome's links are curated in Publisher as three menus — one for the
+  // header, two for the footer's rows — read in a single query. An unreachable
+  // Hasura and a menu nobody has built arrive the same way, as nothing to
+  // show, and each row falls back on its own: a live header can sit above a
+  // static footer. Navigation has no useful empty state, so there is no
+  // degraded rendering worth attempting.
+  const [filterOptions, menus] = await Promise.all([
+    getFilterOptions().catch(() => null),
+    getSiteMenus().catch(() => null),
+  ]);
 
   return (
     <html
@@ -59,9 +70,15 @@ export default async function RootLayout({
       data-scroll-behavior="smooth"
     >
       <body className="flex min-h-full flex-col bg-white font-sans text-pesacheck-black">
-        <Header filterOptions={filterOptions} />
+        <Header
+          filterOptions={filterOptions ?? FALLBACK_FILTER_OPTIONS}
+          navLinks={menus?.nav.length ? menus.nav : NAV_LINKS}
+        />
         <main className="flex-1">{children}</main>
-        <Footer />
+        <Footer
+          navLinks={menus?.footerNav.length ? menus.footerNav : FOOTER_NAV}
+          legalLinks={menus?.footerLegal.length ? menus.footerLegal : LEGAL}
+        />
         <BackToTop />
       </body>
     </html>
