@@ -11,14 +11,20 @@ import type {
   FilterDimension,
   FilterOptions,
 } from "@/lib/data/fact-check-filters";
-import { NAV_LINKS } from "@/lib/site";
+import { NAV_ICONS, NAV_LINKS, type NavLink } from "@/lib/site";
 
 /**
  * Site header. The search bar + filter panel live in `HeaderSearchBar`; its
  * dropdown contents (`filterOptions`) are fetched from Superdesk by the root
  * layout, so the filters are live rather than hardcoded.
  */
-export function Header({ filterOptions }: { filterOptions: FilterOptions }) {
+export function Header({
+  filterOptions,
+  navLinks = NAV_LINKS,
+}: {
+  filterOptions: FilterOptions;
+  navLinks?: NavLink[];
+}) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [openMobile, setOpenMobile] = useState<string | null>(null);
@@ -104,7 +110,7 @@ export function Header({ filterOptions }: { filterOptions: FilterOptions }) {
             }}
             className="hidden shrink-0 items-center gap-5 text-sm font-semibold text-neutral-900 lg:flex"
           >
-            {NAV_LINKS.map((l) =>
+            {navLinks.map((l) =>
               l.menu ? (
                 <div key={l.label}>
                   <button
@@ -158,7 +164,7 @@ export function Header({ filterOptions }: { filterOptions: FilterOptions }) {
                         className={`grid grow auto-cols-fr grid-flow-col gap-x-6 gap-y-[15px] ${l.menu.rows === 2 ? "grid-rows-2" : "grid-rows-3"}`}
                       >
                         {l.menu.items.map((item) => {
-                          const ItemIcon = item.icon;
+                          const ItemIcon = NAV_ICONS[item.icon];
                           return (
                             <li key={`${item.label}-${item.href}`}>
                               <Link
@@ -249,7 +255,7 @@ export function Header({ filterOptions }: { filterOptions: FilterOptions }) {
               />
             </Suspense>
             <nav className="flex flex-col gap-3 text-sm font-semibold text-neutral-900">
-              {NAV_LINKS.map((l) =>
+              {navLinks.map((l) =>
                 l.menu ? (
                   <div key={l.label}>
                     <button
@@ -281,7 +287,7 @@ export function Header({ filterOptions }: { filterOptions: FilterOptions }) {
                     {openMobile === l.label && (
                       <ul className="mt-2 mb-1 flex flex-col gap-3 border-l border-neutral-100 pl-4">
                         {l.menu.items.map((item) => {
-                          const ItemIcon = item.icon;
+                          const ItemIcon = NAV_ICONS[item.icon];
                           return (
                             <li key={`${item.label}-${item.href}`}>
                               <Link
