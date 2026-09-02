@@ -1,6 +1,15 @@
+import type { TeamMember } from "@/lib/about-content";
 import type { Article } from "@/lib/article-content";
 import { renderArticleBody } from "@/lib/data/body";
 import { mediaAssetUrl } from "@/lib/data/media";
+import {
+  ECOSYSTEM_LOGO_FALLBACK,
+  ECOSYSTEM_ROLE_ICON_FALLBACK,
+  ECOSYSTEM_ROLE_ICONS,
+  ECOSYSTEM_TONES,
+  type EcosystemItem,
+  type EcosystemRole,
+} from "@/lib/ecosystem-content";
 import type { FaqItem } from "@/lib/faqs-content";
 import type { Story } from "@/lib/home-content";
 import {
@@ -289,6 +298,22 @@ export function isMediaCentreEntry(
   return isMediaCentreProfile(parseMetadata(metadata).profile);
 }
 
+/** The profile a staff member is authored against, and where their page lives. */
+const TEAM_PROFILE = normaliseProfile("Team Member");
+const TEAM_BASE = "/about/team";
+
+/** Whether a content profile name is the one staff profiles use. */
+export function isTeamProfile(profile: string | null | undefined): boolean {
+  return (
+    Boolean(profile) && normaliseProfile(profile as string) === TEAM_PROFILE
+  );
+}
+
+/** A staff member's own page: `/about/team/<slug>`. */
+export function teamHref(slug: string): string {
+  return `${TEAM_BASE}/${slug}`;
+}
+
 /**
  * Link to an entry's own page. A Media Centre entry is not a fact-check and
  * reads wrongly under `/fact-checks`, so it gets its own URL; anything else
@@ -432,6 +457,125 @@ export function formatLongDate(
 }
 
 /**
+ * Any rendition that resolves, or undefined. Unlike `pickStoryImage` this does
+ * not fall back to a stock photo — a stranger's face on a staff card, or the
+ * wrong organisation's logo, is worse than the design's empty placeholder.
+ */
+function pickExactImage(
+  renditions: Rendition[] | undefined,
+): string | undefined {
+  for (const name of STORY_RENDITIONS) {
+    const url = findRendition(renditions, name);
+    if (url) return url;
+  }
+  return undefined;
+}
+
+/**
+ * Superdesk custom fields carrying what a staff member is, beyond what any
+ * article has. Add them to the Team Member profile under exactly these names;
+ * both are optional.
+ */
+export const TEAM_FIELDS = {
+  /** Job title, e.g. "CEO + Founder". */
+  role: "team_role",
+  linkedin: "linkedin_url",
+} as const;
+
+/**
+ * Map a raw content-list article to a staff card: the headline is the name,
+ * the lead is the card bio, the portrait is the feature media. The full bio
+ * lives in the body, which only the member's own page renders.
+ */
+export function mapTeamMember(article: RawArticle): TeamMember {
+  return {
+    name: article.title,
+    role: articleExtra(article, TEAM_FIELDS.role) ?? "",
+    bio: article.lead ? stripHtml(article.lead) : "",
+    image: pickExactImage(
+      article.swp_article_feature_media?.renditions ?? undefined,
+    ),
+    href: teamHref(article.slug),
+    linkedin: articleExtra(article, TEAM_FIELDS.linkedin),
+  };
+}
+
+/**
+ * Vocabulary naming the group an ecosystem entry belongs to ("Fact-checking
+ * networks"). Groups are derived from the entries themselves, in the order
+ * their first entry appears in the curated list.
+ */
+export const ECOSYSTEM_GROUP_SCHEME = "ecosystem_group";
+
+/** Superdesk custom fields carrying what an ecosystem partner is. */
+export const ECOSYSTEM_FIELDS = {
+  /** Relationship, e.g. "Verified signatory". */
+  role: "partner_role",
+  /** The partner's own website, which is where "Learn More" goes. */
+  url: "partner_url",
+} as const;
+
+/** Nominal logo box. CSS caps the rendered size; these keep next/image happy. */
+const LOGO_BOX = { width: 200, height: 64 };
+
+/**
+ * Map a raw content-list article to an ecosystem card. The accent comes from
+ * the entry's position, cycling the design's four tones — nothing in the schema
+ * carries a colour, so reordering the list reshuffles them.
+ *
+ * An entry with no `partner_url` falls back to its own article rather than
+ * rendering a link to nowhere.
+ */
+export function mapEcosystemItem(
+  article: RawArticle,
+  index: number,
+): EcosystemItem {
+  const renditions = article.swp_article_feature_media?.renditions ?? undefined;
+  const sized = renditions?.find((r) => r.image && r.width && r.height);
+
+  return {
+    name: article.title,
+    role: articleExtra(article, ECOSYSTEM_FIELDS.role) ?? "",
+    tone: ECOSYSTEM_TONES[index % ECOSYSTEM_TONES.length],
+    logo: {
+      src: pickExactImage(renditions) ?? ECOSYSTEM_LOGO_FALLBACK,
+      width: sized?.width ?? LOGO_BOX.width,
+      height: sized?.height ?? LOGO_BOX.height,
+    },
+    description: article.lead ? stripHtml(article.lead) : "",
+    href: articleExtra(article, ECOSYSTEM_FIELDS.url) ?? storyHref(article),
+  };
+}
+
+/**
+ * Vocabulary naming which icon a "How we build the ecosystem" card carries.
+ * The qcodes are the icon ids in `ECOSYSTEM_ROLE_ICONS` — the icons themselves
+ * are React components and cannot come from Superdesk, so an editor chooses
+ * from the fixed set rather than supplying one.
+ */
+export const ECOSYSTEM_ROLE_ICON_SCHEME = "ecosystem_role_icon";
+
+/**
+ * Map a raw content-list article to a role card: headline is the title, lead
+ * is the copy. An untagged role, or one tagged with an icon this build does
+ * not have, falls back to the default rather than rendering an empty badge.
+ */
+export function mapEcosystemRole(article: RawArticle): EcosystemRole {
+  const code = findSubject(
+    parseMetadata(article.metadata),
+    ECOSYSTEM_ROLE_ICON_SCHEME,
+  )?.code;
+
+  const icon = ECOSYSTEM_ROLE_ICONS.find((name) => name === code);
+
+  return {
+    icon: icon ?? ECOSYSTEM_ROLE_ICON_FALLBACK,
+    title: article.title,
+    description: article.lead ? stripHtml(article.lead) : "",
+  };
+}
+
+/**
  * Map a raw content-list article to one FAQ entry: the headline is the
  * question, the lead is the answer.
  *
@@ -529,7 +673,10 @@ const META_SEPARATOR = " · ";
  * — so this strips the wrapper rather than printing it. Undefined when unset or
  * empty, which is what lets a missing field drop its row.
  */
-function extraValue(article: RawArticle, field: string): string | undefined {
+export function articleExtra(
+  article: RawArticle,
+  field: string,
+): string | undefined {
   const match = article.swp_article_extra?.find(
     (extra) => extra.field_name === field,
   );
@@ -544,21 +691,24 @@ function extraValue(article: RawArticle, field: string): string | undefined {
  */
 function eventMeta(article: RawArticle): string | undefined {
   const parts = [
-    extraValue(article, EVENT_FIELDS.venue),
-    extraValue(article, EVENT_FIELDS.dates),
+    articleExtra(article, EVENT_FIELDS.venue),
+    articleExtra(article, EVENT_FIELDS.dates),
   ].filter((part): part is string => Boolean(part));
 
   return parts.length > 0
     ? parts.join(META_SEPARATOR)
-    : extraValue(article, EVENT_FIELDS.meta);
+    : articleExtra(article, EVENT_FIELDS.meta);
 }
 
 /** Map a raw content-list article to the featured event. */
 export function mapSpotlightEvent(article: RawArticle): SpotlightEvent {
   const details = [
-    { label: "Format", value: extraValue(article, EVENT_FIELDS.format) },
-    { label: "Languages", value: extraValue(article, EVENT_FIELDS.languages) },
-    { label: "Cost", value: extraValue(article, EVENT_FIELDS.cost) },
+    { label: "Format", value: articleExtra(article, EVENT_FIELDS.format) },
+    {
+      label: "Languages",
+      value: articleExtra(article, EVENT_FIELDS.languages),
+    },
+    { label: "Cost", value: articleExtra(article, EVENT_FIELDS.cost) },
   ].filter((detail): detail is { label: string; value: string } =>
     Boolean(detail.value),
   );

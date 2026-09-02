@@ -25,6 +25,10 @@ export const GET_ARTICLE_BY_SLUG = /* GraphQL */ `
       body
       published_at
       metadata
+      swp_article_extra {
+        field_name
+        value
+      }
       swp_route {
         slug
         name

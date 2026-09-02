@@ -43,6 +43,16 @@ const ANCIR_LOGO: EcosystemLogo = {
   height: 80,
 };
 
+/**
+ * Accent cycle for the entry cards, in the design's order. Applied by position
+ * (see `mapEcosystemItem`) because nothing in the schema carries a colour.
+ */
+export const ECOSYSTEM_TONES: EcosystemTone[] = ["blue", "green", "ink", "red"];
+
+/** Shown when a partner has no logo attached, rather than a broken image. */
+export const ECOSYSTEM_LOGO_FALLBACK =
+  "/images/our-ecosystem/code-for-africa.png";
+
 export const ECOSYSTEM_INTRO =
   "PesaCheck does more than publish fact-checks. We help build the infrastructure that African fact-checking depends on — convening networks, training newsrooms, and sharing tooling and data with peers across the continent. These are the alliances and networks we belong to.";
 
@@ -113,11 +123,26 @@ export const ECOSYSTEM_GROUPS: EcosystemGroup[] = [
   },
 ];
 
-export const ECOSYSTEM_ROLES: {
-  icon: "announce" | "hand" | "server";
+/**
+ * The icons a role can carry. A CMS cannot ship a React component, so the set
+ * is fixed here and an editor picks one by qcode through the
+ * `ecosystem_role_icon` vocabulary — a role needing a new icon still needs a
+ * change to `ROLE_ICONS` in `components/about/EcosystemRoles.tsx`.
+ */
+export const ECOSYSTEM_ROLE_ICONS = ["announce", "hand", "server"] as const;
+
+export type EcosystemRoleIcon = (typeof ECOSYSTEM_ROLE_ICONS)[number];
+
+export type EcosystemRole = {
+  icon: EcosystemRoleIcon;
   title: string;
   description: string;
-}[] = [
+};
+
+/** Shown for a role whose icon tag is missing or names an icon we do not have. */
+export const ECOSYSTEM_ROLE_ICON_FALLBACK: EcosystemRoleIcon = "announce";
+
+export const ECOSYSTEM_ROLES: EcosystemRole[] = [
   {
     icon: "announce",
     title: "We convene",

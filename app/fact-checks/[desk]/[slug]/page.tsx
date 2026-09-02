@@ -4,7 +4,7 @@ import { ArticleView } from "@/components/article/ArticleView";
 import { ARTICLES, getArticleBySlug } from "@/lib/article-content";
 import { CONTENT_DESKS } from "@/lib/content-desks";
 import { getArticle } from "@/lib/data/article";
-import { isMediaCentreProfile } from "@/lib/data/map";
+import { isMediaCentreProfile, isTeamProfile } from "@/lib/data/map";
 
 type Params = Promise<{ desk: string; slug: string }>;
 
@@ -16,9 +16,14 @@ export function generateStaticParams() {
 
 async function resolveArticle(slug: string) {
   const live = await getArticle(slug).catch(() => null);
-  // A Media Centre entry is not a fact-check and owns its own URL, so the
-  // archive declines it rather than serving the same article at two addresses.
-  if (live) return isMediaCentreProfile(live.profile) ? null : live;
+  // Media Centre entries and staff profiles are not fact-checks and own their
+  // own URLs, so the archive declines them rather than serving the same
+  // article at two addresses.
+  if (live) {
+    const elsewhere =
+      isMediaCentreProfile(live.profile) || isTeamProfile(live.profile);
+    return elsewhere ? null : live;
+  }
   return getArticleBySlug(slug);
 }
 

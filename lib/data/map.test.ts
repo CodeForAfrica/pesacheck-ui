@@ -10,10 +10,12 @@ import {
   isMediaCentreProfile,
   mapAnnouncement,
   mapArticle,
+  mapEcosystemItem,
   mapNewsItem,
   mapResearchStrand,
   mapSpotlightEvent,
   mapStory,
+  mapTeamMember,
   mapUpcomingEvent,
   parseMetadata,
   type RawArticle,
@@ -742,5 +744,95 @@ describe("isMediaCentreProfile", () => {
     expect(isMediaCentreProfile(undefined)).toBe(false);
     expect(isMediaCentreProfile(null)).toBe(false);
     expect(isMediaCentreProfile("")).toBe(false);
+  });
+});
+
+describe("mapTeamMember", () => {
+  const person: RawArticle = {
+    id: 1,
+    title: "Justin Arenstein",
+    slug: "justin-arenstein",
+    lead: "<p>Co-founded PesaCheck in 2016.</p>",
+    metadata: JSON.stringify({ profile: "TeamMember" }),
+    swp_article_extra: [
+      { field_name: "team_role", value: "<p>CEO &amp; Founder</p>" },
+      { field_name: "linkedin_url", value: "<p>https://linkedin.com/in/x</p>" },
+    ],
+    swp_article_feature_media: {
+      description: "Portrait",
+      renditions: [
+        {
+          name: "viewImage",
+          image: { asset_id: "abc", file_extension: "jpg", variants: ["webp"] },
+        },
+      ],
+    },
+  };
+
+  it("maps a person, unwrapping the markup around custom fields", () => {
+    expect(mapTeamMember(person)).toEqual({
+      name: "Justin Arenstein",
+      role: "CEO & Founder",
+      bio: "Co-founded PesaCheck in 2016.",
+      image: "https://media.test/abc.webp",
+      href: "/about/team/justin-arenstein",
+      linkedin: "https://linkedin.com/in/x",
+    });
+  });
+
+  it("leaves the portrait undefined rather than using a stock image", () => {
+    // pickStoryImage falls back to a stock photo; a stranger's face on a staff
+    // card is worse than the design's empty circle.
+    const { image } = mapTeamMember({
+      ...person,
+      swp_article_feature_media: null,
+    });
+    expect(image).toBeUndefined();
+  });
+
+  it("drops the role and LinkedIn badge when the fields are unset", () => {
+    const bare = mapTeamMember({ ...person, swp_article_extra: [] });
+    expect(bare.role).toBe("");
+    expect(bare.linkedin).toBeUndefined();
+  });
+});
+
+describe("mapEcosystemItem", () => {
+  const partner: RawArticle = {
+    id: 2,
+    title: "IFCN",
+    slug: "ifcn",
+    lead: "<p>A verified signatory of the Code of Principles.</p>",
+    metadata: null,
+    swp_article_extra: [
+      { field_name: "partner_role", value: "<p>Verified signatory</p>" },
+      { field_name: "partner_url", value: "<p>https://ifcn.example</p>" },
+    ],
+    swp_route: { slug: "english", staticprefix: "/english" },
+  };
+
+  it("maps a partner, linking to its own website", () => {
+    expect(mapEcosystemItem(partner, 0)).toMatchObject({
+      name: "IFCN",
+      role: "Verified signatory",
+      description: "A verified signatory of the Code of Principles.",
+      href: "https://ifcn.example",
+      tone: "blue",
+    });
+  });
+
+  it("falls back to the article when no partner URL is set", () => {
+    const noUrl = {
+      ...partner,
+      swp_article_extra: [
+        { field_name: "partner_role", value: "<p>Network member</p>" },
+      ],
+    };
+    expect(mapEcosystemItem(noUrl, 0).href).toBe("/fact-checks/english/ifcn");
+  });
+
+  it("cycles the accent by position, every four", () => {
+    const tones = [0, 1, 2, 3, 4].map((i) => mapEcosystemItem(partner, i).tone);
+    expect(tones).toEqual(["blue", "green", "ink", "red", "blue"]);
   });
 });

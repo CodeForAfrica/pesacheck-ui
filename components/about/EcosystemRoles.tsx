@@ -1,6 +1,6 @@
 import { LuHand, LuMegaphone, LuServer } from "react-icons/lu";
 import { Container } from "@/components/ui/SectionHeading";
-import { ECOSYSTEM_ROLES } from "@/lib/ecosystem-content";
+import { ECOSYSTEM_ROLES, type EcosystemRole } from "@/lib/ecosystem-content";
 
 const ROLE_ICONS = {
   announce: LuMegaphone,
@@ -8,7 +8,11 @@ const ROLE_ICONS = {
   server: LuServer,
 };
 
-export function EcosystemRoles() {
+export function EcosystemRoles({
+  roles = ECOSYSTEM_ROLES,
+}: {
+  roles?: EcosystemRole[];
+}) {
   return (
     <section className="py-16">
       <Container>
@@ -22,7 +26,7 @@ export function EcosystemRoles() {
           <div className="mt-[18px] h-px bg-[#e4e5e8]" />
         </div>
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {ECOSYSTEM_ROLES.map((role) => {
+          {roles.map((role) => {
             const RoleIcon = ROLE_ICONS[role.icon];
             return (
               <div key={role.title}>
