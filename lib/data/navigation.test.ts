@@ -1,5 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getNavigation } from "@/lib/data/navigation";
+import {
+  getFooterLinks,
+  getNavigation,
+  getSiteMenus,
+} from "@/lib/data/navigation";
 
 const gql = vi.hoisted(() => vi.fn());
 vi.mock("@/lib/data/client", () => ({ gql, TENANT_CODE: "123abc" }));
@@ -157,5 +161,96 @@ describe("getNavigation", () => {
     );
 
     expect((await getNavigation()).map((l) => l.label)).toEqual(["About"]);
+  });
+});
+
+describe("getFooterLinks", () => {
+  beforeEach(() => gql.mockReset());
+
+  it("reads a flat menu in curated order", async () => {
+    tree(
+      { id: 20, name: "Footer Navigation", parent_id: null },
+      { id: 21, label: "About PesaCheck", uri: "/about", parent_id: 20 },
+      { id: 22, label: "Contact Us", uri: "/about/contact-us", parent_id: 20 },
+      { id: 23, label: "Tools", uri: "/tools", parent_id: 20 },
+    );
+
+    expect(await getFooterLinks("Footer Navigation")).toEqual([
+      { label: "About PesaCheck", href: "/about" },
+      { label: "Contact Us", href: "/about/contact-us" },
+      { label: "Tools", href: "/tools" },
+    ]);
+  });
+
+  it("keeps a fragment in the href, which the legal row relies on", async () => {
+    tree(
+      { id: 20, name: "Footer Legal", parent_id: null },
+      {
+        id: 21,
+        label: "Imprint",
+        uri: "/about/contact-us#imprint",
+        parent_id: 20,
+      },
+    );
+
+    expect((await getFooterLinks("Footer Legal"))[0].href).toBe(
+      "/about/contact-us#imprint",
+    );
+  });
+
+  it("drops links with no destination and ignores nesting", async () => {
+    tree(
+      { id: 20, name: "Footer Navigation", parent_id: null },
+      { id: 21, label: "Real", uri: "/real", parent_id: 20 },
+      { id: 22, label: "Dead", uri: null, parent_id: 20 },
+      // The footer cannot render a submenu, so a grandchild is not a link.
+      { id: 23, label: "Nested", uri: "/nested", parent_id: 21 },
+    );
+
+    expect(await getFooterLinks("Footer Navigation")).toEqual([
+      { label: "Real", href: "/real" },
+    ]);
+  });
+
+  it("returns nothing when the menu is absent, so the static row stands", async () => {
+    tree({ id: 20, name: "Something Else", parent_id: null });
+    expect(await getFooterLinks("Footer Navigation")).toEqual([]);
+  });
+});
+
+describe("getSiteMenus", () => {
+  beforeEach(() => gql.mockReset());
+
+  it("reads all three menus from a single query", async () => {
+    tree(
+      root,
+      { id: 2, label: "Tools", uri: "/tools", parent_id: 1 },
+      { id: 20, name: "Footer Navigation", parent_id: null },
+      { id: 21, label: "Knowledge", uri: "/knowledge", parent_id: 20 },
+      { id: 30, name: "Footer Legal", parent_id: null },
+      {
+        id: 31,
+        label: "Privacy policy",
+        uri: "/privacy-policy",
+        parent_id: 30,
+      },
+    );
+
+    const menus = await getSiteMenus();
+    expect(gql).toHaveBeenCalledTimes(1);
+    expect(menus.nav.map((l) => l.label)).toEqual(["Tools"]);
+    expect(menus.footerNav.map((l) => l.label)).toEqual(["Knowledge"]);
+    expect(menus.footerLegal.map((l) => l.label)).toEqual(["Privacy policy"]);
+  });
+
+  it("lets each menu fall back on its own", async () => {
+    // A live header above a static footer is a legitimate state while the
+    // footer menus are still being built.
+    tree(root, { id: 2, label: "Tools", uri: "/tools", parent_id: 1 });
+
+    const menus = await getSiteMenus();
+    expect(menus.nav).toHaveLength(1);
+    expect(menus.footerNav).toEqual([]);
+    expect(menus.footerLegal).toEqual([]);
   });
 });

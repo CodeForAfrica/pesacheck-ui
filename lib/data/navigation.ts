@@ -18,6 +18,10 @@ import {
  */
 export const MAIN_NAVIGATION = "Main Navigation";
 
+/** The footer's two link rows, each its own menu in Publisher. */
+export const FOOTER_NAVIGATION = "Footer Navigation";
+export const FOOTER_LEGAL = "Footer Legal";
+
 /** One row of `swp_menu`, as selected by `GET_MENUS`. */
 type RawMenu = {
   id: number;
@@ -100,10 +104,18 @@ function toMenuItem(row: RawMenu): NavMenuItem | null {
 export async function getNavigation(
   name = MAIN_NAVIGATION,
 ): Promise<NavLink[]> {
+  return buildNavigation(await fetchMenus(), name);
+}
+
+/** Every menu row for the tenant. One query serves all three site menus. */
+async function fetchMenus(): Promise<RawMenu[]> {
   const { menus } = await gql<{ menus: RawMenu[] }>(GET_MENUS, {
     tenant: TENANT_CODE,
   });
+  return menus;
+}
 
+function buildNavigation(menus: RawMenu[], name: string): NavLink[] {
   const root = menus.find((m) => m.name === name && m.parent_id == null);
   if (!root) return [];
 
@@ -142,4 +154,56 @@ export async function getNavigation(
   }
 
   return links;
+}
+
+/** A footer link: no icon, no children, no filter behaviour. */
+export type FooterLink = { label: string; href: string };
+
+/**
+ * A flat menu's links, in curated order — the footer rows, which are plain
+ * lists rather than the header's tree.
+ *
+ * Only the root's direct children are read: the footer has nowhere to render
+ * nesting, so a deeper menu is treated as the flat list it appears to be
+ * rather than silently dropping the extra levels into it.
+ *
+ * Returns `[]` when the menu is absent or empty, which keeps the static row.
+ */
+export async function getFooterLinks(name: string): Promise<FooterLink[]> {
+  return buildFooterLinks(await fetchMenus(), name);
+}
+
+function buildFooterLinks(menus: RawMenu[], name: string): FooterLink[] {
+  const root = menus.find((m) => m.name === name && m.parent_id == null);
+  if (!root) return [];
+
+  return menus
+    .filter((m) => m.parent_id === root.id && m.id !== root.id)
+    .map((row) => {
+      const label = row.label?.trim() || row.name?.trim();
+      const href = row.uri?.trim();
+      return label && href ? { label, href } : null;
+    })
+    .filter((link): link is FooterLink => link != null);
+}
+
+/**
+ * Every menu the chrome needs, from one query. The header and both footer rows
+ * are read from the same set of rows rather than three round trips, since the
+ * layout renders all of them on every page.
+ *
+ * Each falls back independently: a site with `Main Navigation` built but no
+ * footer menus shows a live header above a static footer.
+ */
+export async function getSiteMenus(): Promise<{
+  nav: NavLink[];
+  footerNav: FooterLink[];
+  footerLegal: FooterLink[];
+}> {
+  const menus = await fetchMenus();
+  return {
+    nav: buildNavigation(menus, MAIN_NAVIGATION),
+    footerNav: buildFooterLinks(menus, FOOTER_NAVIGATION),
+    footerLegal: buildFooterLinks(menus, FOOTER_LEGAL),
+  };
 }
