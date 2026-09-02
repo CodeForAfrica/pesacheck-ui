@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Container } from "@/components/ui/SectionHeading";
+import type { PageHero } from "@/lib/data/pages";
 import { HERO } from "@/lib/knowledge-content";
 
 // Left-to-right blue wash over the library illustration — darker on the left so
@@ -7,11 +8,11 @@ import { HERO } from "@/lib/knowledge-content";
 const HERO_GRADIENT =
   "linear-gradient(95deg, rgba(4, 26, 109, 0.92) 30%, rgba(4, 26, 109, 0.55) 70%, rgba(11, 42, 234, 0.25) 100%)";
 
-export function KnowledgeHero() {
+export function KnowledgeHero({ hero = HERO }: { hero?: PageHero }) {
   return (
     <section className="relative overflow-hidden bg-pesacheck-black">
       <Image
-        src="/images/knowledge-hero/knowledge-base-22.png"
+        src={hero.image ?? "/images/knowledge-hero/knowledge-base-22.png"}
         alt=""
         fill
         priority
@@ -27,10 +28,10 @@ export function KnowledgeHero() {
         <div className="max-w-[611px]">
           <span className="mb-5 block h-[3px] w-[190px] rounded bg-white/80" />
           <h1 className="text-[40px] font-extrabold leading-[1.1] text-white sm:text-[52px] lg:text-[60px]">
-            {HERO.title}
+            {hero.title}
           </h1>
           <p className="mt-5 max-w-[611px] text-base leading-6 text-white/90 lg:text-lg">
-            {HERO.subtitle}
+            {hero.subtitle}
           </p>
         </div>
       </Container>

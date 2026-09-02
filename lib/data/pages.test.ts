@@ -1,0 +1,126 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { getPage, pageListName } from "@/lib/data/pages";
+
+const gql = vi.hoisted(() => vi.fn());
+vi.mock("@/lib/data/client", () => ({ gql, TENANT_CODE: "123abc" }));
+
+type Article = {
+  id: number | string;
+  title: string;
+  slug: string;
+  lead?: string | null;
+  body?: string | null;
+};
+
+/**
+ * `getPage` makes two calls: routes first, then the section list. The list
+ * name it asks for is captured so the naming convention can be asserted.
+ */
+function respond(routes: unknown[], articles: Article[]) {
+  const asked: string[] = [];
+  gql.mockImplementation((_query: string, vars: { name?: string }) => {
+    if (vars?.name === undefined) return Promise.resolve({ routes });
+    asked.push(vars.name);
+    return Promise.resolve({
+      list: [{ name: vars.name, items: articles.map((a) => ({ article: a })) }],
+    });
+  });
+  return asked;
+}
+
+const route = { id: 1, name: "Knowledge", slug: "knowledge", type: "content" };
+
+describe("getPage", () => {
+  beforeEach(() => gql.mockReset());
+
+  it("takes the hero from the first section and the body from the rest", async () => {
+    respond(
+      [route],
+      [
+        {
+          id: 1,
+          title: "Knowledge",
+          slug: "hero",
+          lead: "<p>How we teach.</p>",
+        },
+        {
+          id: 2,
+          title: "Training",
+          slug: "training",
+          body: "<p>Courses.</p><ul><li>Funding</li></ul>",
+        },
+        {
+          id: 3,
+          title: "Mentorships",
+          slug: "mentorships",
+          body: "<p>Pairs.</p>",
+        },
+      ],
+    );
+
+    const page = await getPage("knowledge");
+    expect(page?.hero).toMatchObject({
+      title: "Knowledge",
+      subtitle: "How we teach.",
+    });
+    expect(page?.sections.map((s) => s.id)).toEqual([
+      "training",
+      "mentorships",
+    ]);
+    // Lists survive: the design's funding bullets are authored, not modelled.
+    expect(page?.sections[0].bodyHtml).toContain("<li>Funding</li>");
+  });
+
+  it("uses the article slug as the anchor, not the heading text", async () => {
+    // Anchors are public links; deriving them from a heading would break them
+    // whenever the heading is reworded.
+    respond(
+      [route],
+      [
+        { id: 1, title: "Knowledge", slug: "hero" },
+        { id: 2, title: "A heading someone will reword", slug: "training" },
+      ],
+    );
+
+    expect((await getPage("knowledge"))?.sections[0].id).toBe("training");
+  });
+
+  it("asks for the list named after the route", async () => {
+    const asked = respond([route], [{ id: 1, title: "Knowledge", slug: "h" }]);
+    await getPage("knowledge");
+    expect(asked).toEqual(["Page — Knowledge"]);
+    expect(pageListName("Knowledge")).toBe("Page — Knowledge");
+  });
+
+  it("falls back to the lead when a section has no body", async () => {
+    respond(
+      [route],
+      [
+        { id: 1, title: "Knowledge", slug: "hero" },
+        { id: 2, title: "Training", slug: "training", lead: "<p>Short.</p>" },
+      ],
+    );
+
+    expect((await getPage("knowledge"))?.sections[0].bodyHtml).toContain(
+      "Short.",
+    );
+  });
+
+  it("returns null when the route does not exist", async () => {
+    respond([{ id: 2, name: "Other", slug: "other" }], []);
+    expect(await getPage("knowledge")).toBeNull();
+  });
+
+  it("returns null when the list is empty, so the page keeps its fallback", async () => {
+    respond([route], []);
+    expect(await getPage("knowledge")).toBeNull();
+  });
+
+  it("renders a hero-only page with no sections", async () => {
+    respond([route], [{ id: 1, title: "Knowledge", slug: "hero" }]);
+
+    const page = await getPage("knowledge");
+    expect(page?.hero.title).toBe("Knowledge");
+    expect(page?.sections).toEqual([]);
+  });
+});
