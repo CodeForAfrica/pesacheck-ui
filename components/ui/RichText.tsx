@@ -2,10 +2,11 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 /**
- * Inline markup supported in content copy (see `lib/funding-content.ts`
- * et al): markdown-style links — `[label](href)` — and bold — `**text**`,
- * which may itself contain links. Content stays as plain strings; this is
- * deliberately the only inline markup the content layer supports.
+ * Inline markup supported in the remaining static content copy (see
+ * `lib/privacy-content.ts`): markdown-style links — `[label](href)` — and
+ * bold — `**text**`, which may itself contain links. Content stays as plain
+ * strings; this is deliberately the only inline markup the content layer
+ * supports.
  */
 const LINK_PATTERN = /\[([^\]]+)\]\(([^)]+)\)/g;
 const BOLD_PATTERN = /\*\*([^*]+(?:\*(?!\*)[^*]*)*)\*\*/g;
