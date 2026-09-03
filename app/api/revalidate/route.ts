@@ -1,11 +1,7 @@
 import { timingSafeEqual } from "node:crypto";
 import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
-import {
-  type ChangedRow,
-  tagsForArticle,
-  tagsForTable,
-} from "@/lib/data/cache";
+import { type RevalidateRequest, tagsForDelivery } from "@/lib/data/cache";
 import { TENANT_CODE } from "@/lib/data/client";
 
 /**
@@ -14,11 +10,11 @@ import { TENANT_CODE } from "@/lib/data/client";
  *
  * Pages are prerendered and cached (see `revalidate` in each page and the tags
  * in `lib/data/cache.ts`), so an edit is otherwise invisible for up to five
- * minutes. A Hasura event trigger on the `swp_*` tables POSTs here the moment a
- * row changes; `tagsForTable` maps the changed row to cache tags and this drops
- * exactly the pages built from them. Everything else stays cached.
+ * minutes. A Publisher webhook POSTs here when an article, route or menu
+ * changes; `tagsForEvent` maps the event to cache tags and this drops exactly
+ * the pages built from them. Everything else stays cached.
  *
- * Setup, payload shapes and the Superdesk alternative: `docs/revalidation.md`.
+ * Setup and payload shapes: `docs/revalidation.md`.
  *
  * Config (see .env.example):
  * - REVALIDATE_SECRET  required — shared secret; without it the route is off
@@ -30,48 +26,39 @@ export const dynamic = "force-dynamic";
 
 const SECRET = process.env.REVALIDATE_SECRET;
 
-/** What a Hasura event trigger posts, narrowed to the parts we read. */
-type HasuraPayload = {
-  table?: { name?: unknown };
-  event?: { data?: { new?: ChangedRow | null; old?: ChangedRow | null } };
-};
-
-/** Manual/webhook shape: name the tags (or the article) outright. */
-type DirectPayload = {
-  tags?: unknown;
-  slug?: unknown;
-};
+/** Publisher's own headers on every webhook delivery. */
+const EVENT_HEADER = "x-webhook-event";
+const TENANT_HEADER = "x-webhook-tenant";
 
 function str(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
 }
 
 /**
- * Compare against the configured secret without leaking its length or content
- * through timing. Node's `timingSafeEqual` throws on a length mismatch, so
- * that case is answered before it runs.
+ * Publisher's webhook form has three fields — events, URL, enabled — and no
+ * way to add a header, so the secret has to travel in the URL. The header
+ * forms are kept for anything that can set one: a manual `curl`, uptime
+ * checks, a future sender.
+ *
+ * Compared without leaking its length or content through timing. Node's
+ * `timingSafeEqual` throws on a length mismatch, so that case is answered
+ * before it runs.
  */
 function authorized(request: Request): boolean {
   if (!SECRET) return false;
 
-  const header = request.headers.get("x-revalidate-secret") ?? "";
-  const bearer = request.headers.get("authorization")?.replace(/^Bearer /, "");
-  const offered = Buffer.from(header || bearer || "");
+  const url = new URL(request.url);
+  const offered = Buffer.from(
+    url.searchParams.get("secret") ||
+      request.headers.get("x-revalidate-secret") ||
+      request.headers.get("authorization")?.replace(/^Bearer /, "") ||
+      "",
+  );
   const expected = Buffer.from(SECRET);
 
   return (
     offered.length === expected.length && timingSafeEqual(offered, expected)
   );
-}
-
-/** Tags a caller asked for outright, rather than through a table event. */
-function directTags(body: DirectPayload): string[] {
-  const named = Array.isArray(body.tags)
-    ? body.tags.map(str).filter(Boolean)
-    : [];
-  const slug = str(body.slug);
-
-  return slug ? [...named, ...tagsForArticle(slug)] : named;
 }
 
 export async function POST(request: Request) {
@@ -85,38 +72,31 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  let body: HasuraPayload & DirectPayload;
+  let body: RevalidateRequest["body"];
   try {
     body = await request.json();
   } catch {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const table = str(body.table?.name);
-  const row = body.event?.data?.new ?? body.event?.data?.old ?? {};
-
-  // Hasura triggers fire for every tenant on the shared Publisher database.
-  // Another tenant's article can't change any page of ours, so drop it rather
-  // than rebuild the site on someone else's edit.
-  const rowTenant = str(row.tenant_code);
-  if (rowTenant && TENANT_CODE && rowTenant !== TENANT_CODE) {
+  // Publisher webhooks are configured per tenant, so this should never differ.
+  // Checked anyway: a webhook pointed at the wrong site is otherwise silent,
+  // and rebuilding our pages on another tenant's edit would be invisible too.
+  const tenant = str(request.headers.get(TENANT_HEADER));
+  if (tenant && TENANT_CODE && tenant !== TENANT_CODE) {
     return NextResponse.json({ revalidated: false, reason: "other tenant" });
   }
 
-  const tags = [
-    ...new Set([
-      ...(table ? tagsForTable(table, row) : []),
-      ...directTags(body),
-    ]),
-  ];
+  const event = str(request.headers.get(EVENT_HEADER));
+  const tags = tagsForDelivery({ event, body });
 
   if (tags.length === 0) {
-    // A table nobody reads, or a payload we don't recognise. Not an error —
-    // triggers get added faster than this map does — but worth saying plainly
-    // so a misconfigured trigger doesn't look like it is working.
+    // An event nobody maps, a preview, or a payload we don't recognise. Not an
+    // error — but worth saying plainly, so a webhook subscribed to the wrong
+    // event doesn't look like it is working.
     return NextResponse.json({
       revalidated: false,
-      reason: table ? `no tags mapped for ${table}` : "no tags in payload",
+      reason: event ? `no tags mapped for ${event}` : "no tags in payload",
     });
   }
 

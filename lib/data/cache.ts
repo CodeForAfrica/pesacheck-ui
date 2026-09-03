@@ -59,11 +59,18 @@ export const TAGS = {
   filterOptions: "filter-options",
 } as const;
 
-/** One changed row, as a webhook describes it — only the columns tags need. */
-export type ChangedRow = {
-  slug?: unknown;
-  name?: unknown;
-  tenant_code?: unknown;
+/**
+ * One delivery to `/api/revalidate`: either a Publisher webhook (an event, and
+ * the entity it serialized) or a direct request naming what to drop.
+ */
+export type RevalidateRequest = {
+  /** Publisher's `X-WEBHOOK-EVENT`, absent on a direct request. */
+  event?: string;
+  /** The webhook body, or the direct payload. */
+  body?: {
+    slug?: unknown;
+    tags?: unknown;
+  } | null;
 };
 
 function str(value: unknown): string {
@@ -71,55 +78,83 @@ function str(value: unknown): string {
 }
 
 /**
- * Cache tags for a changed row of `table` — the map `/api/revalidate` applies
- * to a Hasura event payload.
+ * Cache tags for a Publisher webhook event — the map `/api/revalidate` applies.
  *
- * An unknown table returns nothing, which the endpoint reports rather than
- * swallowing: a trigger on a table nobody reads should look like a
- * misconfiguration, not like success.
+ * Event names are Publisher's own (`article[published]`, `menu[updated]`, …);
+ * the full list is in its webhook form. Anything unrecognised returns nothing,
+ * which the endpoint reports rather than swallowing: a webhook subscribed to
+ * the wrong event should look like a misconfiguration, not like success.
  */
-export function tagsForTable(table: string, row: ChangedRow = {}): string[] {
-  switch (table) {
-    // The child tables carry an `article_id` but no slug, so a change there
-    // refreshes the listings and not the article's own page. That is not the
-    // gap it looks like: Publisher rewrites the `swp_article` row whenever
-    // Superdesk republishes, and that event names the slug.
-    case "swp_article":
-    case "swp_article_extra":
-    case "swp_article_metadata": {
-      const slug = str(row.slug);
-      return [
-        ...(slug ? [TAGS.article(slug)] : []),
-        TAGS.articles,
-        TAGS.contentLists,
-      ];
-    }
+export function tagsForEvent(
+  event: string,
+  subject: { slug?: unknown } = {},
+): string[] {
+  const [entity] = event.split("[", 1);
 
-    // A list's items are rows of their own, and they carry no list name — so
-    // a reorder can only say "some list changed".
-    case "swp_content_list":
-    case "swp_content_list_item": {
-      const name = str(row.name);
-      return [...(name ? [TAGS.contentList(name)] : []), TAGS.contentLists];
-    }
+  switch (entity) {
+    // Publish, update, unpublish and cancel all change what a reader sees, and
+    // all name the article. `article[preview]` deliberately does not: it
+    // renders an unpublished draft, and must not push one into the live cache.
+    case "article":
+      return event === "article[preview]"
+        ? []
+        : tagsForArticle(str(subject.slug));
 
-    // Routes decide which desks exist and which desk a listing belongs to.
-    case "swp_route":
+    // Routes decide which content desks exist and which desk a listing sits
+    // under, so a route change moves both.
+    case "route":
       return [TAGS.routes, TAGS.articles];
 
-    case "swp_menu":
+    case "menu":
       return [TAGS.navigation];
 
+    // Packages are the incoming Superdesk items, before Publisher has turned
+    // them into articles. The `article[*]` event that follows is the one with
+    // a slug, so acting here would only revalidate early.
     default:
       return [];
   }
 }
 
 /**
- * Tags for an article named directly — a manual `curl`, or a Superdesk-side
- * webhook shaped by hand. Same breadth as the `swp_article` event: the article
- * plus everything that lists it.
+ * Tags for one article — what an `article[*]` event busts, and what a manual
+ * `{"slug": …}` call means.
+ *
+ * Deliberately generous: the article's own page, every listing, and every
+ * curated list. A listing card carries the title, image and verdict that just
+ * changed, and no column says which lists an article sits in. The cost is a
+ * few extra re-renders; the cost of guessing too narrowly is an edit that
+ * never appears.
+ *
+ * An event with no slug still busts the listings — better a listing refresh
+ * than nothing.
  */
 export function tagsForArticle(slug: string): string[] {
-  return [TAGS.article(slug), TAGS.articles, TAGS.contentLists];
+  return [
+    ...(slug ? [TAGS.article(slug)] : []),
+    TAGS.articles,
+    TAGS.contentLists,
+  ];
+}
+
+/**
+ * Tags for one delivery — what `/api/revalidate` acts on.
+ *
+ * An event and the body are never combined. Every Publisher entity carries a
+ * `slug`, so reading the body as a direct request would undo what the event
+ * map decided: a `route[updated]` would bust an article page named after the
+ * desk, and an `article[preview]` would push a draft into the live cache
+ * despite the event mapping to nothing.
+ */
+export function tagsForDelivery({ event, body }: RevalidateRequest): string[] {
+  const payload = body ?? {};
+
+  if (event) return [...new Set(tagsForEvent(event, payload))];
+
+  const named = Array.isArray(payload.tags)
+    ? payload.tags.map(str).filter(Boolean)
+    : [];
+  const slug = str(payload.slug);
+
+  return [...new Set(slug ? [...named, ...tagsForArticle(slug)] : named)];
 }

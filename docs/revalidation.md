@@ -10,13 +10,16 @@ mechanisms do, and they are meant to overlap.
 
 | | What triggers it | How fast | Covers |
 | --- | --- | --- | --- |
-| **Tag revalidation** | Hasura POSTs `/api/revalidate` when a row changes | seconds | the pages that actually read the changed row |
-| **Time (ISR)** | nothing — every page carries `revalidate = 300` | ≤ 5 min | everything, including edits the webhook missed |
+| **Tag revalidation** | a Publisher webhook POSTs `/api/revalidate` | seconds | articles, content desks, menus |
+| **Time (ISR)** | nothing — every page carries `revalidate = 300` | ≤ 5 min | everything, including what the webhook can't see |
 
-The TTL is the backstop. If the webhook is misconfigured, unreachable, or the
-edit touched a table nobody mapped, the site is still at most five minutes
-behind — it degrades to slow, not broken. That is deliberate: a silent
-never-updates failure is the thing this replaces.
+The TTL is the backstop, and it is load-bearing rather than ceremonial.
+Publisher delivers a webhook once, with no retry and no delivery log, and it
+has **no event for content lists** — so a curation change (reordering the
+homepage hero, adding someone to the Team list) reaches the site on the TTL
+alone. Article, route and menu edits are near-instant; everything else is at
+most five minutes late. Either way the failure mode is slow, not frozen, which
+is the thing this replaces.
 
 ## Cache tags
 
@@ -73,19 +76,29 @@ future wrapper needs the same treatment.
 ## The endpoint
 
 `POST /api/revalidate`, authenticated with the `REVALIDATE_SECRET` shared
-secret sent as `x-revalidate-secret` (or `Authorization: Bearer`). Without the
-secret configured the route answers `503` and the site runs on TTLs alone.
+secret. Without the secret configured the route answers `503` and the site runs
+on TTLs alone.
 
-It accepts two payload shapes.
+**The secret travels in the URL** — `?secret=…`. Publisher's webhook form has
+three fields (events, URL, enabled) and no way to add a header, so there is
+nowhere else to put it. Use a value that is *only* this secret's: it will show
+up in access logs and proxy traces, and while the worst an attacker can do with
+it is force re-renders, that is not a secret to share with anything else. The
+route also accepts `x-revalidate-secret` or `Authorization: Bearer` for callers
+that can set headers — a manual `curl`, a monitor.
 
-**Hasura event trigger** — mapped by table name:
+Publisher sends the event in a header and the changed entity as the body:
 
-```json
-{ "table": { "name": "swp_article" },
-  "event": { "op": "UPDATE", "data": { "new": { "slug": "…", "tenant_code": "…" } } } }
+```
+POST /api/revalidate?secret=…
+X-WEBHOOK-EVENT: article[published]
+X-WEBHOOK-TENANT: 123abc
+
+{ "id": 42, "title": "…", "slug": "an-article-slug", "route": {…}, … }
 ```
 
-**Direct** — for a manual poke, or a webhook you shape yourself:
+`tagsForEvent` in `lib/data/cache.ts` maps the event to tags; only `slug` is
+read from the body. A **direct** shape also works, for a manual poke:
 
 ```json
 { "slug": "an-article-slug" }
@@ -93,13 +106,13 @@ It accepts two payload shapes.
 ```
 
 Answers are deliberately explicit about doing nothing, so a misconfigured
-trigger cannot look like a working one:
+webhook cannot look like a working one:
 
 | Response | Meaning |
 | --- | --- |
 | `{"revalidated": true, "tags": [...]}` | those tags were dropped |
-| `{"revalidated": false, "reason": "other tenant"}` | the row belongs to another tenant on the shared Publisher database |
-| `{"revalidated": false, "reason": "no tags mapped for X"}` | a trigger exists on a table `tagsForTable` doesn't know |
+| `{"revalidated": false, "reason": "other tenant"}` | `X-WEBHOOK-TENANT` isn't ours — a webhook pointed at the wrong site |
+| `{"revalidated": false, "reason": "no tags mapped for X"}` | subscribed to an event no page depends on |
 | `401` | wrong or missing secret |
 | `503` | `REVALIDATE_SECRET` is not set |
 
@@ -107,52 +120,61 @@ Revalidation uses the `"max"` profile — stale-while-revalidate. The reader who
 arrives first gets the old page and the fresh one renders behind them, rather
 than waiting on Hasura.
 
-## Setting up the Hasura trigger
+### Which events map to what
 
-Generate a secret (`openssl rand -hex 32`), set `REVALIDATE_SECRET` in the
-site's environment, then in the Hasura console under **Events → Create**, one
-trigger per table:
-
-| Table | Operations | Why |
+| Publisher event | Tags | Why |
 | --- | --- | --- |
-| `swp_article` | insert, update, delete | the article's page and every listing |
-| `swp_content_list` | insert, update, delete | a list renamed or removed |
-| `swp_content_list_item` | insert, update, delete | curation reordered |
-| `swp_route` | insert, update, delete | which content desks exist |
-| `swp_menu` | insert, update, delete | header and footer links |
+| `article[created\|updated\|published\|unpublished\|canceled]` | `article:<slug>`, `articles`, `content-lists` | the article's page, and everything that lists it |
+| `article[preview]` | none | renders an unpublished draft; must never reach the live cache |
+| `route[created\|updated\|deleted]` | `routes`, `articles` | which desks exist, and which desk a listing sits under |
+| `menu[created\|updated\|deleted]` | `navigation` | header and footer link rows |
+| `package[*]` | none | the incoming Superdesk item, before Publisher has made an article of it — the `article[*]` event that follows is the one carrying a slug |
 
-For each: webhook URL `https://<site>/api/revalidate`, and add the header
-`x-revalidate-secret` with the same value (as a static value, or from an env
-var on the Hasura instance). Leave the payload defaults — the route reads
-`table.name` and `event.data.new`.
+An article event with no slug in the body still busts the listings. A listing
+refresh beats nothing.
 
-Triggers fire for **every** tenant on the shared Publisher database. The route
-drops rows whose `tenant_code` isn't ours rather than rebuilding the site on
-another tenant's edit, so this costs a request, not a render.
+## Setting up the webhook in Publisher
 
-The child tables (`swp_article_extra`, `swp_article_metadata`) are mapped but
-not in the list above: their rows carry no slug, so they can only refresh
-listings. Publisher rewrites the `swp_article` row whenever Superdesk
-republishes, and that event names the slug, so `swp_article` covers them.
+Generate a secret (`openssl rand -hex 32`) and set `REVALIDATE_SECRET` in the
+site's environment first — until it is set the endpoint answers `503`.
 
-## Superdesk-side alternatives
+Then, in Superdesk:
 
-The trigger sits on Hasura because that is what the site actually reads — it
-fires on the row the query returns, whatever wrote it. Two Superdesk-side
-options exist if the Hasura console is ever out of reach:
+1. Switch to the **Publisher** app (left rail / app switcher).
+2. **Settings** → **Website Management** → the PesaCheck tenant.
+3. **Webhooks** → **Add Webhook**.
+4. **Events** — pick from the autocomplete (free text is disabled):
+   `article[created]`, `article[updated]`, `article[published]`,
+   `article[unpublished]`, `article[canceled]`, and `menu[*]` / `route[*]` if
+   the nav and desk lists should follow too. Leave `article[preview]` off; the
+   endpoint ignores it, but subscribing to it only generates noise.
+5. **URL** — `https://<site>/api/revalidate?secret=<the secret>`
+6. **Enabled** on, save.
 
-- **Publisher webhooks** (Publisher settings) fire on publish/unpublish events.
-  They report the Superdesk event rather than the Publisher row, so they miss
-  anything that changes content without a publish — curation, menus, routes —
-  and they fire before the row is guaranteed to be readable through Hasura.
-- **Superdesk subscribers** are a distribution mechanism (who receives
-  published content, through which transport), not a change feed for the
-  website. Publisher is itself one of these subscribers. Adding an HTTP push
-  subscriber to hit this endpoint would work, but it duplicates the delivery
-  path that already ends in the rows Hasura serves.
+Webhooks are tenant-scoped entities in Publisher, so one set per tenant and no
+cross-tenant noise. Exact labels shift between Publisher versions; the screen
+lives under Settings → Website Management.
 
-Either can post `{"slug": "…"}` or `{"tags": [...]}` to the same endpoint with
-the same secret — the direct payload shape exists for exactly this.
+### What this does not cover
+
+- **Content lists.** Publisher has no content-list event, so reordering the
+  homepage hero or adding a person to the Team list fires nothing and lands on
+  the 5-minute TTL. Editing any *article* does bust `content-lists`, so the
+  common case — an article's title or image changing everywhere it appears — is
+  still immediate.
+- **Delivery.** `WebhookHandler` sends one request through Symfony Messenger
+  with no retry, and Publisher keeps no delivery log. A webhook lost to a
+  deploy or a timeout is simply lost, which is the other reason the TTL stays.
+  Publisher's messenger consumer must be running on the instance, or webhooks
+  queue and never send at all.
+
+If either gap ever starts to matter, the alternative is a **Hasura event
+trigger** on the `swp_*` tables — it fires on the row the site actually reads,
+covers content lists, and has retries and invocation logs. It was not taken
+because it needs the Hasura admin secret (the console is disabled on the
+staging instance) plus write access to Publisher's database, which is the
+platform operator's call rather than ours. The endpoint would need a second
+payload parser for it; the tags themselves would not change.
 
 ## Checking it works
 
@@ -163,10 +185,12 @@ Locally, tag revalidation only means something against a production build —
 pnpm build && pnpm start
 ```
 
+Then send what Publisher would send:
+
 ```bash
-curl -s -X POST localhost:3000/api/revalidate \
+curl -s -X POST "localhost:3000/api/revalidate?secret=$REVALIDATE_SECRET" \
   -H 'content-type: application/json' \
-  -H "x-revalidate-secret: $REVALIDATE_SECRET" \
+  -H 'x-webhook-event: article[published]' \
   -d '{"slug":"flooding-not-from-limpopo"}'
 ```
 
@@ -185,13 +209,17 @@ In order of likelihood:
    is silently falling back to `lib/*-content.ts` (see *Fallback behaviour* in
    `superdesk-setup.md`; a broken query looks exactly like unfinished
    curation).
-2. **The trigger didn't fire.** Hasura's console shows per-trigger invocation
-   logs with the response body. A `401` there means the header doesn't match
-   the deployed secret; `no tags mapped` means the table isn't in
-   `tagsForTable`.
-3. **The tag was too narrow.** Read the page's `.meta`, and check the tag the
+2. **It was a curation change.** Content lists have no Publisher event; the
+   TTL is the only thing that refreshes them. Expected, not a fault.
+3. **The webhook didn't fire, or fired and failed.** Publisher keeps no
+   delivery log, so this is diagnosed from the site's side: the endpoint logs
+   nothing either, but your host's access log will show the `POST` and its
+   status. No request at all means the webhook is disabled, subscribed to the
+   wrong event, or Publisher's messenger consumer isn't running. A `401` means
+   the `?secret=` doesn't match the deployed `REVALIDATE_SECRET`.
+4. **The tag was too narrow.** Read the page's `.meta`, and check the tag the
    endpoint reported is in it.
-4. **Multiple instances.** Tag revalidation invalidates the cache of the
+5. **Multiple instances.** Tag revalidation invalidates the cache of the
    instance handling it. On Vercel that cache is shared, so one call is enough.
    Self-hosted behind more than one replica, each holds its own `.next/cache`
    and would need a shared cache handler — otherwise revalidation only reaches

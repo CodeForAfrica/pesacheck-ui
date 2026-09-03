@@ -26,7 +26,7 @@ reaches the site): `docs/superdesk-setup.md`.
   data functions throw and silently fall back to static — which looks like
   "fetching is broken." Every Hasura query MUST filter by `tenant_code`.
 - **Caching:** every `gql()` call declares cache tags (`lib/data/cache.ts`) so
-  `/api/revalidate` can refresh the pages a Superdesk edit affects; pages also
+  `/api/revalidate` can refresh the pages a Publisher webhook reports; pages also
   carry `revalidate = 300` as a backstop. Tag any query you add, and keep
   `articles` out of anything the root layout reads. Details:
   `docs/revalidation.md`.
