@@ -73,6 +73,26 @@ means nothing.
 collected. Its tag is declared on the `unstable_cache` options instead. Any
 future wrapper needs the same treatment.
 
+### A cached read caches failures too
+
+Next declines to cache a non-200 response, so a 5xx from Hasura or Cloudflare
+is retried on the next render. **A GraphQL error is not a non-200**: Hasura
+answers a statement timeout or a validation error with HTTP 200 and an `errors`
+body, `graphql-request` throws on it, and Next — seeing a 200 — stores it under
+that read's tags for the full TTL.
+
+The visible effect is a page stuck on its static fallback for up to five
+minutes after Hasura has recovered, which reads exactly like unfinished
+curation. It clears in one of two ways: the TTL expires, or a webhook
+revalidates the tag, which drops the poisoned entry along with everything else
+carrying it. Republishing the article is therefore a legitimate way to force
+recovery.
+
+This is the price of tagging: an uncached read cannot be revalidated on demand,
+because there is nothing stored for the tag to point at. Worth knowing before
+raising `DEFAULT_REVALIDATE` — a longer TTL is also a longer window in which a
+one-second Hasura blip keeps showing design copy.
+
 ## The endpoint
 
 `POST /api/revalidate`, authenticated with the `REVALIDATE_SECRET` shared
@@ -86,6 +106,17 @@ up in access logs and proxy traces, and while the worst an attacker can do with
 it is force re-renders, that is not a secret to share with anything else. The
 route also accepts `x-revalidate-secret` or `Authorization: Bearer` for callers
 that can set headers — a manual `curl`, a monitor.
+
+Use `openssl rand -hex 32`. Hex needs no escaping anywhere, so the value stays
+identical across the Publisher form, the environment variable and any `curl`
+you paste it into.
+
+Base64 also works — the endpoint reads the query parameter without
+form-decoding it, so a `+` matches as a `+` rather than arriving as a space.
+The one shape that cannot work is a secret containing a literal **space**:
+Next re-serializes the query before the handler sees it, turning `%20` into
+`+`, so such a secret authenticates by header and always fails by URL. Hex
+sidesteps it.
 
 Publisher sends the event in a header and the changed entity as the body:
 
@@ -201,17 +232,20 @@ In order of likelihood:
    is silently falling back to `lib/*-content.ts` (see *Fallback behaviour* in
    `superdesk-setup.md`; a broken query looks exactly like unfinished
    curation).
-2. **It was a curation change.** Content lists have no Publisher event; the
+2. **It showed design copy for a few minutes, then fixed itself.** A Hasura
+   error was cached for the TTL — see *A cached read caches failures too*
+   above. Nothing to fix on the site; look at Hasura for the original error.
+3. **It was a curation change.** Content lists have no Publisher event; the
    TTL is the only thing that refreshes them. Expected, not a fault.
-3. **The webhook didn't fire, or fired and failed.** Publisher keeps no
+4. **The webhook didn't fire, or fired and failed.** Publisher keeps no
    delivery log, so this is diagnosed from the site's side: the endpoint logs
    nothing either, but your host's access log will show the `POST` and its
    status. No request at all means the webhook is disabled, subscribed to the
    wrong event, or Publisher's messenger consumer isn't running. A `401` means
    the `?secret=` doesn't match the deployed `REVALIDATE_SECRET`.
-4. **The tag was too narrow.** Read the page's `.meta`, and check the tag the
+5. **The tag was too narrow.** Read the page's `.meta`, and check the tag the
    endpoint reported is in it.
-5. **Multiple instances.** Tag revalidation invalidates the cache of the
+6. **Multiple instances.** Tag revalidation invalidates the cache of the
    instance handling it. On Vercel that cache is shared, so one call is enough.
    Self-hosted behind more than one replica, each holds its own `.next/cache`
    and would need a shared cache handler — otherwise revalidation only reaches

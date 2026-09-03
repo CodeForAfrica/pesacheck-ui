@@ -3,6 +3,7 @@ import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { type RevalidateRequest, tagsForDelivery } from "@/lib/data/cache";
 import { TENANT_CODE } from "@/lib/data/client";
+import { offeredSecret } from "@/lib/revalidate-auth";
 
 /**
  * On-demand revalidation endpoint — how a Superdesk edit reaches the site
@@ -35,25 +36,15 @@ function str(value: unknown): string {
 }
 
 /**
- * Publisher's webhook form has three fields — events, URL, enabled — and no
- * way to add a header, so the secret has to travel in the URL. The header
- * forms are kept for anything that can set one: a manual `curl`, uptime
- * checks, a future sender.
- *
- * Compared without leaking its length or content through timing. Node's
+ * Compare the offered secret (see `lib/revalidate-auth.ts` for where it comes
+ * from) without leaking its length or content through timing. Node's
  * `timingSafeEqual` throws on a length mismatch, so that case is answered
  * before it runs.
  */
 function authorized(request: Request): boolean {
   if (!SECRET) return false;
 
-  const url = new URL(request.url);
-  const offered = Buffer.from(
-    url.searchParams.get("secret") ||
-      request.headers.get("x-revalidate-secret") ||
-      request.headers.get("authorization")?.replace(/^Bearer /, "") ||
-      "",
-  );
+  const offered = Buffer.from(offeredSecret(request.url, request.headers));
   const expected = Buffer.from(SECRET);
 
   return (
