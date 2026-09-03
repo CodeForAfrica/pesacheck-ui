@@ -223,3 +223,53 @@ describe("path matching", () => {
     expect((await getPage("/knowledge/"))?.title).toBe("Knowledge");
   });
 });
+
+describe("section anchors", () => {
+  beforeEach(() => gql.mockReset());
+
+  it("strips the page prefix so namespaced sluglines keep clean anchors", async () => {
+    // Slugs are unique tenant-wide, so a second page needing "who-we-are"
+    // must namespace it; the anchor should not inherit that.
+    respond(
+      [
+        {
+          id: 2,
+          name: "Methodology",
+          slug: "methodology",
+          staticprefix: "/about/methodology",
+        },
+      ],
+      [
+        { id: 1, title: "How PesaCheck Works", slug: "methodology-hero" },
+        { id: 2, title: "Who We Are", slug: "methodology-who-we-are" },
+        { id: 3, title: "Our Sources", slug: "our-sources" },
+      ],
+    );
+
+    const page = await getPage("about/methodology");
+    expect(page?.sections.map((s) => s.id)).toEqual([
+      "who-we-are",
+      "our-sources",
+    ]);
+  });
+
+  it("leaves a slug that merely starts with the page name alone", async () => {
+    respond(
+      [
+        {
+          id: 2,
+          name: "Knowledge",
+          slug: "knowledge",
+          staticprefix: "/knowledge",
+        },
+      ],
+      [
+        { id: 1, title: "Knowledge", slug: "hero" },
+        // No hyphen boundary, so nothing is stripped.
+        { id: 2, title: "Knowledgebase", slug: "knowledgebase" },
+      ],
+    );
+
+    expect((await getPage("knowledge"))?.sections[0].id).toBe("knowledgebase");
+  });
+});

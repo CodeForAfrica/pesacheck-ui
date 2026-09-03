@@ -96,6 +96,25 @@ function heroText(lead: string | null | undefined): string {
   );
 }
 
+/**
+ * A section's in-page anchor, from its slug.
+ *
+ * Slugs are unique across the whole tenant, but anchors only need to be unique
+ * within a page — and two pages legitimately both have a "Who We Are". So a
+ * slugline may be namespaced with its page (`methodology-who-we-are`) and the
+ * page prefix is stripped here, leaving the anchor the design intended.
+ *
+ * A section whose own name starts with the page name (`about` / `about-us`)
+ * would lose that word; namespacing is opt-in precisely so an editor can avoid
+ * it by leaving the slugline unprefixed where the plain one is free.
+ */
+function sectionAnchor(slug: string, routeSlug: string): string {
+  const prefix = `${routeSlug}-`;
+  return slug.startsWith(prefix) && slug.length > prefix.length
+    ? slug.slice(prefix.length)
+    : slug;
+}
+
 function sectionImage(article: RawArticle): string | undefined {
   const renditions = article.swp_article_feature_media?.renditions ?? undefined;
   for (const name of ["viewImage", "baseImage", "original"]) {
@@ -156,7 +175,7 @@ export async function getPage(path: string): Promise<Page | null> {
       image: sectionImage(heroArticle),
     },
     sections: rest.map((article) => ({
-      id: article.slug,
+      id: sectionAnchor(article.slug, route.slug ?? ""),
       title: article.title,
       // The body carries the section's paragraphs, bullet lists and images as
       // authored, which is what lets one renderer serve pages whose designs
