@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 /**
- * Inline markup supported in content copy (see `lib/methodology-content.ts`
+ * Inline markup supported in content copy (see `lib/funding-content.ts`
  * et al): markdown-style links — `[label](href)` — and bold — `**text**`,
  * which may itself contain links. Content stays as plain strings; this is
  * deliberately the only inline markup the content layer supports.
