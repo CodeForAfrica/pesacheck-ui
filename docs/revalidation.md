@@ -191,13 +191,14 @@ load-bearing rather than ceremonial:
   webhook lost to a deploy or a timeout is simply lost. Publisher's messenger
   consumer also has to be running, or webhooks queue and never send at all.
 
-If either gap starts to matter, the alternative is a **Hasura event trigger**
-on the `swp_*` tables — it fires on the row the site actually reads, covers
-content lists, and has retries and invocation logs. It was not taken because it
-needs the Hasura admin secret (the console is disabled on the staging instance)
-plus write access to Publisher's database, which is the platform operator's
-call rather than ours. It would need a second payload parser in the endpoint;
-the tags themselves would not change.
+If either gap starts to matter, the alternative considered and set aside was a
+**Hasura event trigger** on the `swp_*` tables — it fires on the row the site
+actually reads, so it covers content lists, and it has retries and invocation
+logs. It was ruled out deliberately: creating one needs the Hasura admin secret
+(the served console is disabled) plus write access to Publisher's database, so
+it is the platform operator's setup rather than the editorial team's. Revisiting
+it would mean a second payload parser in the endpoint; the tags themselves would
+not change.
 
 ## Checking it works
 
