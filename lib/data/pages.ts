@@ -1,6 +1,11 @@
 import { renderBody } from "@/lib/data/body";
 import { gql, TENANT_CODE } from "@/lib/data/client";
-import { findRendition, type RawArticle } from "@/lib/data/map";
+import {
+  findRendition,
+  findSubject,
+  parseMetadata,
+  type RawArticle,
+} from "@/lib/data/map";
 import { GET_PAGE_SECTIONS, GET_ROUTES } from "@/lib/data/queries/pages";
 
 /**
@@ -13,6 +18,26 @@ export const PAGE_LIST_PREFIX = "Page — ";
 
 export function pageListName(routeName: string): string {
   return `${PAGE_LIST_PREFIX}${routeName}`;
+}
+
+/**
+ * Vocabulary marking what a section is on its page. Only `hero` means
+ * anything: it names the section that becomes the banner, so the hero can be
+ * moved, replaced or reordered without its position mattering.
+ *
+ * A page whose sections carry no tag falls back to treating the first item as
+ * the hero, which is how the first pages were authored.
+ */
+export const PAGE_SECTION_SCHEME = "page_section_role";
+export const HERO_CODE = "hero";
+
+/** Whether an article is tagged as its page's hero. */
+function isHero(article: RawArticle): boolean {
+  const subject = findSubject(
+    parseMetadata(article.metadata),
+    PAGE_SECTION_SCHEME,
+  );
+  return subject?.code === HERO_CODE;
 }
 
 /** The banner at the top of a page. */
@@ -85,10 +110,13 @@ function sectionImage(article: RawArticle): string | undefined {
  * empty. Null is what tells a page to fall back to its static content, and
  * what makes the catch-all route 404 rather than render an empty shell.
  *
- * The **first** item in the list is the hero — its headline is the page title
- * and its lead the standfirst — and the rest are body sections. That keeps the
- * hero editable as just another section, at the cost that reordering the list
- * changes which section is the banner.
+ * The hero is the section tagged `hero` through `PAGE_SECTION_SCHEME`: its
+ * headline is the page title, its lead the standfirst and its feature media
+ * the banner image. Tagging rather than position means the hero can sit
+ * anywhere in the list and be swapped for another section without dragging.
+ *
+ * Untagged pages fall back to the first item, so the pages authored before the
+ * vocabulary existed keep working.
  */
 export async function getPage(slug: string): Promise<Page | null> {
   const route = (await getRoutes()).find((r) => r.slug === slug);
@@ -103,8 +131,13 @@ export async function getPage(slug: string): Promise<Page | null> {
     .map((item) => item.article)
     .filter((article): article is RawArticle => article != null);
 
-  const [heroArticle, ...rest] = articles;
+  // An explicit tag wins; otherwise the first item is the hero, which is how
+  // pages authored before the vocabulary existed still work.
+  const taggedHero = articles.find(isHero);
+  const heroArticle = taggedHero ?? articles[0];
   if (!heroArticle) return null;
+
+  const rest = articles.filter((article) => article !== heroArticle);
 
   return {
     slug,

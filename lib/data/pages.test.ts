@@ -10,7 +10,18 @@ type Article = {
   slug: string;
   lead?: string | null;
   body?: string | null;
+  metadata?: string | null;
 };
+
+/** Tag an article as its page's hero, the way Superdesk stores it. */
+function asHero<T extends Article>(article: T): T {
+  return {
+    ...article,
+    metadata: JSON.stringify({
+      subject: [{ scheme: "page_section_role", code: "hero", name: "Hero" }],
+    }),
+  };
+}
 
 /**
  * `getPage` makes two calls: routes first, then the section list. The list
@@ -122,5 +133,59 @@ describe("getPage", () => {
     const page = await getPage("knowledge");
     expect(page?.hero.title).toBe("Knowledge");
     expect(page?.sections).toEqual([]);
+  });
+});
+
+describe("hero selection", () => {
+  beforeEach(() => gql.mockReset());
+
+  it("takes the tagged section as the hero wherever it sits", async () => {
+    respond(
+      [route],
+      [
+        { id: 1, title: "Training", slug: "training", body: "<p>Courses.</p>" },
+        asHero({
+          id: 2,
+          title: "Knowledge",
+          slug: "banner",
+          lead: "<p>Lead.</p>",
+        }),
+        { id: 3, title: "Incubator", slug: "incubator", body: "<p>Desks.</p>" },
+      ],
+    );
+
+    const page = await getPage("knowledge");
+    expect(page?.hero.title).toBe("Knowledge");
+    // The hero is removed from the body wherever it was, and the rest keep
+    // their curated order.
+    expect(page?.sections.map((s) => s.id)).toEqual(["training", "incubator"]);
+  });
+
+  it("falls back to the first item when nothing is tagged", async () => {
+    respond(
+      [route],
+      [
+        { id: 1, title: "Knowledge", slug: "hero", lead: "<p>Lead.</p>" },
+        { id: 2, title: "Training", slug: "training" },
+      ],
+    );
+
+    const page = await getPage("knowledge");
+    expect(page?.hero.title).toBe("Knowledge");
+    expect(page?.sections.map((s) => s.id)).toEqual(["training"]);
+  });
+
+  it("uses the first tagged section when more than one is marked", async () => {
+    respond(
+      [route],
+      [
+        asHero({ id: 1, title: "First", slug: "a" }),
+        asHero({ id: 2, title: "Second", slug: "b" }),
+      ],
+    );
+
+    const page = await getPage("knowledge");
+    expect(page?.hero.title).toBe("First");
+    expect(page?.sections.map((s) => s.id)).toEqual(["b"]);
   });
 });
