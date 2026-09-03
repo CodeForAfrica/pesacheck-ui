@@ -6,6 +6,11 @@ import { CONTENT_DESKS } from "@/lib/content-desks";
 import { getArticle } from "@/lib/data/article";
 import { isMediaCentreProfile, isTeamProfile } from "@/lib/data/map";
 
+// Backstop for a revalidation webhook that never arrived (see
+// `app/api/revalidate/route.ts`): without it these pages are prerendered once
+// and never rebuilt, so a Superdesk edit would wait for the next deploy.
+export const revalidate = 300;
+
 type Params = Promise<{ desk: string; slug: string }>;
 
 export function generateStaticParams() {

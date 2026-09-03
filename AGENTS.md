@@ -25,6 +25,11 @@ reaches the site): `docs/superdesk-setup.md`.
   `NEXT_PUBLIC_API_URL` / `NEXT_PUBLIC_TENANT_CODE` / `NEXT_PUBLIC_MEDIA_URL`,
   data functions throw and silently fall back to static — which looks like
   "fetching is broken." Every Hasura query MUST filter by `tenant_code`.
+- **Caching:** every `gql()` call declares cache tags (`lib/data/cache.ts`) so
+  `/api/revalidate` can refresh the pages a Superdesk edit affects; pages also
+  carry `revalidate = 300` as a backstop. Tag any query you add, and keep
+  `articles` out of anything the root layout reads. Details:
+  `docs/revalidation.md`.
 - **Reference implementation** for queries/mappers is the sibling repo
   `../pesacheck-pwa-app-router` (production frontend against this same schema).
 - The fact-check **verdict** is not a column: it's in `swp_article.metadata`

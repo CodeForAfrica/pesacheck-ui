@@ -341,6 +341,10 @@ state. This means **a broken query looks exactly like unfinished curation**. If
 a section shows copy you recognise from the design, check the list before
 suspecting the code.
 
+An edit that is correct in Superdesk but shows the *previous* live content is a
+different problem — the site is prerendered, and the page has not been
+revalidated yet. See [`revalidation.md`](./revalidation.md).
+
 ## Known instance problems
 
 Recorded because they cost time to diagnose, and they are infrastructure rather

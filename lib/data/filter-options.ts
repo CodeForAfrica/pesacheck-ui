@@ -11,6 +11,7 @@
  * per request.
  */
 import { unstable_cache } from "next/cache";
+import { TAGS } from "@/lib/data/cache";
 import { gql, TENANT_CODE } from "@/lib/data/client";
 import {
   buildFactCheckWhere,
@@ -141,12 +142,16 @@ function mergeLanguageOptions(
 }
 
 async function fetchFilterOptions(): Promise<FilterOptions> {
-  const { items } = await gql<TaxonomyResponse>(GET_FACT_CHECK_TAXONOMY, {
-    // Same `Debunk` + tenant + published definition as the listings, so the
-    // options can only ever describe articles the grid can actually show.
-    where: buildFactCheckWhere(EMPTY_FILTERS, TENANT_CODE),
-    limit: TAXONOMY_SAMPLE_SIZE,
-  });
+  const { items } = await gql<TaxonomyResponse>(
+    GET_FACT_CHECK_TAXONOMY,
+    {
+      // Same `Debunk` + tenant + published definition as the listings, so the
+      // options can only ever describe articles the grid can actually show.
+      where: buildFactCheckWhere(EMPTY_FILTERS, TENANT_CODE),
+      limit: TAXONOMY_SAMPLE_SIZE,
+    },
+    { tags: [TAGS.filterOptions] },
+  );
   return deriveFilterOptions(items);
 }
 
@@ -154,9 +159,14 @@ async function fetchFilterOptions(): Promise<FilterOptions> {
  * Live filter options, cached across requests for `FILTER_OPTIONS_TTL_SECONDS`.
  * Throws when Hasura is unreachable — callers apply the usual
  * `?? FALLBACK_FILTER_OPTIONS` degraded-mode pattern.
+ *
+ * The tag has to be declared here rather than on the inner `gql` call: fetch
+ * tags raised inside an `unstable_cache` callback are not collected, so an
+ * untagged wrapper would hold an hour-old option set through every
+ * revalidation.
  */
 export const getFilterOptions: () => Promise<FilterOptions> = unstable_cache(
   fetchFilterOptions,
   ["fact-check-filter-options", TENANT_CODE],
-  { revalidate: FILTER_OPTIONS_TTL_SECONDS },
+  { revalidate: FILTER_OPTIONS_TTL_SECONDS, tags: [TAGS.filterOptions] },
 );

@@ -1,3 +1,4 @@
+import { TAGS } from "@/lib/data/cache";
 import { gql, TENANT_CODE } from "@/lib/data/client";
 import {
   buildFactCheckWhere,
@@ -61,11 +62,14 @@ export const FACT_CHECKS_PAGE_SIZE = 10;
 export async function getContentListArticles(
   name: string,
 ): Promise<RawArticle[]> {
-  const { list } = await gql<ContentListResponse>(GET_CONTENT_LIST_ITEMS, {
-    tenant: TENANT_CODE,
-    name,
-    routeSlugs: LANGUAGE_ROUTE_SLUGS,
-  });
+  const { list } = await gql<ContentListResponse>(
+    GET_CONTENT_LIST_ITEMS,
+    { tenant: TENANT_CODE, name, routeSlugs: LANGUAGE_ROUTE_SLUGS },
+    // Tagged by list name as well as collectively: reordering one list
+    // refreshes only its pages, while editing any article refreshes them all
+    // (a list renders the article's title, image and verdict).
+    { tags: [TAGS.contentList(name), TAGS.contentLists] },
+  );
 
   const items = list[0]?.items ?? [];
   return items
@@ -208,11 +212,15 @@ async function getFactCheckListing(
   page: number,
 ): Promise<FactCheckListing> {
   const fetchPage = (p: number) =>
-    gql<FactCheckResponse>(GET_FACT_CHECK_ARTICLES, {
-      where,
-      limit: FACT_CHECKS_PAGE_SIZE,
-      offset: pageOffset(p, FACT_CHECKS_PAGE_SIZE),
-    });
+    gql<FactCheckResponse>(
+      GET_FACT_CHECK_ARTICLES,
+      {
+        where,
+        limit: FACT_CHECKS_PAGE_SIZE,
+        offset: pageOffset(p, FACT_CHECKS_PAGE_SIZE),
+      },
+      { tags: [TAGS.articles] },
+    );
 
   let { total, items } = await fetchPage(page);
   const count = total.aggregate.totalCount;
