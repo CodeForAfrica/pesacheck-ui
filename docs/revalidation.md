@@ -73,6 +73,27 @@ means nothing.
 collected. Its tag is declared on the `unstable_cache` options instead. Any
 future wrapper needs the same treatment.
 
+### What `next dev` caches
+
+Development is not simply "uncached". `next dev` keeps no route cache, so every
+request re-renders — but the **data cache is live in development too**, which
+means a page can visibly re-render and still show data minutes old. That is a
+convincing illusion of a broken query.
+
+So `gql()` skips the data cache when `NODE_ENV === "development"`: local reads
+always hit Hasura, and an edit in Superdesk shows up on the next reload. The
+cost is a slower dev server — six round trips per homepage render instead of
+six cache reads. Confirm which you are getting by adding
+`logging: { fetches: {} }` to `next.config.ts`; the dev server then annotates
+each fetch `(cache skip)` or `(cache hit)`.
+
+`next start` runs as production, so it caches normally — which is what makes it
+the only local way to test revalidation.
+
+One dev cache remains: `serverComponentsHmrCache` (on by default) reuses fetch
+responses across HMR refreshes, so data can look frozen while you are editing
+files. It clears on a full reload.
+
 ### A cached read caches failures too
 
 Next declines to cache a non-200 response, so a 5xx from Hasura or Cloudflare
@@ -262,8 +283,9 @@ The third is the most work and the easiest to let drift out of sync.
 
 ## Checking it works
 
-Locally, tag revalidation only means something against a production build —
-`next dev` renders every request fresh, so nothing is ever stale there.
+Locally, tag revalidation only means something against a production build.
+`next dev` keeps no route cache — every request re-renders — so there is no
+prerendered page for a tag to drop.
 
 ```bash
 pnpm build && pnpm start

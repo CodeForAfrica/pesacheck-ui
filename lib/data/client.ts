@@ -8,18 +8,42 @@
 import { GraphQLClient } from "graphql-request";
 import { DEFAULT_REVALIDATE } from "@/lib/data/cache";
 
-const CONFIGURED_API_URL = process.env.NEXT_PUBLIC_API_URL;
-
-if (!CONFIGURED_API_URL) {
-  throw new Error(
-    "NEXT_PUBLIC_API_URL is not set. Copy .env.example to .env.local.",
-  );
+/**
+ * Fail loudly at module load rather than degrading quietly.
+ *
+ * Both values are baked in by `next build` (see the `NEXT_PUBLIC_` note in
+ * `AGENTS.md`), so a missing one is a deploy that can never fetch anything —
+ * every page would silently serve the static fallback, which reads as
+ * "the content isn't migrated yet" rather than "the site is misconfigured".
+ *
+ * The env var is referenced literally on purpose: Next inlines
+ * `process.env.NEXT_PUBLIC_X` by textual substitution, and a dynamic lookup
+ * like `process.env[name]` is *not* inlined.
+ */
+function required(name: string, value: string | undefined): string {
+  if (!value) {
+    throw new Error(`${name} is not set. Copy .env.example to .env.local.`);
+  }
+  return value;
 }
 
-const API_URL: string = CONFIGURED_API_URL;
+const API_URL = required(
+  "NEXT_PUBLIC_API_URL",
+  process.env.NEXT_PUBLIC_API_URL,
+);
 
-/** Tenant every query must filter by (without it you get other tenants' data). */
-export const TENANT_CODE = process.env.NEXT_PUBLIC_TENANT_CODE ?? "";
+/**
+ * Tenant every query must filter by (without it you get other tenants' data).
+ *
+ * Required rather than defaulted to `""`: an empty tenant is not an error to
+ * Hasura, it simply matches no rows, so the site would render its static
+ * fallback everywhere with nothing logged and nothing thrown — the hardest
+ * version of this failure to diagnose.
+ */
+export const TENANT_CODE = required(
+  "NEXT_PUBLIC_TENANT_CODE",
+  process.env.NEXT_PUBLIC_TENANT_CODE,
+);
 
 /**
  * Shared secret sent on every request so Cloudflare lets our server-side calls through.
@@ -66,10 +90,17 @@ export function gql<T>(
 ): Promise<T> {
   const { tags = [], revalidate = DEFAULT_REVALIDATE } = options;
 
+  // `next dev` re-renders every request, but it would re-render from *cached
+  // data*: the data cache is live in development too, so a Superdesk edit
+  // would take up to `revalidate` seconds to appear locally while the page
+  // visibly re-rendered — the exact confusion this whole file exists to end.
+  // Only `next dev` is affected; `next start` runs as production and caches.
+  const ttl = process.env.NODE_ENV === "development" ? 0 : revalidate;
+
   const client = new GraphQLClient(API_URL, {
     headers: HEADERS,
     fetch: (input: string | URL | Request, init?: RequestInit) =>
-      fetch(input, { ...init, next: { tags, revalidate } }),
+      fetch(input, { ...init, next: { tags, revalidate: ttl } }),
   });
 
   return client.request<T>(query, variables);
