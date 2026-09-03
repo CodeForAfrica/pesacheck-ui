@@ -200,6 +200,66 @@ it is the platform operator's setup rather than the editorial team's. Revisiting
 it would mean a second payload parser in the endpoint; the tags themselves would
 not change.
 
+## Cloudflare sits in front of all of this
+
+`pesacheck.org` is served through Cloudflare, which affects both directions of
+this feature. Neither item below is fixable in this repo, and if either is
+wrong the symptom is the same as the bug this replaces — content that updates
+five minutes late — so check them before concluding the code is broken.
+
+### 1. The webhook has to reach the origin
+
+Cloudflare's bot protection challenges traffic that does not look like a
+browser. This is not hypothetical here: `EDGE_PRESHARED_AUTH` exists because
+Bot Fight Mode was challenging the site's *outbound* calls to the GraphQL host
+(see `lib/data/client.ts`). Publisher's webhook is the same shape inbound — a
+Guzzle POST from a datacentre IP, no cookies, no browser fingerprint.
+
+If it is challenged the request never reaches Next, and **nothing reports it**:
+Publisher sends once, does not retry, and keeps no delivery log. So add a WAF
+skip rule for the path `/api/revalidate`. Matching on path alone is enough —
+the endpoint authenticates itself, and the secret is in the query string, which
+is not somewhere to key a WAF rule.
+
+Verify from outside the network, with a deliberately wrong secret:
+
+```bash
+curl -s -i -X POST "https://<site>/api/revalidate?secret=wrong" \
+  -H 'content-type: application/json' -d '{}'
+```
+
+A JSON `401 {"error":"Unauthorized"}` means the request reached Next — the path
+is open and the endpoint is live. An HTML challenge page, a `403`, or a
+`cf-mitigated` header means Cloudflare answered instead and the webhook will
+never arrive.
+
+### 2. Cloudflare must not out-cache the origin
+
+Next serves prerendered pages with `Cache-Control: s-maxage=300,
+stale-while-revalidate=…`, and on-demand revalidation refreshes *Next's* copy.
+If Cloudflare is caching the HTML on its own longer TTL, readers keep getting
+the edge copy and the revalidation is invisible to them.
+
+Worth checking, because the zone is configured that way today:
+
+```
+$ curl -sI https://pesacheck.org/ | grep -iE 'cache-control|cf-cache-status|age'
+cache-control: public, max-age=14400
+cf-cache-status: HIT
+age: 8464
+```
+
+Four hours at the edge — and `max-age` (rather than `s-maxage`) means the
+*browser* holds it that long too, which no purge can reach. Those headers come
+from the current production site rather than this app, so treat it as "confirm
+the zone's rules for this hostname", not as a diagnosis.
+
+Three ways out, in order of preference: let Cloudflare honour the origin's
+`Cache-Control` for HTML; or bypass the edge cache for HTML and let Next's own
+cache do the work it is already doing; or keep the edge cache and issue a
+Cloudflare purge alongside `revalidateTag` in `app/api/revalidate/route.ts`.
+The third is the most work and the easiest to let drift out of sync.
+
 ## Checking it works
 
 Locally, tag revalidation only means something against a production build —
@@ -242,11 +302,15 @@ In order of likelihood:
    delivery log, so this is diagnosed from the site's side: the endpoint logs
    nothing either, but your host's access log will show the `POST` and its
    status. No request at all means the webhook is disabled, subscribed to the
-   wrong event, or Publisher's messenger consumer isn't running. A `401` means
-   the `?secret=` doesn't match the deployed `REVALIDATE_SECRET`.
+   wrong event, Publisher's messenger consumer isn't running — or Cloudflare
+   answered it before Next saw it (see above). A `401` means the `?secret=`
+   doesn't match the deployed `REVALIDATE_SECRET`.
 5. **The tag was too narrow.** Read the page's `.meta`, and check the tag the
    endpoint reported is in it.
-6. **Multiple instances.** Tag revalidation invalidates the cache of the
+6. **The origin is fresh but readers see stale.** Compare a request to the
+   deployment URL directly against one through the public hostname. If they
+   differ, the edge cache is serving its own copy — see above.
+7. **Multiple instances.** Tag revalidation invalidates the cache of the
    instance handling it. On Vercel that cache is shared, so one call is enough.
    Self-hosted behind more than one replica, each holds its own `.next/cache`
    and would need a shared cache handler — otherwise revalidation only reaches

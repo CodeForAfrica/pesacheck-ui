@@ -347,8 +347,9 @@ Website Management.
 Publish or correct an article, then reload its page on the site. Arriving
 within a few seconds means the webhook works; needing five minutes means it
 did not fire and the TTL caught it instead. Publisher keeps no delivery log, so
-the site's access log is where a failed delivery shows up — see
-[`revalidation.md`](./revalidation.md).
+the site's access log is where a failed delivery shows up — and if the site is
+behind a WAF, the request may be blocked before it ever gets that far. Both are
+covered in [`revalidation.md`](./revalidation.md).
 
 ### What a webhook cannot tell the site
 
