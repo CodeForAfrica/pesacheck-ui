@@ -133,48 +133,40 @@ than waiting on Hasura.
 An article event with no slug in the body still busts the listings. A listing
 refresh beats nothing.
 
-## Setting up the webhook in Publisher
+## Setting up the webhook
 
-Generate a secret (`openssl rand -hex 32`) and set `REVALIDATE_SECRET` in the
-site's environment first — until it is set the endpoint answers `503`.
+1. Generate a secret — `openssl rand -hex 32` — and set `REVALIDATE_SECRET` in
+   the site's environment. Until it is set the endpoint answers `503`.
+2. Add the webhook in Publisher, pointing at
+   `https://<site>/api/revalidate?secret=<the secret>`. Click-path, the events
+   to subscribe to, and how to verify it: **[Webhooks — telling the site an
+   edit happened](./superdesk-setup.md#webhooks--telling-the-site-an-edit-happened)**
+   in `superdesk-setup.md`.
 
-Then, in Superdesk:
+Webhooks are tenant-scoped entities in Publisher, so there is one set per
+tenant and no cross-tenant noise.
 
-1. Switch to the **Publisher** app (left rail / app switcher).
-2. **Settings** → **Website Management** → the PesaCheck tenant.
-3. **Webhooks** → **Add Webhook**.
-4. **Events** — pick from the autocomplete (free text is disabled):
-   `article[created]`, `article[updated]`, `article[published]`,
-   `article[unpublished]`, `article[canceled]`, and `menu[*]` / `route[*]` if
-   the nav and desk lists should follow too. Leave `article[preview]` off; the
-   endpoint ignores it, but subscribing to it only generates noise.
-5. **URL** — `https://<site>/api/revalidate?secret=<the secret>`
-6. **Enabled** on, save.
+### Why the TTL stays
 
-Webhooks are tenant-scoped entities in Publisher, so one set per tenant and no
-cross-tenant noise. Exact labels shift between Publisher versions; the screen
-lives under Settings → Website Management.
+Two properties of Publisher's webhooks make time-based revalidation
+load-bearing rather than ceremonial:
 
-### What this does not cover
+- **No content-list event.** Reordering a curated list fires nothing, so
+  curation changes land on the TTL. An *article* edit does bust
+  `content-lists`, so the common case — a title or image changing everywhere it
+  appears — is still immediate.
+- **Single-attempt delivery.** `WebhookHandler` sends one request through
+  Symfony Messenger with no retry, and Publisher keeps no delivery log. A
+  webhook lost to a deploy or a timeout is simply lost. Publisher's messenger
+  consumer also has to be running, or webhooks queue and never send at all.
 
-- **Content lists.** Publisher has no content-list event, so reordering the
-  homepage hero or adding a person to the Team list fires nothing and lands on
-  the 5-minute TTL. Editing any *article* does bust `content-lists`, so the
-  common case — an article's title or image changing everywhere it appears — is
-  still immediate.
-- **Delivery.** `WebhookHandler` sends one request through Symfony Messenger
-  with no retry, and Publisher keeps no delivery log. A webhook lost to a
-  deploy or a timeout is simply lost, which is the other reason the TTL stays.
-  Publisher's messenger consumer must be running on the instance, or webhooks
-  queue and never send at all.
-
-If either gap ever starts to matter, the alternative is a **Hasura event
-trigger** on the `swp_*` tables — it fires on the row the site actually reads,
-covers content lists, and has retries and invocation logs. It was not taken
-because it needs the Hasura admin secret (the console is disabled on the
-staging instance) plus write access to Publisher's database, which is the
-platform operator's call rather than ours. The endpoint would need a second
-payload parser for it; the tags themselves would not change.
+If either gap starts to matter, the alternative is a **Hasura event trigger**
+on the `swp_*` tables — it fires on the row the site actually reads, covers
+content lists, and has retries and invocation logs. It was not taken because it
+needs the Hasura admin secret (the console is disabled on the staging instance)
+plus write access to Publisher's database, which is the platform operator's
+call rather than ours. It would need a second payload parser in the endpoint;
+the tags themselves would not change.
 
 ## Checking it works
 

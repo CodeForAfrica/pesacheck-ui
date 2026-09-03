@@ -310,6 +310,58 @@ Four things about how lists behave:
   published to any other route will not appear on the site even when correctly
   curated.**
 
+## Webhooks — telling the site an edit happened
+
+The site is prerendered, so a published edit is not visible until something
+invalidates the cache. A Publisher webhook does that within seconds; without
+one, everything still updates, just on the 5-minute page TTL.
+
+Configure it **once per tenant**, in the Publisher app inside Superdesk:
+
+1. Switch to the **Publisher** app (left rail / app switcher).
+2. **Settings** → **Website Management** → the PesaCheck tenant.
+3. **Webhooks** → **Add Webhook**.
+4. **Events** — pick from the autocomplete; free text is disabled:
+
+   | Event | Add it to refresh |
+   | --- | --- |
+   | `article[published]` | a new fact-check, everywhere it appears |
+   | `article[updated]` | a correction to a live article |
+   | `article[unpublished]`, `article[canceled]` | a takedown |
+   | `article[created]` | harmless; fires before the article is public |
+   | `route[created\|updated\|deleted]` | which content desks exist |
+   | `menu[created\|updated\|deleted]` | header and footer links |
+
+   Leave `article[preview]` off — it carries an unpublished draft, and the site
+   refuses it.
+5. **URL** — `https://<site>/api/revalidate?secret=<REVALIDATE_SECRET>`.
+   The form has no header field, so the secret goes in the query string; it
+   must match `REVALIDATE_SECRET` in the site's environment.
+6. **Enabled** on, save.
+
+Labels shift between Publisher versions; the screen lives under Settings →
+Website Management.
+
+### Verifying it
+
+Publish or correct an article, then reload its page on the site. Arriving
+within a few seconds means the webhook works; needing five minutes means it
+did not fire and the TTL caught it instead. Publisher keeps no delivery log, so
+the site's access log is where a failed delivery shows up — see
+[`revalidation.md`](./revalidation.md).
+
+### What a webhook cannot tell the site
+
+**Content lists have no event.** Reordering `Homepage — Hero`, or adding a
+person to `About — Team`, fires nothing — those changes appear on the 5-minute
+TTL. Editing an *article* does refresh every list it appears in, so the common
+case is still immediate. Nothing is broken if a curation change takes a few
+minutes; it is the designed behaviour.
+
+Delivery is also single-attempt: Publisher sends each webhook once, with no
+retry, and its messenger consumer must be running on the instance or webhooks
+queue and never send. This is why the TTL stays.
+
 ## Authoring checklist
 
 For a Media Centre entry to appear:
@@ -328,8 +380,9 @@ For a FAQ entry, the same steps with fewer fields: create it from the **FAQ**
 profile, write the question as the headline and the answer as the abstract, pick
 an **FAQ Group**, publish, and add it to `About — FAQs`.
 
-Sections revalidate every 5 minutes (`export const revalidate = 300`); nothing
-needs deploying.
+A published article reaches the site within seconds, via the webhook above.
+Curation — adding the item to a list, or reordering one — has no webhook event
+and lands on the 5-minute TTL. Nothing needs deploying either way.
 
 ## Fallback behaviour
 
@@ -392,6 +445,8 @@ a template cannot reference a profile that does not exist yet:
 4. **Content lists** — `POST /api/v2/content/lists/` in Publisher with
    `{"name": …, "type": "manual"}` as JSON (form-encoded is rejected with 400),
    then populate them in the UI.
+5. **Webhook** — Settings → Website Management → Webhooks, per the section
+   above. Last, because it only matters once there is content to change.
 
 `metadata.profile` arrives in Publisher carrying the profile's **internal name**,
 not the label an editor sees — and the two differ whenever the label contains a
