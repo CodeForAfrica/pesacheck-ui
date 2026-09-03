@@ -39,7 +39,13 @@ function respond(routes: unknown[], articles: Article[]) {
   return asked;
 }
 
-const route = { id: 1, name: "Knowledge", slug: "knowledge", type: "content" };
+const route = {
+  id: 1,
+  name: "Knowledge",
+  slug: "knowledge",
+  type: "content",
+  staticprefix: "/knowledge",
+};
 
 describe("getPage", () => {
   beforeEach(() => gql.mockReset());
@@ -187,5 +193,33 @@ describe("hero selection", () => {
     const page = await getPage("knowledge");
     expect(page?.hero.title).toBe("First");
     expect(page?.sections.map((s) => s.id)).toEqual(["b"]);
+  });
+});
+
+describe("path matching", () => {
+  beforeEach(() => gql.mockReset());
+
+  it("resolves a nested page by its static prefix", async () => {
+    // The URL is whatever Publisher serves the route at, not the bare slug.
+    respond(
+      [
+        {
+          id: 2,
+          name: "Principles",
+          slug: "principles",
+          staticprefix: "/about/principles",
+        },
+      ],
+      [{ id: 1, title: "Principles", slug: "hero" }],
+    );
+
+    expect((await getPage("about/principles"))?.title).toBe("Principles");
+    // The bare slug is not the URL, so it must not resolve.
+    expect(await getPage("principles")).toBeNull();
+  });
+
+  it("tolerates surrounding slashes in the path", async () => {
+    respond([route], [{ id: 1, title: "Knowledge", slug: "hero" }]);
+    expect((await getPage("/knowledge/"))?.title).toBe("Knowledge");
   });
 });

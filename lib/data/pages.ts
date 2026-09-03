@@ -106,7 +106,7 @@ function sectionImage(article: RawArticle): string | undefined {
 }
 
 /**
- * Fetch a page by route slug, or null when no such route exists or its list is
+ * Fetch a page by URL path, or null when no such route exists or its list is
  * empty. Null is what tells a page to fall back to its static content, and
  * what makes the catch-all route 404 rather than render an empty shell.
  *
@@ -118,8 +118,15 @@ function sectionImage(article: RawArticle): string | undefined {
  * Untagged pages fall back to the first item, so the pages authored before the
  * vocabulary existed keep working.
  */
-export async function getPage(slug: string): Promise<Page | null> {
-  const route = (await getRoutes()).find((r) => r.slug === slug);
+export async function getPage(path: string): Promise<Page | null> {
+  const wanted = `/${path.replace(/^\/+|\/+$/g, "")}`;
+
+  // Matched on the static prefix, which is the URL Publisher serves the route
+  // at, so a nested page like `/about/principles` resolves without this
+  // needing to know it is nested. Deliberately not falling back to the slug:
+  // that would also serve `/about/principles` at `/principles`, giving one
+  // page two URLs.
+  const route = (await getRoutes()).find((r) => r.staticprefix === wanted);
   if (!route?.name) return null;
 
   const { list } = await gql<SectionsResponse>(GET_PAGE_SECTIONS, {
@@ -140,7 +147,7 @@ export async function getPage(slug: string): Promise<Page | null> {
   const rest = articles.filter((article) => article !== heroArticle);
 
   return {
-    slug,
+    slug: path,
     title: route.name,
     description: route.description?.trim() || undefined,
     hero: {
