@@ -222,6 +222,19 @@ function stripHtml(html: string): string {
     .trim();
 }
 
+/**
+ * Alt text for an article's feature media. The Superdesk `description` is
+ * rich text (e.g. `<p>false</p>`), so strip its markup; fall back to the
+ * article title when there's no usable description.
+ */
+function featureMediaAlt(
+  media: RawArticle["swp_article_feature_media"],
+  title: string,
+): string {
+  const description = media?.description ? stripHtml(media.description) : "";
+  return description || title;
+}
+
 /** Short month + day (e.g. "Jul 28"), in UTC for deterministic output. */
 export function formatStoryDate(
   published: string | null | undefined,
@@ -360,13 +373,16 @@ export function mapArticle(raw: RawFullArticle): Article {
 
   const { bodyHtml, footnotes } = renderArticleBody(raw.body);
 
+  const media = raw.swp_article_feature_media;
+  const alt = featureMediaAlt(media, raw.title);
+  const featureSrc = pickExactImage(media?.renditions ?? undefined);
+
   return {
     slug: raw.slug,
     format: "short",
-    image: pickStoryImage(
-      raw.swp_article_feature_media?.renditions ?? undefined,
-    ),
-    alt: raw.swp_article_feature_media?.description?.trim() || raw.title,
+    image: pickStoryImage(media?.renditions ?? undefined),
+    featureImage: featureSrc ? { src: featureSrc, alt } : undefined,
+    alt,
     title: raw.title,
     verdict: findSubject(meta, "Debunk")?.name,
     tags,
@@ -396,8 +412,7 @@ export function mapStory(article: RawArticle): Story {
     image: pickStoryImage(
       article.swp_article_feature_media?.renditions ?? undefined,
     ),
-    alt:
-      article.swp_article_feature_media?.description?.trim() || article.title,
+    alt: featureMediaAlt(article.swp_article_feature_media, article.title),
     verdict: findSubject(meta, "Debunk")?.name,
     title: article.title,
     excerpt: lead || undefined,
@@ -598,8 +613,7 @@ export function mapNewsItem(article: RawArticle): NewsItem {
     image: pickStoryImage(
       article.swp_article_feature_media?.renditions ?? undefined,
     ),
-    alt:
-      article.swp_article_feature_media?.description?.trim() || article.title,
+    alt: featureMediaAlt(article.swp_article_feature_media, article.title),
     outlet: findSubject(meta, MEDIA_CENTRE_LABEL_SCHEME)?.name ?? "",
     title: article.title,
     date: formatStoryDate(article.published_at) ?? "",
@@ -717,8 +731,7 @@ export function mapSpotlightEvent(article: RawArticle): SpotlightEvent {
     image: pickStoryImage(
       article.swp_article_feature_media?.renditions ?? undefined,
     ),
-    alt:
-      article.swp_article_feature_media?.description?.trim() || article.title,
+    alt: featureMediaAlt(article.swp_article_feature_media, article.title),
     meta: eventMeta(article) ?? "",
     title: article.title,
     body: article.lead ? stripHtml(article.lead) : "",
