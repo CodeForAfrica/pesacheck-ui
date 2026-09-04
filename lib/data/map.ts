@@ -309,6 +309,24 @@ export function isTeamProfile(profile: string | null | undefined): boolean {
   );
 }
 
+/**
+ * Sections of a route-backed static page. They publish to a real route like
+ * anything else, so without this the fact-check route would serve a page
+ * section as though it were an article — it resolves by slug and ignores the
+ * desk segment.
+ */
+const PAGE_SECTION_PROFILE = normaliseProfile("Page Section");
+
+/** Whether a content profile name is the one static-page sections use. */
+export function isPageSectionProfile(
+  profile: string | null | undefined,
+): boolean {
+  return (
+    Boolean(profile) &&
+    normaliseProfile(profile as string) === PAGE_SECTION_PROFILE
+  );
+}
+
 /** A staff member's own page: `/about/team/<slug>`. */
 export function teamHref(slug: string): string {
   return `${TEAM_BASE}/${slug}`;

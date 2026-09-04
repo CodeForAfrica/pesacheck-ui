@@ -8,6 +8,7 @@ import {
   formatStoryDate,
   getVerdict,
   isMediaCentreProfile,
+  isPageSectionProfile,
   mapAnnouncement,
   mapArticle,
   mapEcosystemItem,
@@ -834,5 +835,18 @@ describe("mapEcosystemItem", () => {
   it("cycles the accent by position, every four", () => {
     const tones = [0, 1, 2, 3, 4].map((i) => mapEcosystemItem(partner, i).tone);
     expect(tones).toEqual(["blue", "green", "ink", "red", "blue"]);
+  });
+});
+
+describe("isPageSectionProfile", () => {
+  it("recognises the page-section profile, including the internal name", () => {
+    expect(isPageSectionProfile("Page Section")).toBe(true);
+    expect(isPageSectionProfile("PageSection")).toBe(true);
+  });
+
+  it("rejects other profiles and absent values", () => {
+    expect(isPageSectionProfile("Article")).toBe(false);
+    expect(isPageSectionProfile("Team Member")).toBe(false);
+    expect(isPageSectionProfile(undefined)).toBe(false);
   });
 });

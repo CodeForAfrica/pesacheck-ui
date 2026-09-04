@@ -4,7 +4,11 @@ import { ArticleView } from "@/components/article/ArticleView";
 import { ARTICLES, getArticleBySlug } from "@/lib/article-content";
 import { CONTENT_DESKS } from "@/lib/content-desks";
 import { getArticle } from "@/lib/data/article";
-import { isMediaCentreProfile, isTeamProfile } from "@/lib/data/map";
+import {
+  isMediaCentreProfile,
+  isPageSectionProfile,
+  isTeamProfile,
+} from "@/lib/data/map";
 
 type Params = Promise<{ desk: string; slug: string }>;
 
@@ -16,12 +20,14 @@ export function generateStaticParams() {
 
 async function resolveArticle(slug: string) {
   const live = await getArticle(slug).catch(() => null);
-  // Media Centre entries and staff profiles are not fact-checks and own their
-  // own URLs, so the archive declines them rather than serving the same
-  // article at two addresses.
+  // Media Centre entries, staff profiles and page sections are not
+  // fact-checks. This route resolves by slug and ignores the desk segment, so
+  // without this it would serve every one of them as an article.
   if (live) {
     const elsewhere =
-      isMediaCentreProfile(live.profile) || isTeamProfile(live.profile);
+      isMediaCentreProfile(live.profile) ||
+      isTeamProfile(live.profile) ||
+      isPageSectionProfile(live.profile);
     return elsewhere ? null : live;
   }
   return getArticleBySlug(slug);
