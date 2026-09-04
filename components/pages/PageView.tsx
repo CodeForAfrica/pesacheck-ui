@@ -1,6 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
-import { isListSection, ListSection } from "@/components/pages/ListSection";
+import {
+  hasOwnHeadings,
+  isListSection,
+  ListSection,
+} from "@/components/pages/ListSection";
 import { SectionNav } from "@/components/pages/SectionNav";
 import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import type { Page } from "@/lib/data/pages";
@@ -122,11 +126,15 @@ export function PageView({ page }: { page: Page }) {
                 id={section.id}
                 className="scroll-mt-28"
               >
-                <SectionHeading title={section.title} />
+                {!hasOwnHeadings(section.template) && (
+                  <SectionHeading title={section.title} />
+                )}
                 {isListSection(section.template) ? (
                   // A built-in section brings its own layout, so it is not
                   // confined to the prose column.
-                  <div className="mt-8">
+                  <div
+                    className={hasOwnHeadings(section.template) ? "" : "mt-8"}
+                  >
                     <ListSection section={section} />
                   </div>
                 ) : (

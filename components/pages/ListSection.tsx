@@ -16,6 +16,9 @@ import type { PageSection } from "@/lib/data/pages";
 const LIST_SECTIONS = {
   "faq-questions": {
     defaultList: FAQ_LIST,
+    // The question groups carry their own headings, so the page must not add
+    // one above them — the design goes straight from the hero to the groups.
+    ownHeadings: true,
     async render(listName: string) {
       const groups = await getFaqGroups(listName).catch(() => null);
       // No fallback to the design copy here: a section an editor placed and
@@ -28,8 +31,21 @@ const LIST_SECTIONS = {
 
 export type SectionTemplate = keyof typeof LIST_SECTIONS;
 
+function entryFor(template: string | undefined) {
+  return template && template in LIST_SECTIONS
+    ? LIST_SECTIONS[template as SectionTemplate]
+    : undefined;
+}
+
 export function isListSection(template: string | undefined): boolean {
-  return Boolean(template && template in LIST_SECTIONS);
+  return entryFor(template) !== undefined;
+}
+
+/** Whether the built-in renders its own headings, so the page omits the one it
+ *  would otherwise put above a section. */
+export function hasOwnHeadings(template: string | undefined): boolean {
+  const entry = entryFor(template);
+  return entry !== undefined && "ownHeadings" in entry && entry.ownHeadings;
 }
 
 /**
@@ -38,10 +54,7 @@ export function isListSection(template: string | undefined): boolean {
  * way an unknown nav icon does, rather than failing the page.
  */
 export async function ListSection({ section }: { section: PageSection }) {
-  const entry =
-    section.template && section.template in LIST_SECTIONS
-      ? LIST_SECTIONS[section.template as SectionTemplate]
-      : undefined;
+  const entry = entryFor(section.template);
   if (!entry) return null;
 
   return entry.render(section.listName?.trim() || entry.defaultList);
