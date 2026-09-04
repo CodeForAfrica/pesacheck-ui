@@ -11,6 +11,7 @@ import { MediaCentreResearch } from "@/components/about/MediaCentreResearch";
 import { AlliesSection } from "@/components/partners/AlliesSection";
 import { OurPartnersSection } from "@/components/partners/OurPartnersSection";
 import { ToolsShowcase } from "@/components/tools/ToolsShowcase";
+import { AllyPartnerStrip } from "@/components/ui/AllyPartnerStrip";
 import { Impact } from "@/components/ui/Impact";
 import {
   ECOSYSTEM_LIST,
@@ -192,6 +193,29 @@ const LIST_SECTIONS: Record<string, ListSectionEntry> = {
     async render(listName: string) {
       const stats = await getImpactStats(listName).catch(() => null);
       return stats?.length ? <Impact stats={stats} bare /> : null;
+    },
+  },
+
+  "ally-partner-strip": {
+    // Reads both walls, so its `defaultList` is only the allies; the partner
+    // list is fixed. A page wanting different sets would need two sections.
+    defaultList: ALLIES_LIST,
+    ownHeadings: true,
+    fullBleed: true,
+    async render(listName: string, section: PageSection) {
+      const [allies, partners] = await Promise.all([
+        getLogos(listName).catch(() => []),
+        getLogos(PARTNERS_LIST).catch(() => []),
+      ]);
+      if (!allies.length && !partners.length) return null;
+
+      return (
+        <AllyPartnerStrip
+          allies={allies}
+          partners={partners}
+          blurb={bodyText(section)}
+        />
+      );
     },
   },
 
