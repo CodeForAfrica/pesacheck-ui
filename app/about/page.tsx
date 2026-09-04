@@ -4,6 +4,7 @@ import { AboutIntro } from "@/components/about/AboutIntro";
 import { AboutTeam } from "@/components/about/AboutTeam";
 import { Impact } from "@/components/ui/Impact";
 import { ABOUT_TEAM } from "@/lib/about-content";
+import { getPage } from "@/lib/data/pages";
 import { getTeam } from "@/lib/data/team";
 
 export const metadata: Metadata = {
@@ -19,12 +20,30 @@ export const revalidate = 300;
 export default async function AboutPage() {
   // An unreachable Hasura and an uncurated list arrive the same way — as
   // nothing to show — and the grid has no empty state, so both fall back.
-  const team = await getTeam().catch(() => null);
+  // Keeps its own file: the impact band and the intro's paired images are
+  // layout this page owns, not sections a catch-all could place. Its copy is
+  // live — the hero, and the intro paragraphs from the first page section.
+  const [team, page] = await Promise.all([
+    getTeam().catch(() => null),
+    getPage("about").catch(() => null),
+  ]);
+
+  const intro = page?.sections[0]?.bodyHtml
+    ? page.sections[0].bodyHtml
+        .split(/<\/p>/)
+        .map((p) =>
+          p
+            .replace(/<[^>]*>/g, " ")
+            .replace(/\s+/g, " ")
+            .trim(),
+        )
+        .filter(Boolean)
+    : undefined;
 
   return (
     <>
-      <AboutHero />
-      <AboutIntro />
+      <AboutHero hero={page?.hero} />
+      <AboutIntro paragraphs={intro?.length ? intro : undefined} />
       <Impact />
       <AboutTeam team={team?.length ? team : ABOUT_TEAM} />
     </>

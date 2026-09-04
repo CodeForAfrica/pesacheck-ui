@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Container } from "@/components/ui/SectionHeading";
+import type { PageHero } from "@/lib/data/pages";
 import { TOOLS_HERO } from "@/lib/tools-content";
 
 /*
@@ -19,7 +20,7 @@ const HERO_GRADIENT = `linear-gradient(90deg,
   rgba(2, 29, 51, 0.4) 79%,
   rgba(2, 29, 51, 0) 89%)`;
 
-export function ToolsHero() {
+export function ToolsHero({ hero = TOOLS_HERO }: { hero?: PageHero }) {
   return (
     <section className="relative overflow-hidden bg-pesacheck-black">
       <Image
@@ -39,13 +40,13 @@ export function ToolsHero() {
         <div className="max-w-[611px]">
           <span className="mb-[30px] block h-[3px] w-[104px] rounded bg-white/90" />
           <h1 className="text-[34px] font-extrabold leading-[1.1] text-white sm:text-[42px] lg:text-[48px]">
-            {TOOLS_HERO.title}
+            {hero.title}
           </h1>
           <Link
             href={TOOLS_HERO.subtitleHref}
             className="mt-4 inline-block text-xl font-medium leading-[30px] text-white/90 transition-colors hover:text-white"
           >
-            {TOOLS_HERO.subtitle}
+            {hero.subtitle}
           </Link>
         </div>
       </Container>

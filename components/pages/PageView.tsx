@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   hasOwnHeadings,
+  isFullBleed,
   isListSection,
   ListSection,
 } from "@/components/pages/ListSection";
@@ -100,58 +101,83 @@ function PageCallToAction({ cta }: { cta: NonNullable<Page["cta"]> }) {
   );
 }
 
+/** One section in the page's column: heading, then prose or a built-in. */
+function ColumnSection({ section }: { section: Page["sections"][number] }) {
+  return (
+    <section id={section.id} className="scroll-mt-28">
+      {!hasOwnHeadings(section.template) && (
+        <SectionHeading title={section.title} />
+      )}
+      {isListSection(section.template) ? (
+        <div className={hasOwnHeadings(section.template) ? "" : "mt-8"}>
+          <ListSection section={section} />
+        </div>
+      ) : (
+        <div className="mt-8 max-w-[610px]">
+          {/* Sanitised in lib/data/body.ts:renderBody. */}
+          <div
+            className={PROSE}
+            // biome-ignore lint/security/noDangerouslySetInnerHtml: sanitized in renderBody
+            dangerouslySetInnerHTML={{ __html: section.bodyHtml }}
+          />
+        </div>
+      )}
+    </section>
+  );
+}
+
 export function PageView({ page }: { page: Page }) {
-  const navItems = page.sections.map((s) => ({ id: s.id, label: s.title }));
-  // One section needs no rail to itself, and without one the body should take
-  // the full width rather than the 180px first column.
+  // The rail is for the sections a reader scrolls between. A built-in brings
+  // its own headings and often spans the page, so it is not a rail entry —
+  // which is also what keeps a page built entirely from built-ins, like the
+  // ecosystem, from growing a rail its design never had.
+  const navItems = page.sections
+    .filter((s) => !isListSection(s.template))
+    .map((s) => ({ id: s.id, label: s.title }));
   const showNav = navItems.length > 1;
+
+  // Sections are emitted in order, but a full-bleed one breaks out of the
+  // column: consecutive column sections are gathered into one container and a
+  // full-bleed section is rendered between them, edge to edge.
+  const runs: { fullBleed: boolean; sections: Page["sections"] }[] = [];
+  for (const section of page.sections) {
+    const fullBleed = isFullBleed(section.template);
+    const last = runs.at(-1);
+    if (last && last.fullBleed === fullBleed && !fullBleed) {
+      last.sections.push(section);
+    } else {
+      runs.push({ fullBleed, sections: [section] });
+    }
+  }
 
   return (
     <>
       <PageHero page={page} />
 
-      <Container className="py-16 lg:py-20">
-        <div
-          className={`grid gap-10 lg:gap-14 ${
-            showNav ? "lg:grid-cols-[180px_1fr]" : ""
-          }`}
-        >
-          {showNav && (
-            <SectionNav items={navItems} label={`${page.title} sections`} />
-          )}
-          <div className="space-y-20">
-            {page.sections.map((section) => (
-              <section
-                key={section.id}
-                id={section.id}
-                className="scroll-mt-28"
-              >
-                {!hasOwnHeadings(section.template) && (
-                  <SectionHeading title={section.title} />
-                )}
-                {isListSection(section.template) ? (
-                  // A built-in section brings its own layout, so it is not
-                  // confined to the prose column.
-                  <div
-                    className={hasOwnHeadings(section.template) ? "" : "mt-8"}
-                  >
-                    <ListSection section={section} />
-                  </div>
-                ) : (
-                  <div className="mt-8 max-w-[610px]">
-                    {/* Sanitised in lib/data/body.ts:renderBody. */}
-                    <div
-                      className={PROSE}
-                      // biome-ignore lint/security/noDangerouslySetInnerHtml: sanitized in renderBody
-                      dangerouslySetInnerHTML={{ __html: section.bodyHtml }}
-                    />
-                  </div>
-                )}
-              </section>
-            ))}
+      {runs.map((run) =>
+        run.fullBleed ? (
+          <div key={run.sections[0].id} id={run.sections[0].id}>
+            <ListSection section={run.sections[0]} />
           </div>
-        </div>
-      </Container>
+        ) : (
+          <Container key={run.sections[0].id} className="py-16 lg:py-20">
+            <div
+              className={`grid gap-10 lg:gap-14 ${
+                showNav ? "lg:grid-cols-[180px_1fr]" : ""
+              }`}
+            >
+              {showNav && (
+                <SectionNav items={navItems} label={`${page.title} sections`} />
+              )}
+              <div className="space-y-20">
+                {run.sections.map((section) => (
+                  <ColumnSection key={section.id} section={section} />
+                ))}
+              </div>
+            </div>
+          </Container>
+        ),
+      )}
 
       {page.cta && <PageCallToAction cta={page.cta} />}
     </>

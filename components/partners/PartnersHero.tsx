@@ -1,8 +1,9 @@
 import Image from "next/image";
 import { Container } from "@/components/ui/SectionHeading";
+import type { PageHero } from "@/lib/data/pages";
 import { PARTNERS_HERO } from "@/lib/partners-content";
 
-export function PartnersHero() {
+export function PartnersHero({ hero = PARTNERS_HERO }: { hero?: PageHero }) {
   return (
     <section className="relative overflow-hidden bg-pesacheck-black">
       <Image
@@ -19,10 +20,10 @@ export function PartnersHero() {
         <div className="max-w-[611px]">
           <span className="mb-5 block h-[3px] w-[190px] rounded bg-white/90" />
           <h1 className="text-[40px] font-black leading-[1.1] text-white sm:text-[52px]">
-            {PARTNERS_HERO.title}
+            {hero.title}
           </h1>
           <p className="mt-5 text-xl font-medium leading-[30px] text-white/90">
-            {PARTNERS_HERO.subtitle}
+            {hero.subtitle}
           </p>
         </div>
       </Container>

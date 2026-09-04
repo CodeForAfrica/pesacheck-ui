@@ -4,7 +4,7 @@ import {
   mapFaqItem,
   parseMetadata,
 } from "@/lib/data/map";
-import { getContentListArticles } from "@/lib/data/stories";
+import { ANY_ROUTE, getContentListArticles } from "@/lib/data/stories";
 import type { FaqGroup } from "@/lib/faqs-content";
 
 /**
@@ -34,7 +34,7 @@ export const FAQ_LIST = "Page — FAQs — Questions";
 export async function getFaqGroups(
   listName: string = FAQ_LIST,
 ): Promise<FaqGroup[]> {
-  const articles = await getContentListArticles(listName);
+  const articles = await getContentListArticles(listName, ANY_ROUTE);
 
   const groups = new Map<string, FaqGroup>();
   for (const article of articles) {

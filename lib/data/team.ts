@@ -9,7 +9,7 @@ import {
   parseMetadata,
   TEAM_FIELDS,
 } from "@/lib/data/map";
-import { getContentListArticles } from "@/lib/data/stories";
+import { ANY_ROUTE, getContentListArticles } from "@/lib/data/stories";
 
 /**
  * Curated list backing the "Our team" grid, named the way the other lists are.
@@ -24,7 +24,9 @@ export const TEAM_LIST = "About — Team";
 
 /** Staff for the "Our team" grid, in curated order. */
 export async function getTeam(): Promise<TeamMember[]> {
-  return (await getContentListArticles(TEAM_LIST)).map(mapTeamMember);
+  return (await getContentListArticles(TEAM_LIST, ANY_ROUTE)).map(
+    mapTeamMember,
+  );
 }
 
 /** A staff member's page, with the two custom fields their card also uses. */
