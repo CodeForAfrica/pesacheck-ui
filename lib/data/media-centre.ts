@@ -5,7 +5,7 @@ import {
   mapSpotlightEvent,
   mapUpcomingEvent,
 } from "@/lib/data/map";
-import { getContentListArticles } from "@/lib/data/stories";
+import { ANY_ROUTE, getContentListArticles } from "@/lib/data/stories";
 import type {
   Announcement,
   NewsItem,
@@ -41,7 +41,7 @@ export const MEDIA_CENTRE_LISTS = {
 export async function getMediaCentreResearch(
   listName: string = MEDIA_CENTRE_LISTS.research,
 ): Promise<ResearchStrand[]> {
-  const articles = await getContentListArticles(listName);
+  const articles = await getContentListArticles(listName, ANY_ROUTE);
   return articles.map(mapResearchStrand);
 }
 
@@ -49,7 +49,7 @@ export async function getMediaCentreResearch(
 export async function getMediaCentreNews(
   listName: string = MEDIA_CENTRE_LISTS.news,
 ): Promise<NewsItem[]> {
-  const articles = await getContentListArticles(listName);
+  const articles = await getContentListArticles(listName, ANY_ROUTE);
   return articles.map(mapNewsItem);
 }
 
@@ -67,7 +67,7 @@ export async function getMediaCentreEvents(
   spotlight: SpotlightEvent | null;
   upcoming: UpcomingEvent[];
 }> {
-  const [featured, ...rest] = await getContentListArticles(listName);
+  const [featured, ...rest] = await getContentListArticles(listName, ANY_ROUTE);
   return {
     spotlight: featured ? mapSpotlightEvent(featured) : null,
     upcoming: rest.map(mapUpcomingEvent),
@@ -78,6 +78,6 @@ export async function getMediaCentreEvents(
 export async function getMediaCentreAnnouncements(
   listName: string = MEDIA_CENTRE_LISTS.announcements,
 ): Promise<Announcement[]> {
-  const articles = await getContentListArticles(listName);
+  const articles = await getContentListArticles(listName, ANY_ROUTE);
   return articles.map(mapAnnouncement);
 }
