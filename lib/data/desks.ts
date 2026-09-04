@@ -1,4 +1,5 @@
 import { CONTENT_DESKS, type ContentDesk } from "@/lib/content-desks";
+import { TAGS } from "@/lib/data/cache";
 import { gql, TENANT_CODE } from "@/lib/data/client";
 import { GET_COLLECTION_ROUTES } from "@/lib/data/queries/routes";
 
@@ -19,9 +20,11 @@ type RoutesResponse = {
  * Known gap: the Figma "migration" desk has no route on staging, so it drops out
  */
 export async function getContentDesks(): Promise<ContentDesk[]> {
-  const { swp_route } = await gql<RoutesResponse>(GET_COLLECTION_ROUTES, {
-    tenant: TENANT_CODE,
-  });
+  const { swp_route } = await gql<RoutesResponse>(
+    GET_COLLECTION_ROUTES,
+    { tenant: TENANT_CODE },
+    { tags: [TAGS.routes] },
+  );
 
   const liveSlugs = new Set(swp_route.map((r) => r.slug));
 

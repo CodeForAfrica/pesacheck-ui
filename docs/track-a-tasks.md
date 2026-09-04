@@ -466,4 +466,7 @@ PR1 must land first. PR2a / PR2b / PR3 can then proceed in parallel.
 - **Verdict:** always via `getVerdict(metadata)`; tolerate missing (empty `subject[]`).
 - **Test pure mappers:** add cases to `lib/data/map.test.ts` (Vitest) for any new
   mapper logic — pure functions only; no live-Hasura or component tests.
+- **Tag every query:** `gql()` takes cache tags (`lib/data/cache.ts`) so a
+  Superdesk edit can refresh the pages that read it, instead of waiting out the
+  5-minute page TTL. See [`revalidation.md`](./revalidation.md).
 - **Convergence (Track B):** when local stack is ready, only env vars change.

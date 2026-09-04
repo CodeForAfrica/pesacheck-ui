@@ -1,4 +1,5 @@
 import type { Article } from "@/lib/article-content";
+import { TAGS } from "@/lib/data/cache";
 import { gql, TENANT_CODE } from "@/lib/data/client";
 import { mapArticle, type RawFullArticle } from "@/lib/data/map";
 import { GET_ARTICLE_BY_SLUG } from "@/lib/data/queries/article";
@@ -14,10 +15,11 @@ type ArticleResponse = { article: RawFullArticle[] };
 export async function getRawArticle(
   slug: string,
 ): Promise<RawFullArticle | null> {
-  const { article } = await gql<ArticleResponse>(GET_ARTICLE_BY_SLUG, {
-    tenant: TENANT_CODE,
-    slug,
-  });
+  const { article } = await gql<ArticleResponse>(
+    GET_ARTICLE_BY_SLUG,
+    { tenant: TENANT_CODE, slug },
+    { tags: [TAGS.article(slug)] },
+  );
   return article[0] ?? null;
 }
 
