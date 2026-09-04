@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { EcosystemGroups } from "@/components/about/EcosystemGroups";
 import { EcosystemRoles } from "@/components/about/EcosystemRoles";
 import { FaqGroups } from "@/components/about/FaqGroups";
+import { ToolsShowcase } from "@/components/tools/ToolsShowcase";
 import {
   ECOSYSTEM_LIST,
   ECOSYSTEM_ROLES_LIST,
@@ -10,6 +11,7 @@ import {
 } from "@/lib/data/ecosystem";
 import { FAQ_LIST, getFaqGroups } from "@/lib/data/faqs";
 import type { PageSection } from "@/lib/data/pages";
+import { getTools, TOOLS_LIST } from "@/lib/data/tools";
 
 /**
  * One built-in section: where it reads from, how it renders, and the two
@@ -57,6 +59,16 @@ const LIST_SECTIONS: Record<string, ListSectionEntry> = {
       // left empty should read as empty, not silently show placeholder
       // questions from the repository.
       return groups?.length ? <FaqGroups groups={groups} bare /> : null;
+    },
+  },
+
+  "tools-showcase": {
+    defaultList: TOOLS_LIST,
+    // Carries its own "More than fact-checking" heading and blurb.
+    ownHeadings: true,
+    async render(listName: string) {
+      const tools = await getTools(listName).catch(() => null);
+      return tools?.length ? <ToolsShowcase tools={tools} bare /> : null;
     },
   },
 
