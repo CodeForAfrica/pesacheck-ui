@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { isListSection, ListSection } from "@/components/pages/ListSection";
 import { SectionNav } from "@/components/pages/SectionNav";
 import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import type { Page } from "@/lib/data/pages";
@@ -122,14 +123,22 @@ export function PageView({ page }: { page: Page }) {
                 className="scroll-mt-28"
               >
                 <SectionHeading title={section.title} />
-                <div className="mt-8 max-w-[610px]">
-                  {/* Sanitised in lib/data/body.ts:renderBody. */}
-                  <div
-                    className={PROSE}
-                    // biome-ignore lint/security/noDangerouslySetInnerHtml: sanitized in renderBody
-                    dangerouslySetInnerHTML={{ __html: section.bodyHtml }}
-                  />
-                </div>
+                {isListSection(section.template) ? (
+                  // A built-in section brings its own layout, so it is not
+                  // confined to the prose column.
+                  <div className="mt-8">
+                    <ListSection section={section} />
+                  </div>
+                ) : (
+                  <div className="mt-8 max-w-[610px]">
+                    {/* Sanitised in lib/data/body.ts:renderBody. */}
+                    <div
+                      className={PROSE}
+                      // biome-ignore lint/security/noDangerouslySetInnerHtml: sanitized in renderBody
+                      dangerouslySetInnerHTML={{ __html: section.bodyHtml }}
+                    />
+                  </div>
+                )}
               </section>
             ))}
           </div>

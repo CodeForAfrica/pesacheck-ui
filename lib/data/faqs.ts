@@ -31,8 +31,10 @@ export const FAQ_LIST = "Page — FAQs — Questions";
  * Untagged questions collect in one leading group with no title, which the
  * page renders without a heading rather than dropping.
  */
-export async function getFaqGroups(): Promise<FaqGroup[]> {
-  const articles = await getContentListArticles(FAQ_LIST);
+export async function getFaqGroups(
+  listName: string = FAQ_LIST,
+): Promise<FaqGroup[]> {
+  const articles = await getContentListArticles(listName);
 
   const groups = new Map<string, FaqGroup>();
   for (const article of articles) {
