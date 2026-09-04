@@ -65,3 +65,50 @@ export const GET_CONTENT_LIST_ITEMS = /* GraphQL */ `
     }
   }
 `;
+
+/**
+ * The same list, unfiltered by route. For a list whose membership is
+ * deliberate — a page's sections, the team, the ecosystem — where the content
+ * is published on its own page's route and the language filter would drop it.
+ */
+export const GET_CONTENT_LIST_ITEMS_ANY_ROUTE = /* GraphQL */ `
+  query GetContentListItemsAnyRoute($tenant: String!, $name: String!) {
+    list: swp_content_list(
+      where: { name: { _eq: $name }, tenant_code: { _eq: $tenant } }
+    ) {
+      name
+      items: swp_content_list_items(order_by: { position: asc }) {
+        article: swp_article {
+          id
+          title
+          slug
+          lead
+          body
+          published_at
+          metadata
+          swp_route {
+            slug
+            staticprefix
+          }
+          swp_article_extra {
+            field_name
+            value
+          }
+          swp_article_feature_media {
+            description
+            renditions: swp_image_renditions {
+              name
+              width
+              height
+              image: swp_image {
+                asset_id
+                file_extension
+                variants
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;

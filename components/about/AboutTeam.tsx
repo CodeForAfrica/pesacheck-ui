@@ -76,22 +76,34 @@ function TeamCard({ member }: { member: TeamMember }) {
   );
 }
 
-export function AboutTeam({ team = ABOUT_TEAM }: { team?: TeamMember[] }) {
+export function AboutTeam({
+  team = ABOUT_TEAM,
+  bare = false,
+}: {
+  team?: TeamMember[];
+  bare?: boolean;
+}) {
+  const inner = (
+    <>
+      <SectionHeading title="Our team" />
+      <div className="mt-10 grid gap-x-5 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
+        {team.map((member, i) => (
+          // The static fallback is ten copies of one placeholder person, so
+          // the name is not unique; the page is what identifies a member.
+          <TeamCard
+            key={member.href ?? `${member.name}-${i}`}
+            member={member}
+          />
+        ))}
+      </div>
+    </>
+  );
+
+  if (bare) return inner;
+
   return (
     <section id="our-team" className="py-14 lg:py-20">
-      <Container>
-        <SectionHeading title="Our team" />
-        <div className="mt-10 grid gap-x-5 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
-          {team.map((member, i) => (
-            // The static fallback is ten copies of one placeholder person, so
-            // the name is not unique; the page is what identifies a member.
-            <TeamCard
-              key={member.href ?? `${member.name}-${i}`}
-              member={member}
-            />
-          ))}
-        </div>
-      </Container>
+      <Container>{inner}</Container>
     </section>
   );
 }

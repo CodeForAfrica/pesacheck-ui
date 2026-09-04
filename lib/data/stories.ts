@@ -7,7 +7,10 @@ import {
 } from "@/lib/data/fact-check-filters";
 import { mapStory, type RawArticle } from "@/lib/data/map";
 import { clampPage, pageOffset, totalPages } from "@/lib/data/pagination";
-import { GET_CONTENT_LIST_ITEMS } from "@/lib/data/queries/content-lists";
+import {
+  GET_CONTENT_LIST_ITEMS,
+  GET_CONTENT_LIST_ITEMS_ANY_ROUTE,
+} from "@/lib/data/queries/content-lists";
 import { GET_FACT_CHECK_ARTICLES } from "@/lib/data/queries/fact-checks";
 import type { Story } from "@/lib/home-content";
 
@@ -48,24 +51,46 @@ export const LANGUAGE_ROUTE_SLUGS = [
   "amharic",
 ];
 
+/**
+ * Every route on the tenant. Passed by callers whose list membership is
+ * deliberate — page sections, team members, ecosystem entries — since that
+ * content is published on its own page's route rather than a language desk.
+ */
+export const ANY_ROUTE: string[] = [];
+
 export const FACT_CHECKS_PAGE_SIZE = 10;
 
 /**
- * Fetch a content list's language articles, in curated order, as raw rows.
- * Callers pick the mapper: most want `Story` (`getContentListStories`), the
- * Media Centre maps the same rows to its own shapes.
+ * Fetch a content list's articles, in curated order, as raw rows. Callers pick
+ * the mapper: most want `Story` (`getContentListStories`), the Media Centre
+ * maps the same rows to its own shapes.
+ *
+ * Items are filtered to `routeSlugs`, defaulting to the language routes,
+ * because the story lists are polluted with non-article entries. A list whose
+ * membership is entirely deliberate — a page's sections, a set of team members
+ * — should pass its own routes or none: page content is published wherever its
+ * page lives, and filtering it by language route silently drops the lot.
  *
  * A missing list and an empty list are indistinguishable here — both return
  * `[]`, which callers read as "nothing curated yet".
  */
 export async function getContentListArticles(
   name: string,
+  routeSlugs: string[] = LANGUAGE_ROUTE_SLUGS,
 ): Promise<RawArticle[]> {
-  const { list } = await gql<ContentListResponse>(GET_CONTENT_LIST_ITEMS, {
-    tenant: TENANT_CODE,
-    name,
-    routeSlugs: LANGUAGE_ROUTE_SLUGS,
-  });
+  // An empty `_in` matches nothing in Hasura, so "any route" is a different
+  // query rather than an empty filter.
+  const { list } =
+    routeSlugs.length > 0
+      ? await gql<ContentListResponse>(GET_CONTENT_LIST_ITEMS, {
+          tenant: TENANT_CODE,
+          name,
+          routeSlugs,
+        })
+      : await gql<ContentListResponse>(GET_CONTENT_LIST_ITEMS_ANY_ROUTE, {
+          tenant: TENANT_CODE,
+          name,
+        });
 
   const items = list[0]?.items ?? [];
   return items

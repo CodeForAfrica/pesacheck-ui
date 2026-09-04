@@ -285,7 +285,12 @@ section back to its static fallback.
 | `Media Centre — In the News` | press clippings |
 | `Media Centre — Announcements` | announcements list |
 | `Media Centre — Spotlight` | event spotlight **and** "Also coming up" |
-| `About — FAQs` | every question on the FAQs page |
+| `Page — FAQs` | the FAQs hero and its call-out bar |
+| `Page — FAQs — Questions` | every question on the FAQs page |
+| `Page — Knowledge` | the Knowledge page |
+| `Page — Principles` | the Principles page |
+| `Page — Methodology` | the Methodology page |
+| `Page — Funding` | the Funding page |
 | `About — Team` | the "Our team" grid on the About page |
 | `About — Ecosystem` | the partner cards on Our Ecosystem |
 | `About — Ecosystem Roles` | the "How we build the ecosystem" cards |
@@ -326,7 +331,7 @@ For a Media Centre entry to appear:
 
 For a FAQ entry, the same steps with fewer fields: create it from the **FAQ**
 profile, write the question as the headline and the answer as the abstract, pick
-an **FAQ Group**, publish, and add it to `About — FAQs`.
+an **FAQ Group**, publish, and add it to `Page — FAQs — Questions`.
 
 Sections revalidate every 5 minutes (`export const revalidate = 300`); nothing
 needs deploying.

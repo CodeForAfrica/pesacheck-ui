@@ -5,6 +5,7 @@ import { BackToTop } from "@/components/layout/BackToTop";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { getFilterOptions } from "@/lib/data/filter-options";
+import { getLogoWalls } from "@/lib/data/logos";
 import { getSiteMenus } from "@/lib/data/navigation";
 import { FALLBACK_FILTER_OPTIONS } from "@/lib/fact-checks-content";
 import { FOOTER_NAV, LEGAL, NAV_LINKS } from "@/lib/site";
@@ -58,9 +59,12 @@ export default async function RootLayout({
   // show, and each row falls back on its own: a live header can sit above a
   // static footer. Navigation has no useful empty state, so there is no
   // degraded rendering worth attempting.
-  const [filterOptions, menus] = await Promise.all([
+  const [filterOptions, menus, logos] = await Promise.all([
     getFilterOptions().catch(() => null),
     getSiteMenus().catch(() => null),
+    // The footer's ally and partner strips read the same two lists the
+    // Partners page does, so they are live wherever the footer renders.
+    getLogoWalls().catch(() => null),
   ]);
 
   return (
@@ -78,6 +82,8 @@ export default async function RootLayout({
         <Footer
           navLinks={menus?.footerNav.length ? menus.footerNav : FOOTER_NAV}
           legalLinks={menus?.footerLegal.length ? menus.footerLegal : LEGAL}
+          allies={logos?.allies.length ? logos.allies : undefined}
+          partners={logos?.partners.length ? logos.partners : undefined}
         />
         <BackToTop />
       </body>

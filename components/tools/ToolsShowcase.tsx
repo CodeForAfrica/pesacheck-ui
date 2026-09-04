@@ -51,21 +51,34 @@ function ToolCard({ tool }: { tool: Tool }) {
   );
 }
 
-export function ToolsShowcase() {
+export function ToolsShowcase({
+  tools = TOOLS,
+  bare = false,
+}: {
+  tools?: Tool[];
+  /** Drops the section and container, for a page that already provides them. */
+  bare?: boolean;
+}) {
+  const grid = (
+    <>
+      <SectionHeading title="More than fact-checking" />
+      <p className="mt-4 max-w-[610px] text-sm font-medium leading-relaxed text-neutral-600">
+        {ABOUT_BLURB}
+      </p>
+
+      <div className="mt-9 grid gap-7 sm:grid-cols-2">
+        {tools.map((tool) => (
+          <ToolCard key={tool.name} tool={tool} />
+        ))}
+      </div>
+    </>
+  );
+
+  if (bare) return grid;
+
   return (
     <section className="py-14 lg:py-20">
-      <Container>
-        <SectionHeading title="More than fact-checking" />
-        <p className="mt-4 max-w-[610px] text-sm font-medium leading-relaxed text-neutral-600">
-          {ABOUT_BLURB}
-        </p>
-
-        <div className="mt-9 grid gap-7 sm:grid-cols-2">
-          {TOOLS.map((tool) => (
-            <ToolCard key={tool.name} tool={tool} />
-          ))}
-        </div>
-      </Container>
+      <Container>{grid}</Container>
     </section>
   );
 }

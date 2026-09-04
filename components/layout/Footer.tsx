@@ -3,18 +3,28 @@ import Link from "next/link";
 import { FooterAllySection } from "@/components/layout/FooterAllySection";
 import { Container } from "@/components/ui/SectionHeading";
 import type { FooterLink } from "@/lib/data/navigation";
-import { FOOTER_ABOUT, FOOTER_NAV, LEGAL, SOCIAL_ICONS } from "@/lib/site";
+import {
+  FOOTER_ABOUT,
+  FOOTER_NAV,
+  LEGAL,
+  type Logo,
+  SOCIAL_ICONS,
+} from "@/lib/site";
 
 export function Footer({
   navLinks = FOOTER_NAV,
   legalLinks = LEGAL,
+  allies,
+  partners,
 }: {
   navLinks?: FooterLink[];
   legalLinks?: FooterLink[];
+  allies?: Logo[];
+  partners?: Logo[];
 } = {}) {
   return (
     <footer className="bg-white">
-      <FooterAllySection />
+      <FooterAllySection allies={allies} partners={partners} />
 
       <Container className="pb-16">
         <div className="flex flex-wrap items-start justify-between gap-6 pt-10">

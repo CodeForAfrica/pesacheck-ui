@@ -32,15 +32,18 @@ function GroupHeading({ title }: { title: string }) {
 
 export function EcosystemGroups({
   groups = ECOSYSTEM_GROUPS,
+  intro = ECOSYSTEM_INTRO,
 }: {
   groups?: EcosystemGroup[];
+  /** Standfirst above the groups; the page's first section supplies it. */
+  intro?: string;
 }) {
   return (
     <>
       <section className="pt-20 pb-0">
         <Container>
           <p className="max-w-[760px] text-base font-normal leading-[1.7] text-[#3b3f45]">
-            {ECOSYSTEM_INTRO}
+            {intro}
           </p>
         </Container>
       </section>
