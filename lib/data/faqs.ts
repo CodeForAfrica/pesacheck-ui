@@ -8,12 +8,16 @@ import { getContentListArticles } from "@/lib/data/stories";
 import type { FaqGroup } from "@/lib/faqs-content";
 
 /**
- * Curated list backing the FAQs page, named the way the other lists are.
- * Create it in Publisher under exactly this name, one article per question,
- * and the page switches from the static fallback to live content on the next
- * request.
+ * Curated list of the FAQ questions, one article each.
+ *
+ * Named as a companion to `Page — FAQs`, which carries the page's hero and
+ * call-out bar. They stay separate lists deliberately: a question is not a
+ * page section, and the two are ordered for different reasons — question order
+ * decides which group heading comes first, section order decides the page.
+ * Merging them would put both rules in one list with nothing on screen to say
+ * which drag did what.
  */
-export const FAQ_LIST = "About — FAQs";
+export const FAQ_LIST = "Page — FAQs — Questions";
 
 /**
  * Questions for the FAQs page, grouped by the `faq_group` vocabulary.
