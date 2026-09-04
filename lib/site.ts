@@ -371,15 +371,19 @@ const STAT_BLURB =
   "Pesacheck has lorem ipsum dolor sit amet consectetur adipiscing";
 
 export type ImpactStat = {
-  icon: ElementType;
+  /**
+   * Key into `NAV_ICONS`, not the component: a stat may be authored in
+   * Superdesk, and the same fixed set serves both the nav and this.
+   */
+  icon: NavIconKey;
   value: string;
   label: string;
 };
 
 // Row-major order matching the 2x2 Figma grid.
 export const IMPACT_STATS: ImpactStat[] = [
-  { icon: LuLanguages, value: "6 Publishing Languages", label: STAT_BLURB },
-  { icon: LuSearch, value: "10,000+ Fact-checks", label: STAT_BLURB },
-  { icon: FiRefreshCw, value: "8+ Years in operation", label: STAT_BLURB },
-  { icon: FiGlobe, value: "18+ Countries we operate in", label: STAT_BLURB },
+  { icon: "languages", value: "6 Publishing Languages", label: STAT_BLURB },
+  { icon: "search", value: "10,000+ Fact-checks", label: STAT_BLURB },
+  { icon: "refresh", value: "8+ Years in operation", label: STAT_BLURB },
+  { icon: "globe", value: "18+ Countries we operate in", label: STAT_BLURB },
 ];

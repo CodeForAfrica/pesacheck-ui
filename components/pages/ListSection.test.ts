@@ -7,15 +7,24 @@ import {
 
 describe("isListSection", () => {
   it("recognises the templates this build ships", () => {
-    expect(isListSection("faq-questions")).toBe(true);
-    expect(isListSection("ecosystem-groups")).toBe(true);
-    expect(isListSection("ecosystem-roles")).toBe(true);
+    for (const t of [
+      "faq-questions",
+      "ecosystem-groups",
+      "ecosystem-roles",
+      "tools-showcase",
+      "allies-logos",
+      "partners-logos",
+      "team-grid",
+      "impact-stats",
+    ]) {
+      expect(isListSection(t)).toBe(true);
+    }
   });
 
   it("rejects a template this build does not have, rather than throwing", () => {
     // An editor can pick a code from a vocabulary that outruns the deploy; the
     // section renders nothing instead of failing the page.
-    expect(isListSection("team-grid")).toBe(false);
+    expect(isListSection("no-such-template")).toBe(false);
     expect(isListSection(undefined)).toBe(false);
     expect(isListSection("")).toBe(false);
   });
@@ -40,7 +49,7 @@ describe("template traits", () => {
   });
 
   it("reports nothing for a template this build does not have", () => {
-    expect(isFullBleed("team-grid")).toBe(false);
-    expect(hasOwnHeadings("team-grid")).toBe(false);
+    expect(isFullBleed("no-such-template")).toBe(false);
+    expect(hasOwnHeadings("no-such-template")).toBe(false);
   });
 });

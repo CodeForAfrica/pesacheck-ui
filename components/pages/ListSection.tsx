@@ -1,10 +1,13 @@
 import type { ReactNode } from "react";
+import { AboutIntro } from "@/components/about/AboutIntro";
+import { AboutTeam } from "@/components/about/AboutTeam";
 import { EcosystemGroups } from "@/components/about/EcosystemGroups";
 import { EcosystemRoles } from "@/components/about/EcosystemRoles";
 import { FaqGroups } from "@/components/about/FaqGroups";
 import { AlliesSection } from "@/components/partners/AlliesSection";
 import { OurPartnersSection } from "@/components/partners/OurPartnersSection";
 import { ToolsShowcase } from "@/components/tools/ToolsShowcase";
+import { Impact } from "@/components/ui/Impact";
 import {
   ECOSYSTEM_LIST,
   ECOSYSTEM_ROLES_LIST,
@@ -12,8 +15,11 @@ import {
   getEcosystemRoles,
 } from "@/lib/data/ecosystem";
 import { FAQ_LIST, getFaqGroups } from "@/lib/data/faqs";
+import { getImpactStats, IMPACT_LIST } from "@/lib/data/impact";
+import { getIntroImages, INTRO_IMAGES_LIST } from "@/lib/data/intro-images";
 import { ALLIES_LIST, getLogos, PARTNERS_LIST } from "@/lib/data/logos";
 import type { PageSection } from "@/lib/data/pages";
+import { getTeam, TEAM_LIST } from "@/lib/data/team";
 import { getTools, TOOLS_LIST } from "@/lib/data/tools";
 
 /**
@@ -72,6 +78,52 @@ const LIST_SECTIONS: Record<string, ListSectionEntry> = {
     async render(listName: string) {
       const tools = await getTools(listName).catch(() => null);
       return tools?.length ? <ToolsShowcase tools={tools} bare /> : null;
+    },
+  },
+
+  "about-intro": {
+    // Two portraits beside the copy — a layout prose cannot express, which is
+    // why the intro is a template rather than an ordinary section.
+    defaultList: INTRO_IMAGES_LIST,
+    ownHeadings: true,
+    async render(listName: string, section: PageSection) {
+      const images = await getIntroImages(listName).catch(() => null);
+      const paragraphs = section.bodyHtml
+        .split(/<\/p>/)
+        .map((p) =>
+          p
+            .replace(/<[^>]*>/g, " ")
+            .replace(/\s+/g, " ")
+            .trim(),
+        )
+        .filter(Boolean);
+      if (paragraphs.length === 0) return null;
+
+      return (
+        <AboutIntro
+          paragraphs={paragraphs}
+          images={images?.length ? images : undefined}
+          bare
+        />
+      );
+    },
+  },
+
+  "team-grid": {
+    defaultList: TEAM_LIST,
+    ownHeadings: true,
+    async render(listName: string) {
+      const team = await getTeam(listName).catch(() => null);
+      return team?.length ? <AboutTeam team={team} bare /> : null;
+    },
+  },
+
+  "impact-stats": {
+    defaultList: IMPACT_LIST,
+    ownHeadings: true,
+    async render(listName: string) {
+      const stats = await getImpactStats(listName).catch(() => null);
+      return stats?.length ? <Impact stats={stats} bare /> : null;
     },
   },
 

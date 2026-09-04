@@ -20,13 +20,13 @@ import { ANY_ROUTE, getContentListArticles } from "@/lib/data/stories";
  * Order is curated rather than alphabetical: leadership reads first, which no
  * sort would produce.
  */
-export const TEAM_LIST = "About — Team";
+export const TEAM_LIST = "Page — About — Team";
 
 /** Staff for the "Our team" grid, in curated order. */
-export async function getTeam(): Promise<TeamMember[]> {
-  return (await getContentListArticles(TEAM_LIST, ANY_ROUTE)).map(
-    mapTeamMember,
-  );
+export async function getTeam(
+  listName: string = TEAM_LIST,
+): Promise<TeamMember[]> {
+  return (await getContentListArticles(listName, ANY_ROUTE)).map(mapTeamMember);
 }
 
 /** A staff member's page, with the two custom fields their card also uses. */
