@@ -64,7 +64,13 @@ function AllyColumn({ title, logos }: { title: string; logos: Logo[] }) {
   );
 }
 
-export function FooterAllySection() {
+export function FooterAllySection({
+  allies = ALLIES,
+  partners = PARTNERS,
+}: {
+  allies?: Logo[];
+  partners?: Logo[];
+}) {
   const pathname = usePathname();
   if (pathname === "/about/partners") return null;
 
@@ -72,8 +78,8 @@ export function FooterAllySection() {
     <section style={{ background: "var(--Neutral-50, #F6F7F8)" }}>
       <Container className="mt-10 py-16">
         <div className="grid gap-12 lg:grid-cols-2">
-          <AllyColumn title="Our Allies" logos={ALLIES} />
-          <AllyColumn title="Our Partners" logos={PARTNERS} />
+          <AllyColumn title="Our Allies" logos={allies} />
+          <AllyColumn title="Our Partners" logos={partners} />
         </div>
       </Container>
     </section>

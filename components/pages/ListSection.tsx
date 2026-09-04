@@ -2,6 +2,8 @@ import type { ReactNode } from "react";
 import { EcosystemGroups } from "@/components/about/EcosystemGroups";
 import { EcosystemRoles } from "@/components/about/EcosystemRoles";
 import { FaqGroups } from "@/components/about/FaqGroups";
+import { AlliesSection } from "@/components/partners/AlliesSection";
+import { OurPartnersSection } from "@/components/partners/OurPartnersSection";
 import { ToolsShowcase } from "@/components/tools/ToolsShowcase";
 import {
   ECOSYSTEM_LIST,
@@ -10,6 +12,7 @@ import {
   getEcosystemRoles,
 } from "@/lib/data/ecosystem";
 import { FAQ_LIST, getFaqGroups } from "@/lib/data/faqs";
+import { ALLIES_LIST, getLogos, PARTNERS_LIST } from "@/lib/data/logos";
 import type { PageSection } from "@/lib/data/pages";
 import { getTools, TOOLS_LIST } from "@/lib/data/tools";
 
@@ -69,6 +72,30 @@ const LIST_SECTIONS: Record<string, ListSectionEntry> = {
     async render(listName: string) {
       const tools = await getTools(listName).catch(() => null);
       return tools?.length ? <ToolsShowcase tools={tools} bare /> : null;
+    },
+  },
+
+  "allies-logos": {
+    defaultList: ALLIES_LIST,
+    ownHeadings: true,
+    async render(listName: string, section: PageSection) {
+      const logos = await getLogos(listName).catch(() => null);
+      return logos?.length ? (
+        <AlliesSection logos={logos} description={bodyText(section)} bare />
+      ) : null;
+    },
+  },
+
+  "partners-logos": {
+    defaultList: PARTNERS_LIST,
+    ownHeadings: true,
+    // The partner wall sits on its own tinted band across the page.
+    fullBleed: true,
+    async render(listName: string, section: PageSection) {
+      const logos = await getLogos(listName).catch(() => null);
+      return logos?.length ? (
+        <OurPartnersSection logos={logos} description={bodyText(section)} />
+      ) : null;
     },
   },
 
