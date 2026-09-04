@@ -256,6 +256,17 @@ describe("mapStory", () => {
     expect(story.alt).toBe(article.title);
   });
 
+  it("strips HTML from the media description for alt", () => {
+    const story = mapStory({
+      ...article,
+      swp_article_feature_media: {
+        description: "<p>false</p>",
+        renditions: article.swp_article_feature_media?.renditions,
+      },
+    });
+    expect(story.alt).toBe("false");
+  });
+
   it("prefers viewImage but falls back to any resolvable rendition", () => {
     const story = mapStory({
       ...article,
@@ -366,6 +377,17 @@ describe("Media Centre mappers", () => {
     const bare = { ...article, metadata: null };
     expect(mapNewsItem(bare).outlet).toBe("");
     expect(mapAnnouncement(bare).tag).toBe("");
+  });
+
+  it("strips HTML from the media description for the clipping alt", () => {
+    const clipping = mapNewsItem({
+      ...article,
+      swp_article_feature_media: {
+        description: "<p>Newsroom &amp; wire desk</p>",
+        renditions: article.swp_article_feature_media?.renditions,
+      },
+    });
+    expect(clipping.alt).toBe("Newsroom & wire desk");
   });
 
   it("maps an article to a research strand, CTA opening its own article", () => {
@@ -666,6 +688,10 @@ describe("mapArticle", () => {
     expect(article.readTime).toBe("1 min");
     expect(article.image).toBe("https://media.test/abc.webp");
     expect(article.alt).toBe("A caption");
+    expect(article.featureImage).toEqual({
+      src: "https://media.test/abc.webp",
+      alt: "A caption",
+    });
     expect(article.desk).toBe("english");
     // Body is rendered HTML, not structured paragraphs.
     expect(article.leadParagraphs).toEqual([]);
@@ -701,6 +727,7 @@ describe("mapArticle", () => {
     expect(article.author).toBe("PesaCheck");
     expect(article.verdict).toBe("False");
     expect(article.image).toBe("/images/spotlight/long-format3-2.png");
+    expect(article.featureImage).toBeUndefined();
     expect(article.bodyHtml).toContain("<b>claim</b>");
   });
 
@@ -727,6 +754,55 @@ describe("mapArticle", () => {
       swp_article_metadata: { byline: "Relation Byline" },
     });
     expect(article.author).toBe("Metadata Byline");
+  });
+
+  it("strips HTML from the feature-media description for both alt fields", () => {
+    const article = mapArticle({
+      ...full,
+      swp_article_feature_media: {
+        description: "<p>false</p>",
+        renditions: full.swp_article_feature_media?.renditions,
+      },
+    });
+    expect(article.alt).toBe("false");
+    expect(article.featureImage).toEqual({
+      src: "https://media.test/abc.webp",
+      alt: "false",
+    });
+  });
+
+  it("falls back to the title for alt when the description is blank or only markup", () => {
+    const titleOnly = (description: string | null) =>
+      mapArticle({
+        ...full,
+        swp_article_feature_media: {
+          description,
+          renditions: full.swp_article_feature_media?.renditions,
+        },
+      });
+
+    for (const description of [null, "", "   ", "<p></p>"]) {
+      const article = titleOnly(description);
+      expect(article.alt).toBe(full.title);
+      expect(article.featureImage?.alt).toBe(full.title);
+    }
+  });
+
+  it("leaves featureImage undefined when only an unnamed rendition resolves", () => {
+    const article = mapArticle({
+      ...full,
+      swp_article_feature_media: {
+        description: "A caption",
+        renditions: [
+          {
+            name: "16-9",
+            image: { asset_id: "wide", file_extension: "jpg", variants: [] },
+          },
+        ],
+      },
+    });
+    expect(article.image).toBe("https://media.test/wide.jpg");
+    expect(article.featureImage).toBeUndefined();
   });
 });
 

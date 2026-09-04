@@ -11,6 +11,7 @@ export type Article = {
   format?: "short" | "long";
   /** Full-bleed hero image (1440×640). Used by the long-form layout. */
   image: string;
+  featureImage?: { src: string; alt: string };
   alt: string;
   title: string;
   verdict?: string;
