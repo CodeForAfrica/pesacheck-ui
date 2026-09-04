@@ -26,10 +26,10 @@ import type {
  * `EVENT_FIELDS` in `lib/data/map.ts`.
  */
 export const MEDIA_CENTRE_LISTS = {
-  research: "Media Centre — In Research",
-  news: "Media Centre — In the News",
-  announcements: "Media Centre — Announcements",
-  events: "Media Centre — Spotlight",
+  research: "Page — Media Centre — In Research",
+  news: "Page — Media Centre — In the News",
+  announcements: "Page — Media Centre — Announcements",
+  events: "Page — Media Centre — Spotlight",
 } as const;
 
 /**
@@ -38,14 +38,18 @@ export const MEDIA_CENTRE_LISTS = {
  * label names the document kind, and the accent comes from the article's position
  * (see `mapResearchStrand`).
  */
-export async function getMediaCentreResearch(): Promise<ResearchStrand[]> {
-  const articles = await getContentListArticles(MEDIA_CENTRE_LISTS.research);
+export async function getMediaCentreResearch(
+  listName: string = MEDIA_CENTRE_LISTS.research,
+): Promise<ResearchStrand[]> {
+  const articles = await getContentListArticles(listName);
   return articles.map(mapResearchStrand);
 }
 
 /** Press clippings for the "In the news" row, in curated order. */
-export async function getMediaCentreNews(): Promise<NewsItem[]> {
-  const articles = await getContentListArticles(MEDIA_CENTRE_LISTS.news);
+export async function getMediaCentreNews(
+  listName: string = MEDIA_CENTRE_LISTS.news,
+): Promise<NewsItem[]> {
+  const articles = await getContentListArticles(listName);
   return articles.map(mapNewsItem);
 }
 
@@ -57,13 +61,13 @@ export async function getMediaCentreNews(): Promise<NewsItem[]> {
  * Returns `null` for the spotlight when the list is missing or empty, which is
  * what tells the page to fall back to the design copy.
  */
-export async function getMediaCentreEvents(): Promise<{
+export async function getMediaCentreEvents(
+  listName: string = MEDIA_CENTRE_LISTS.events,
+): Promise<{
   spotlight: SpotlightEvent | null;
   upcoming: UpcomingEvent[];
 }> {
-  const [featured, ...rest] = await getContentListArticles(
-    MEDIA_CENTRE_LISTS.events,
-  );
+  const [featured, ...rest] = await getContentListArticles(listName);
   return {
     spotlight: featured ? mapSpotlightEvent(featured) : null,
     upcoming: rest.map(mapUpcomingEvent),
@@ -71,9 +75,9 @@ export async function getMediaCentreEvents(): Promise<{
 }
 
 /** Announcements for the list below it, in curated order. */
-export async function getMediaCentreAnnouncements(): Promise<Announcement[]> {
-  const articles = await getContentListArticles(
-    MEDIA_CENTRE_LISTS.announcements,
-  );
+export async function getMediaCentreAnnouncements(
+  listName: string = MEDIA_CENTRE_LISTS.announcements,
+): Promise<Announcement[]> {
+  const articles = await getContentListArticles(listName);
   return articles.map(mapAnnouncement);
 }

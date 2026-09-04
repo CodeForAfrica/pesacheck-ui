@@ -4,6 +4,10 @@ import { AboutTeam } from "@/components/about/AboutTeam";
 import { EcosystemGroups } from "@/components/about/EcosystemGroups";
 import { EcosystemRoles } from "@/components/about/EcosystemRoles";
 import { FaqGroups } from "@/components/about/FaqGroups";
+import { MediaCentreAnnouncements } from "@/components/about/MediaCentreAnnouncements";
+import { MediaCentreEvent } from "@/components/about/MediaCentreEvent";
+import { MediaCentreNews } from "@/components/about/MediaCentreNews";
+import { MediaCentreResearch } from "@/components/about/MediaCentreResearch";
 import { AlliesSection } from "@/components/partners/AlliesSection";
 import { OurPartnersSection } from "@/components/partners/OurPartnersSection";
 import { ToolsShowcase } from "@/components/tools/ToolsShowcase";
@@ -18,6 +22,13 @@ import { FAQ_LIST, getFaqGroups } from "@/lib/data/faqs";
 import { getImpactStats, IMPACT_LIST } from "@/lib/data/impact";
 import { getIntroImages, INTRO_IMAGES_LIST } from "@/lib/data/intro-images";
 import { ALLIES_LIST, getLogos, PARTNERS_LIST } from "@/lib/data/logos";
+import {
+  getMediaCentreAnnouncements,
+  getMediaCentreEvents,
+  getMediaCentreNews,
+  getMediaCentreResearch,
+  MEDIA_CENTRE_LISTS,
+} from "@/lib/data/media-centre";
 import type { PageSection } from "@/lib/data/pages";
 import { getTeam, TEAM_LIST } from "@/lib/data/team";
 import { getTools, TOOLS_LIST } from "@/lib/data/tools";
@@ -78,6 +89,60 @@ const LIST_SECTIONS: Record<string, ListSectionEntry> = {
     async render(listName: string) {
       const tools = await getTools(listName).catch(() => null);
       return tools?.length ? <ToolsShowcase tools={tools} bare /> : null;
+    },
+  },
+
+  "media-research": {
+    defaultList: MEDIA_CENTRE_LISTS.research,
+    async render(listName: string, section: PageSection) {
+      const strands = await getMediaCentreResearch(listName).catch(() => null);
+      return strands?.length ? (
+        <MediaCentreResearch strands={strands} title={section.title} bare />
+      ) : null;
+    },
+  },
+
+  "media-news": {
+    defaultList: MEDIA_CENTRE_LISTS.news,
+    // Sits on its own tinted band across the page.
+    fullBleed: true,
+    async render(listName: string, section: PageSection) {
+      const items = await getMediaCentreNews(listName).catch(() => null);
+      return items?.length ? (
+        <MediaCentreNews items={items} title={section.title} />
+      ) : null;
+    },
+  },
+
+  "media-announcements": {
+    defaultList: MEDIA_CENTRE_LISTS.announcements,
+    async render(listName: string, section: PageSection) {
+      const announcements = await getMediaCentreAnnouncements(listName).catch(
+        () => null,
+      );
+      return announcements?.length ? (
+        <MediaCentreAnnouncements
+          announcements={announcements}
+          title={section.title}
+          bare
+        />
+      ) : null;
+    },
+  },
+
+  "media-events": {
+    defaultList: MEDIA_CENTRE_LISTS.events,
+    async render(listName: string, section: PageSection) {
+      const events = await getMediaCentreEvents(listName).catch(() => null);
+      // The list carries the whole rail: first item featured, rest upcoming.
+      return events?.spotlight ? (
+        <MediaCentreEvent
+          event={events.spotlight}
+          upcoming={events.upcoming}
+          title={section.title}
+          bare
+        />
+      ) : null;
     },
   },
 
