@@ -42,6 +42,10 @@ export const GET_PAGE_SECTIONS = /* GraphQL */ `
           lead
           body
           metadata
+          swp_article_extra {
+            field_name
+            value
+          }
           swp_article_feature_media {
             description
             renditions: swp_image_renditions {

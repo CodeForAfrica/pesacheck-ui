@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { SectionNav } from "@/components/pages/SectionNav";
 import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import type { Page } from "@/lib/data/pages";
@@ -70,6 +71,30 @@ function PageHero({ page }: { page: Page }) {
  * There is no per-page layout left to write — a new page is a route, a list
  * and some sections.
  */
+/** The call-out bar at the foot of a page, when one is authored. */
+function PageCallToAction({ cta }: { cta: NonNullable<Page["cta"]> }) {
+  return (
+    <Container className="pb-16 sm:pb-20">
+      <div className="flex flex-col items-start gap-6 rounded-2xl bg-neutral-50 p-8 sm:flex-row sm:items-center sm:justify-between">
+        <div className="max-w-[768px]">
+          <p className="text-base font-bold text-[#181d27]">{cta.heading}</p>
+          {cta.body && (
+            <p className="mt-2 text-sm font-medium text-[#535862]">
+              {cta.body}
+            </p>
+          )}
+        </div>
+        <Link
+          href={cta.href}
+          className="shrink-0 rounded-[10px] bg-neutral-700 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-neutral-800"
+        >
+          {cta.label}
+        </Link>
+      </div>
+    </Container>
+  );
+}
+
 export function PageView({ page }: { page: Page }) {
   const navItems = page.sections.map((s) => ({ id: s.id, label: s.title }));
   // One section needs no rail to itself, and without one the body should take
@@ -110,6 +135,8 @@ export function PageView({ page }: { page: Page }) {
           </div>
         </div>
       </Container>
+
+      {page.cta && <PageCallToAction cta={page.cta} />}
     </>
   );
 }

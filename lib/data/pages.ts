@@ -1,6 +1,7 @@
 import { renderBody } from "@/lib/data/body";
 import { gql, TENANT_CODE } from "@/lib/data/client";
 import {
+  articleExtra,
   findRendition,
   findSubject,
   parseMetadata,
@@ -30,14 +31,23 @@ export function pageListName(routeName: string): string {
  */
 export const PAGE_SECTION_SCHEME = "page_section_role";
 export const HERO_CODE = "hero";
+export const CTA_CODE = "cta";
 
-/** Whether an article is tagged as its page's hero. */
-function isHero(article: RawArticle): boolean {
-  const subject = findSubject(
-    parseMetadata(article.metadata),
-    PAGE_SECTION_SCHEME,
-  );
-  return subject?.code === HERO_CODE;
+/**
+ * Superdesk custom fields for a call-to-action section's button. The copy is
+ * the section's own headline and lead; only the button has nowhere else to
+ * live. Both optional — without a URL there is no button, and the section
+ * renders as an ordinary one.
+ */
+export const CTA_FIELDS = {
+  label: "cta_label",
+  url: "cta_url",
+} as const;
+
+/** The role an article is tagged with on its page, if any. */
+function roleOf(article: RawArticle): string | undefined {
+  return findSubject(parseMetadata(article.metadata), PAGE_SECTION_SCHEME)
+    ?.code;
 }
 
 /** The banner at the top of a page. */
@@ -45,6 +55,14 @@ export type PageHero = {
   title: string;
   subtitle: string;
   image?: string;
+};
+
+/** The call-out bar at the foot of a page. */
+export type PageCta = {
+  heading: string;
+  body: string;
+  label: string;
+  href: string;
 };
 
 /** One titled, anchor-linkable section of a page's body. */
@@ -63,6 +81,8 @@ export type Page = {
   description?: string;
   hero: PageHero;
   sections: PageSection[];
+  /** Present only when a section is tagged `cta` and carries a URL. */
+  cta?: PageCta;
 };
 
 type RawRoute = {
@@ -125,6 +145,24 @@ function sectionImage(article: RawArticle): string | undefined {
 }
 
 /**
+ * A tagged section becomes a CTA only when it names somewhere to go. Without a
+ * URL the button would be decorative, so the section is dropped rather than
+ * rendered as a dead call to action.
+ */
+function toCta(article: RawArticle | undefined): PageCta | undefined {
+  if (!article) return undefined;
+  const href = articleExtra(article, CTA_FIELDS.url);
+  if (!href) return undefined;
+
+  return {
+    heading: article.title,
+    body: heroText(article.lead),
+    label: articleExtra(article, CTA_FIELDS.label) ?? "Get in touch",
+    href,
+  };
+}
+
+/**
  * Fetch a page by URL path, or null when no such route exists or its list is
  * empty. Null is what tells a page to fall back to its static content, and
  * what makes the catch-all route 404 rather than render an empty shell.
@@ -159,11 +197,23 @@ export async function getPage(path: string): Promise<Page | null> {
 
   // An explicit tag wins; otherwise the first item is the hero, which is how
   // pages authored before the vocabulary existed still work.
-  const taggedHero = articles.find(isHero);
+  const taggedHero = articles.find((a) => roleOf(a) === HERO_CODE);
   const heroArticle = taggedHero ?? articles[0];
   if (!heroArticle) return null;
 
-  const rest = articles.filter((article) => article !== heroArticle);
+  const ctaArticle = articles.find(
+    (a) => a !== heroArticle && roleOf(a) === CTA_CODE,
+  );
+  const cta = toCta(ctaArticle);
+
+  // A CTA is lifted out of the body — it is a call-out bar at the foot of the
+  // page, not something the rail scrolls to. Only when it became one, though:
+  // a tagged section with no URL stays an ordinary section rather than
+  // disappearing from the page altogether.
+  const rest = articles.filter(
+    (article) =>
+      article !== heroArticle && !(cta !== undefined && article === ctaArticle),
+  );
 
   return {
     slug: path,
@@ -174,6 +224,7 @@ export async function getPage(path: string): Promise<Page | null> {
       subtitle: heroText(heroArticle.lead),
       image: sectionImage(heroArticle),
     },
+    cta,
     sections: rest.map((article) => ({
       id: sectionAnchor(article.slug, route.slug ?? ""),
       title: article.title,

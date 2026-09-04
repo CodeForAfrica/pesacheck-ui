@@ -273,3 +273,63 @@ describe("section anchors", () => {
     expect((await getPage("knowledge"))?.sections[0].id).toBe("knowledgebase");
   });
 });
+
+describe("call to action", () => {
+  beforeEach(() => gql.mockReset());
+
+  /** A section tagged `cta`, with the button fields Superdesk stores. */
+  function ctaSection(url?: string, label?: string) {
+    const extra = [
+      url ? { field_name: "cta_url", value: url } : null,
+      label ? { field_name: "cta_label", value: label } : null,
+    ].filter(Boolean);
+    return {
+      id: 9,
+      title: "Still have questions?",
+      slug: "faqs-cta",
+      lead: "<p>Chat to our team.</p>",
+      metadata: JSON.stringify({
+        subject: [{ scheme: "page_section_role", code: "cta", name: "CTA" }],
+      }),
+      swp_article_extra: extra,
+    };
+  }
+
+  it("lifts a tagged section out of the body into the CTA", async () => {
+    respond(
+      [route],
+      [
+        { id: 1, title: "FAQs", slug: "hero" },
+        { id: 2, title: "A section", slug: "a-section" },
+        ctaSection("/about/contact-us", "Get in touch"),
+      ],
+    );
+
+    const page = await getPage("knowledge");
+    expect(page?.cta).toEqual({
+      heading: "Still have questions?",
+      body: "Chat to our team.",
+      label: "Get in touch",
+      href: "/about/contact-us",
+    });
+    // It is a call-out bar, not something the rail scrolls to.
+    expect(page?.sections.map((s) => s.id)).toEqual(["a-section"]);
+  });
+
+  it("defaults the button label when only a URL is given", async () => {
+    respond(
+      [route],
+      [{ id: 1, title: "FAQs", slug: "hero" }, ctaSection("/x")],
+    );
+    expect((await getPage("knowledge"))?.cta?.label).toBe("Get in touch");
+  });
+
+  it("drops a CTA with no URL rather than rendering a dead button", async () => {
+    respond([route], [{ id: 1, title: "FAQs", slug: "hero" }, ctaSection()]);
+
+    const page = await getPage("knowledge");
+    expect(page?.cta).toBeUndefined();
+    // Without a destination it stays an ordinary section rather than vanishing.
+    expect(page?.sections.map((s) => s.id)).toEqual(["faqs-cta"]);
+  });
+});
