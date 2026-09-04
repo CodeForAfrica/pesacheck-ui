@@ -94,6 +94,7 @@ const LIST_SECTIONS: Record<string, ListSectionEntry> = {
 
   "media-research": {
     defaultList: MEDIA_CENTRE_LISTS.research,
+    ownHeadings: true,
     async render(listName: string, section: PageSection) {
       const strands = await getMediaCentreResearch(listName).catch(() => null);
       return strands?.length ? (
@@ -116,6 +117,7 @@ const LIST_SECTIONS: Record<string, ListSectionEntry> = {
 
   "media-announcements": {
     defaultList: MEDIA_CENTRE_LISTS.announcements,
+    ownHeadings: true,
     async render(listName: string, section: PageSection) {
       const announcements = await getMediaCentreAnnouncements(listName).catch(
         () => null,
@@ -132,6 +134,7 @@ const LIST_SECTIONS: Record<string, ListSectionEntry> = {
 
   "media-events": {
     defaultList: MEDIA_CENTRE_LISTS.events,
+    ownHeadings: true,
     async render(listName: string, section: PageSection) {
       const events = await getMediaCentreEvents(listName).catch(() => null);
       // The list carries the whole rail: first item featured, rest upcoming.
