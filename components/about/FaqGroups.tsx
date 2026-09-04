@@ -1,5 +1,5 @@
 import { Container } from "@/components/ui/SectionHeading";
-import { FAQ_GROUPS, type FaqGroup } from "@/lib/faqs-content";
+import type { FaqGroup } from "@/lib/faqs-content";
 
 /** The groups themselves, without page chrome. */
 function Groups({ groups }: { groups: FaqGroup[] }) {
@@ -41,13 +41,14 @@ function Groups({ groups }: { groups: FaqGroup[] }) {
  *
  * `bare` drops the section and container, for when this is placed inside a
  * page that already provides them — otherwise the padding and gutters double
- * up.
+ * up. Rendered through the `faq-questions` section template, which is the only
+ * caller and always supplies real groups.
  */
 export function FaqGroups({
-  groups = FAQ_GROUPS,
+  groups,
   bare = false,
 }: {
-  groups?: FaqGroup[];
+  groups: FaqGroup[];
   bare?: boolean;
 }) {
   if (bare) return <Groups groups={groups} />;
