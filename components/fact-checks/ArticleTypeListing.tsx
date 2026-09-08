@@ -1,10 +1,39 @@
+import { Suspense } from "react";
 import { FactChecksExplorer } from "@/components/fact-checks/FactChecksExplorer";
+import { FactChecksSkeleton } from "@/components/fact-checks/FactChecksSkeleton";
 import type { ArticleType } from "@/lib/article-types";
-import { parseFilterParams } from "@/lib/data/fact-check-filters";
+import {
+  type FilterSelection,
+  parseFilterParams,
+} from "@/lib/data/fact-check-filters";
 import { parsePageParam } from "@/lib/data/pagination";
 import { getByContentType } from "@/lib/data/stories";
 
 type SearchParams = Record<string, string | string[] | undefined>;
+
+async function Listing({
+  type,
+  page,
+  filters,
+}: {
+  type: ArticleType;
+  page: number;
+  filters: FilterSelection;
+}) {
+  const listing = (await getByContentType(type.codes, page, filters).catch(
+    () => null,
+  )) ?? { stories: [], page: 1, totalPages: 1, total: 0 };
+
+  return (
+    <FactChecksExplorer
+      title={type.title}
+      stories={listing.stories}
+      page={listing.page}
+      totalPages={listing.totalPages}
+      filters={filters}
+    />
+  );
+}
 
 /**
  * The listing shared by the Quick Reads, Explainers and Longform pages: the
@@ -27,17 +56,13 @@ export async function ArticleTypeListing({
   const page = parsePageParam(params.page);
   const filters = parseFilterParams(params);
 
-  const listing = (await getByContentType(type.codes, page, filters).catch(
-    () => null,
-  )) ?? { stories: [], page: 1, totalPages: 1, total: 0 };
-
   return (
-    <FactChecksExplorer
-      title={type.title}
-      stories={listing.stories}
-      page={listing.page}
-      totalPages={listing.totalPages}
-      filters={filters}
-    />
+    // Keyed on the query so each filter or page change suspends afresh.
+    <Suspense
+      key={JSON.stringify(params)}
+      fallback={<FactChecksSkeleton title={type.title} />}
+    >
+      <Listing type={type} page={page} filters={filters} />
+    </Suspense>
   );
 }

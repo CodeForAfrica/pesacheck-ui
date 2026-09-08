@@ -1,13 +1,18 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { ArticleView } from "@/components/article/ArticleView";
 import { FactChecksContentDesks } from "@/components/fact-checks/FactChecksContentDesks";
 import { FactChecksExplorer } from "@/components/fact-checks/FactChecksExplorer";
 import { FactChecksHero } from "@/components/fact-checks/FactChecksHero";
+import { FactChecksSkeleton } from "@/components/fact-checks/FactChecksSkeleton";
 import { ARTICLES, getArticleBySlug } from "@/lib/article-content";
 import { CONTENT_DESKS, deskBySlug } from "@/lib/content-desks";
 import { getArticle } from "@/lib/data/article";
-import { parseFilterParams } from "@/lib/data/fact-check-filters";
+import {
+  type FilterSelection,
+  parseFilterParams,
+} from "@/lib/data/fact-check-filters";
 import {
   clampPage,
   pageOffset,
@@ -77,6 +82,29 @@ export async function generateMetadata({
   return {};
 }
 
+async function DeskListing({
+  deskSlug,
+  page,
+  filters,
+}: {
+  deskSlug: string;
+  page: number;
+  filters: FilterSelection;
+}) {
+  const listing =
+    (await getByDesk(deskSlug, page, filters).catch(() => null)) ??
+    staticPage(page);
+
+  return (
+    <FactChecksExplorer
+      stories={listing.stories}
+      page={listing.page}
+      totalPages={listing.totalPages}
+      filters={filters}
+    />
+  );
+}
+
 export default async function ContentDeskOrArticlePage({
   params,
   searchParams,
@@ -99,21 +127,19 @@ export default async function ContentDeskOrArticlePage({
   const page = parsePageParam(sp.page);
   const filters = parseFilterParams(sp);
 
-  const [listingResult, heroStories] = await Promise.all([
-    getByDesk(desk.slug, page, filters).catch(() => null),
-    getDeskHero(desk.name).catch(() => null),
-  ]);
-  const listing = listingResult ?? staticPage(page);
+  // Only the hero is awaited here: it does not change with filters, so it
+  // should not be replaced by a placeholder every time one is applied.
+  const heroStories = await getDeskHero(desk.name).catch(() => null);
 
   return (
     <>
       <FactChecksHero topic={desk.name} stories={heroStories ?? undefined} />
-      <FactChecksExplorer
-        stories={listing.stories}
-        page={listing.page}
-        totalPages={listing.totalPages}
-        filters={filters}
-      />
+      <Suspense
+        key={JSON.stringify(sp)}
+        fallback={<FactChecksSkeleton title="Fact Checks" />}
+      >
+        <DeskListing deskSlug={desk.slug} page={page} filters={filters} />
+      </Suspense>
       <FactChecksContentDesks activeSlug={desk.slug} />
     </>
   );
