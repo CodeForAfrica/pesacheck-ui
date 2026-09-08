@@ -317,9 +317,11 @@ Four things about how lists behave:
 
 ## Webhooks — telling the site an edit happened
 
-The site is prerendered, so a published edit is not visible until something
-invalidates the cache. A Publisher webhook does that within seconds; without
-one, everything still updates, just on the 5-minute page TTL.
+Fact-check article and desk pages are prerendered, so a published edit to one
+is not visible until something invalidates the cache. A Publisher webhook does
+that within seconds; without one, those pages update on their 5-minute TTL.
+(Most other pages render per request and were never affected — see
+[`revalidation.md`](./revalidation.md).)
 
 Configure it **once per tenant**, in the Publisher app inside Superdesk:
 

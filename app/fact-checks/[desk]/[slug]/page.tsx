@@ -11,8 +11,10 @@ import {
 } from "@/lib/data/map";
 
 // Backstop for a revalidation webhook that never arrived (see
-// `app/api/revalidate/route.ts`): without it these pages are prerendered once
-// and never rebuilt, so a Superdesk edit would wait for the next deploy.
+// `app/api/revalidate/route.ts`). Without it these pages take Next's default
+// for a static route — one hour — so a correction sat behind an hour of
+// cached HTML. Five minutes is the floor; the webhook is what makes it
+// seconds.
 export const revalidate = 300;
 
 type Params = Promise<{ desk: string; slug: string }>;

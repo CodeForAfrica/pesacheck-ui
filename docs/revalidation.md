@@ -4,14 +4,28 @@ How an edit in Superdesk reaches the live site, and what to check when it
 doesn't. Companion to [`superdesk-setup.md`](./superdesk-setup.md) (the content
 side) and `AGENTS.md` (the data layer).
 
-The site is prerendered: pages are built once and served from cache, so a
-Superdesk edit is not visible until something invalidates that cache. Two
-mechanisms do, and they are meant to overlap.
+Part of the site is prerendered, and that part serves cached HTML until
+something invalidates it. Two mechanisms do, and they are meant to overlap.
+
+**Which pages this is about.** Most routes are dynamic (`ƒ` in the build
+output) — the `/[...slug]` pages, `/fact-checks`, `/search`, the article-type
+listings, the team and media-centre detail pages. They render per request and
+were never stale. What caches is the homepage, the handful of remaining static
+pages, and the fact-check desk and article pages. A single build's route table
+is the authority:
+
+```bash
+pnpm build   # the Revalidate column says which pages cache, and for how long
+```
 
 | | What triggers it | How fast | Covers |
 | --- | --- | --- | --- |
 | **Tag revalidation** | a Publisher webhook POSTs `/api/revalidate` | seconds | articles, content desks, menus |
 | **Time (ISR)** | nothing — every page carries `revalidate = 300` | ≤ 5 min | everything, including what the webhook can't see |
+
+Before this, those pages carried Next's default for a static route — **one
+hour** — so a correction could sit behind an hour of cached HTML. Not frozen
+until a redeploy, but far too slow for a fact-check correction.
 
 The TTL is the backstop, and it is load-bearing rather than ceremonial.
 Publisher delivers a webhook once, with no retry and no delivery log, and it
@@ -305,6 +319,33 @@ to it; a page that doesn't carry the tag keeps its build-time timestamp. That
 comparison — one page's cache entry changing while its neighbour's doesn't — is
 the thing worth checking, because a response of `{"revalidated": true}` only
 says the tags were dropped, not that they were the right ones.
+
+## Reproducing the staleness
+
+Worth knowing, because the obvious test does not show it and reads as "there is
+no bug here":
+
+- **`next dev` never shows it.** No route cache, so every request re-renders.
+- **A dynamic page never shows it.** `/fact-checks`, `/search` and the
+  `/[...slug]` pages are server-rendered per request.
+- **The first visit to an article never shows it.** `generateStaticParams`
+  emits only the sample slugs, so a real article URL is rendered on demand the
+  first time it is asked for — and that render is fresh. Staleness begins with
+  the *second* edit, once a copy is cached.
+
+So the sequence that does show it:
+
+```bash
+pnpm build && pnpm start
+```
+
+1. Open a real published article at `/fact-checks/<desk>/<slug>`. This is the
+   step that caches it, and the one that is easy to skip.
+2. Edit its headline in Superdesk and publish.
+3. Reload. The old headline persists — for 5 minutes on this configuration,
+   and for an hour before it.
+4. `curl` the revalidate endpoint for that slug, reload again: the new
+   headline, immediately. That last step is what the webhook automates.
 
 ## When an edit still doesn't show
 
