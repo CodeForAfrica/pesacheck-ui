@@ -10,9 +10,8 @@ describe("offeredSecret", () => {
   });
 
   it("keeps a '+' rather than form-decoding it to a space", () => {
-    // The bug this guards: `URLSearchParams` treats `+` as a space, so a
-    // base64 secret authenticated by header and 401'd by webhook — with no
-    // Publisher delivery log to show why.
+    // `URLSearchParams` would treat `+` as a space, so a base64 secret would
+    // authenticate by header and 401 by webhook.
     expect(offeredSecret(url("?secret=ab+cd/ef=="), none)).toBe("ab+cd/ef==");
   });
 
@@ -20,10 +19,9 @@ describe("offeredSecret", () => {
     expect(offeredSecret(url("?secret=ab%2Bcd"), none)).toBe("ab+cd");
   });
 
-  it("decodes %20 — though Next turns it into '+' before we see it", () => {
-    // Unit-level behaviour only: a route handler's `request.url` has already
-    // been re-serialized, so `%20` reaches us as `+`. Asserted so nobody
-    // "fixes" the decoding on the strength of a case the runtime never sends.
+  it("decodes %20, though Next turns it into '+' before we see it", () => {
+    // A route handler's `request.url` is already re-serialized, so `%20`
+    // never actually arrives here.
     expect(offeredSecret(url("?secret=a%20b"), none)).toBe("a b");
   });
 

@@ -131,9 +131,7 @@ export async function getRoutes(): Promise<RawRoute[]> {
   const { routes } = await gql<{ routes: RawRoute[] }>(
     GET_ROUTES,
     { tenant: TENANT_CODE },
-    // Same table as the content desks, so the same tag: Publisher's
-    // `route[*]` webhook refreshes which pages exist and which desks exist
-    // in one go.
+    // Same table as the content desks, so the same tag.
     { tags: [TAGS.routes] },
   );
   return routes;
@@ -223,8 +221,7 @@ export async function getPage(path: string): Promise<Page | null> {
   const { list } = await gql<SectionsResponse>(
     GET_PAGE_SECTIONS,
     { tenant: TENANT_CODE, name: listName },
-    // A page's sections are a content list like any other, so it is tagged
-    // like any other: by name, and collectively for article edits.
+    // A page's sections are a content list, tagged like any other.
     { tags: [TAGS.contentList(listName), TAGS.contentLists] },
   );
 

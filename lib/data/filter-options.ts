@@ -160,10 +160,8 @@ async function fetchFilterOptions(): Promise<FilterOptions> {
  * Throws when Hasura is unreachable — callers apply the usual
  * `?? FALLBACK_FILTER_OPTIONS` degraded-mode pattern.
  *
- * The tag has to be declared here rather than on the inner `gql` call: fetch
- * tags raised inside an `unstable_cache` callback are not collected, so an
- * untagged wrapper would hold an hour-old option set through every
- * revalidation.
+ * The tag is declared here rather than on the inner `gql` call: fetch tags
+ * raised inside an `unstable_cache` callback are not collected.
  */
 export const getFilterOptions: () => Promise<FilterOptions> = unstable_cache(
   fetchFilterOptions,

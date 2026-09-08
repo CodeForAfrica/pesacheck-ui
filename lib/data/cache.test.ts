@@ -53,16 +53,15 @@ describe("tagsForEvent", () => {
   });
 
   it("returns nothing for an event no page depends on", () => {
-    // The endpoint reports this rather than answering "revalidated", so a
-    // webhook on the wrong event can't look like it is working.
+    // The endpoint reports these rather than answering "revalidated".
     expect(tagsForEvent("package[processed]", {})).toEqual([]);
     expect(tagsForEvent("", {})).toEqual([]);
     expect(tagsForEvent("article", {})).not.toEqual([]);
   });
 
   it("never tags filter options — they sit in the root layout", () => {
-    // `filter-options` on an article event would put every page in the site
-    // behind every edit. See the tag's own comment.
+    // They render in the root layout, so that would put every page in the
+    // site behind every article edit.
     const everyEvent = [
       "article[published]",
       "article[updated]",
@@ -85,7 +84,7 @@ describe("tagsForArticle", () => {
 describe("tagsForDelivery", () => {
   it("takes the event's answer, not the body's slug", () => {
     // Every Publisher entity carries a slug, so reading the body as a direct
-    // request would quietly undo the event map. Both of these regressed once.
+    // request would undo the event map.
     expect(
       tagsForDelivery({
         event: "article[preview]",

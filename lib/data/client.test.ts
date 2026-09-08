@@ -1,10 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-/**
- * The data client's env checks. These matter more than they look: a missing
- * value used to mean the whole site quietly served its static fallback, which
- * reads as unfinished content migration rather than a broken deploy.
- */
+/** The data client's env checks. */
 
 afterEach(() => {
   vi.unstubAllEnvs();
@@ -27,8 +23,8 @@ describe("data client configuration", () => {
   });
 
   it("throws when the tenant code is missing", async () => {
-    // An empty tenant is not an error to Hasura — it matches no rows — so
-    // without this the site renders fallback content everywhere, silently.
+    // An empty tenant matches no rows rather than erroring, so without this
+    // the site falls back everywhere.
     vi.stubEnv("NEXT_PUBLIC_TENANT_CODE", "");
     await expect(loadClient()).rejects.toThrow("NEXT_PUBLIC_TENANT_CODE");
   });

@@ -79,10 +79,8 @@ export async function getContentListArticles(
   name: string,
   routeSlugs: string[] = LANGUAGE_ROUTE_SLUGS,
 ): Promise<RawArticle[]> {
-  // Tagged by list name as well as collectively: reordering one list refreshes
-  // only its pages, while editing any article refreshes them all (a list
-  // renders the article's title, image and verdict). Both branches read the
-  // same list, so both carry the same tags.
+  // By list name and collectively: reordering one list refreshes only its
+  // pages, while any article edit refreshes them all.
   const cache = { tags: [TAGS.contentList(name), TAGS.contentLists] };
 
   // An empty `_in` matches nothing in Hasura, so "any route" is a different

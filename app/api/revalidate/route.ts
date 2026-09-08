@@ -6,14 +6,10 @@ import { TENANT_CODE } from "@/lib/data/client";
 import { offeredSecret } from "@/lib/revalidate-auth";
 
 /**
- * On-demand revalidation endpoint — how a Superdesk edit reaches the site
- * without waiting for a TTL.
- *
- * Pages are prerendered and cached (see `revalidate` in each page and the tags
- * in `lib/data/cache.ts`), so an edit is otherwise invisible for up to five
- * minutes. A Publisher webhook POSTs here when an article, route or menu
- * changes; `tagsForEvent` maps the event to cache tags and this drops exactly
- * the pages built from them. Everything else stays cached.
+ * On-demand cache revalidation. A Publisher webhook POSTs here when an
+ * article, route or menu changes; the event maps to cache tags
+ * (`lib/data/cache.ts`) and those pages are dropped. Without it, prerendered
+ * pages wait out their 5-minute TTL.
  *
  * Setup and payload shapes: `docs/revalidation.md`.
  *
@@ -21,8 +17,6 @@ import { offeredSecret } from "@/lib/revalidate-auth";
  * - REVALIDATE_SECRET  required — shared secret; without it the route is off
  */
 
-// Reads a shared secret from the request and revalidates a global cache, so
-// there is nothing here worth prerendering or caching.
 export const dynamic = "force-dynamic";
 
 const SECRET = process.env.REVALIDATE_SECRET;
@@ -36,10 +30,8 @@ function str(value: unknown): string {
 }
 
 /**
- * Compare the offered secret (see `lib/revalidate-auth.ts` for where it comes
- * from) without leaking its length or content through timing. Node's
- * `timingSafeEqual` throws on a length mismatch, so that case is answered
- * before it runs.
+ * Compare the offered secret in constant time. `timingSafeEqual` throws on a
+ * length mismatch, so that case is answered first.
  */
 function authorized(request: Request): boolean {
   if (!SECRET) return false;
@@ -70,9 +62,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  // Publisher webhooks are configured per tenant, so this should never differ.
-  // Checked anyway: a webhook pointed at the wrong site is otherwise silent,
-  // and rebuilding our pages on another tenant's edit would be invisible too.
+  // Webhooks are configured per tenant, so this should never differ. Checked
+  // because a webhook pointed at the wrong site is otherwise silent.
   const tenant = str(request.headers.get(TENANT_HEADER));
   if (tenant && TENANT_CODE && tenant !== TENANT_CODE) {
     return NextResponse.json({ revalidated: false, reason: "other tenant" });
@@ -82,17 +73,16 @@ export async function POST(request: Request) {
   const tags = tagsForDelivery({ event, body });
 
   if (tags.length === 0) {
-    // An event nobody maps, a preview, or a payload we don't recognise. Not an
-    // error — but worth saying plainly, so a webhook subscribed to the wrong
-    // event doesn't look like it is working.
+    // An unmapped event, a preview, or an unrecognised payload. Said plainly
+    // so a webhook on the wrong event doesn't look like it is working.
     return NextResponse.json({
       revalidated: false,
       reason: event ? `no tags mapped for ${event}` : "no tags in payload",
     });
   }
 
-  // "max": serve the stale page while the fresh one renders, rather than
-  // making the reader who arrives first wait for Hasura.
+  // "max" serves the stale page while the fresh one renders, so the first
+  // reader after an edit doesn't wait on Hasura.
   for (const tag of tags) revalidateTag(tag, "max");
 
   return NextResponse.json({ revalidated: true, tags, now: Date.now() });

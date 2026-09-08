@@ -2,11 +2,8 @@ import type { Metadata } from "next";
 import { ArticleTypeListing } from "@/components/fact-checks/ArticleTypeListing";
 import { LONGFORM } from "@/lib/article-types";
 
-// Backstop for a revalidation webhook that never arrived (see
-// `app/api/revalidate/route.ts`). Without it these pages take Next's default
-// for a static route — one hour — so a correction sat behind an hour of
-// cached HTML. Five minutes is the floor; the webhook is what makes it
-// seconds.
+// Floor for when the revalidation webhook doesn't arrive. Next's default for
+// a static route is an hour, which is too long for a correction.
 export const revalidate = 300;
 
 export const metadata: Metadata = {
