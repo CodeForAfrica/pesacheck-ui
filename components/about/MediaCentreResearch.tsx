@@ -62,20 +62,31 @@ function Strand({ strand }: { strand: ResearchStrand }) {
 export function MediaCentreResearch({
   strands = RESEARCH_STRANDS,
   limit = RESEARCH_LIMIT,
+  title = "In research",
+  bare = false,
 }: {
   strands?: ResearchStrand[];
   limit?: number;
+  /** The page section's heading, when placed rather than hardcoded. */
+  title?: string;
+  bare?: boolean;
 }) {
+  const inner = (
+    <>
+      <SectionHeading title={title} />
+      <div className="mt-9 grid gap-x-10 gap-y-11 sm:grid-cols-2 lg:grid-cols-3">
+        {strands.slice(0, limit).map((strand) => (
+          <Strand key={strand.label} strand={strand} />
+        ))}
+      </div>
+    </>
+  );
+
+  if (bare) return inner;
+
   return (
     <section className="py-14 lg:py-16">
-      <Container>
-        <SectionHeading title="In research" />
-        <div className="mt-9 grid gap-x-10 gap-y-11 sm:grid-cols-2 lg:grid-cols-3">
-          {strands.slice(0, limit).map((strand) => (
-            <Strand key={strand.label} strand={strand} />
-          ))}
-        </div>
-      </Container>
+      <Container>{inner}</Container>
     </section>
   );
 }

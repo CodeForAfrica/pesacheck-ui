@@ -52,6 +52,18 @@ export function ArticleBodyShort({ article }: { article: Article }) {
   if (article.bodyHtml) {
     return (
       <div className="w-full min-w-0 lg:w-[610px]">
+        {article.featureImage && (
+          <div className="relative h-[300px] w-full overflow-hidden rounded-lg md:h-[350px]">
+            <Image
+              src={article.featureImage.src}
+              alt={article.featureImage.alt}
+              fill
+              sizes="(max-width: 768px) 100vw, 610px"
+              className="object-cover"
+              loading="eager"
+            />
+          </div>
+        )}
         {/* Body HTML is sanitized server-side in lib/data/body.ts:renderBody. */}
         <div
           className={PROSE_CLASS}

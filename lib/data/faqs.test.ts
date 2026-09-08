@@ -3,7 +3,10 @@ import { getFaqGroups } from "@/lib/data/faqs";
 import type { RawArticle } from "@/lib/data/map";
 
 const getContentListArticles = vi.hoisted(() => vi.fn());
-vi.mock("@/lib/data/stories", () => ({ getContentListArticles }));
+vi.mock("@/lib/data/stories", () => ({
+  getContentListArticles,
+  ANY_ROUTE: [],
+}));
 
 /** A curated question, optionally tagged with the group it belongs to. */
 function question(title: string, group?: string, lead = "Yes."): RawArticle {

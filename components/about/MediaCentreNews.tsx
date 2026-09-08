@@ -45,20 +45,31 @@ function NewsCard({ item }: { item: NewsItem }) {
 export function MediaCentreNews({
   items = NEWS,
   limit = NEWS_LIMIT,
+  title = "In the news",
+  bare = false,
 }: {
   items?: NewsItem[];
   limit?: number;
+  /** The page section's heading, when placed rather than hardcoded. */
+  title?: string;
+  bare?: boolean;
 }) {
+  const inner = (
+    <>
+      <SectionHeading title={title} />
+      <div className="mt-9 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {items.slice(0, limit).map((item) => (
+          <NewsCard key={item.title} item={item} />
+        ))}
+      </div>
+    </>
+  );
+
+  if (bare) return inner;
+
   return (
     <section className="bg-neutral-50 py-14 lg:py-16">
-      <Container>
-        <SectionHeading title="In the news" />
-        <div className="mt-9 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {items.slice(0, limit).map((item) => (
-            <NewsCard key={item.title} item={item} />
-          ))}
-        </div>
-      </Container>
+      <Container>{inner}</Container>
     </section>
   );
 }

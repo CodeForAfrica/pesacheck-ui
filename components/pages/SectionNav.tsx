@@ -5,11 +5,20 @@ import { useEffect, useState } from "react";
 type NavItem = { id: string; label: string };
 
 /**
- * Sticky sidebar nav for the Knowledge sections. Scroll-links to each section
- * and highlights the one currently in view via an IntersectionObserver
- * scroll-spy. Collapses to a horizontal scrollable tab row on small screens.
+ * Sticky sidebar nav for a page's sections. Scroll-links to each one and
+ * highlights whichever is in view via an IntersectionObserver scroll-spy.
+ * Collapses to a horizontal scrollable tab row on small screens.
+ *
+ * The ids it links to are the section slugs, so they are stable across
+ * rewording — see `getPage`.
  */
-export function KnowledgeNav({ items }: { items: NavItem[] }) {
+export function SectionNav({
+  items,
+  label = "Page sections",
+}: {
+  items: NavItem[];
+  label?: string;
+}) {
   const [active, setActive] = useState(items[0]?.id ?? "");
 
   useEffect(() => {
@@ -32,7 +41,7 @@ export function KnowledgeNav({ items }: { items: NavItem[] }) {
 
   return (
     <nav
-      aria-label="Knowledge sections"
+      aria-label={label}
       className="flex gap-4 overflow-x-auto pb-2 lg:sticky lg:top-28 lg:flex-col lg:gap-3 lg:self-start lg:overflow-visible lg:pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
     >
       {items.map((item) => {
