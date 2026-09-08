@@ -42,8 +42,9 @@ reaches the site): `docs/superdesk-setup.md`.
   server-only, like `EDGE_PRESHARED_AUTH`.
 - **Caching:** every `gql()` call declares cache tags (`lib/data/cache.ts`) so
   `/api/revalidate` can refresh the pages a Publisher webhook reports; pages also
-  carry `revalidate = 300` as a backstop. Tag any query you add, and keep
-  `articles` out of anything the root layout reads. Details:
+  carry `revalidate = 300` as a backstop. Tag any query you add, and keep tags
+  that an article edit busts (`articles`, `content-lists`) out of anything the
+  root layout reads — otherwise one publish rebuilds the whole site. Details:
   `docs/revalidation.md`.
 - **Reference implementation** for queries/mappers is the sibling repo
   `../pesacheck-pwa-app-router` (production frontend against this same schema).

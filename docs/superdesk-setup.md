@@ -360,9 +360,9 @@ covered in [`revalidation.md`](./revalidation.md).
 
 ### What a webhook cannot tell the site
 
-**Content lists have no event.** Reordering `Homepage — Hero`, or adding a
-person to `About — Team`, fires nothing — those changes appear on the 5-minute
-TTL. Editing an *article* does refresh every list it appears in, so the common
+**Content lists have no event.** Reordering `Homepage — Hero`, adding a person
+to `About — Team`, or changing the sections of a page — all content lists —
+fires nothing. Those changes appear on the 5-minute TTL. Editing an *article* does refresh every list it appears in, so the common
 case is still immediate. Nothing is broken if a curation change takes a few
 minutes; it is the designed behaviour.
 

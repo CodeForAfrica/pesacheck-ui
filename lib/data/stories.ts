@@ -78,10 +78,20 @@ export const FACT_CHECKS_PAGE_SIZE = 10;
 export async function getContentListArticles(
   name: string,
   routeSlugs: string[] = LANGUAGE_ROUTE_SLUGS,
+  { inLayout = false }: { inLayout?: boolean } = {},
 ): Promise<RawArticle[]> {
   // By list name and collectively: reordering one list refreshes only its
   // pages, while any article edit refreshes them all.
-  const cache = { tags: [TAGS.contentList(name), TAGS.contentLists] };
+  //
+  // A list read by the root layout takes the name tag alone. `content-lists`
+  // is busted by every article edit, and a layout tag lands on every page, so
+  // the pair would rebuild the whole site each time a fact-check is
+  // published. Those lists change rarely and refresh on their TTL.
+  const cache = {
+    tags: inLayout
+      ? [TAGS.contentList(name)]
+      : [TAGS.contentList(name), TAGS.contentLists],
+  };
 
   // An empty `_in` matches nothing in Hasura, so "any route" is a different
   // query rather than an empty filter.

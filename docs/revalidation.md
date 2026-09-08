@@ -47,10 +47,10 @@ await gql<Shape>(QUERY, { tenant: TENANT_CODE, slug }, { tags: [TAGS.article(slu
 | Tag | Set by | Busted by |
 | --- | --- | --- |
 | `article:<slug>` | `getRawArticle` | that article changing |
-| `articles` | the fact-check grids, search, desk listings | any article changing |
-| `content-list:<name>` | `getContentListArticles` | that list changing |
-| `content-lists` | the same call, collectively | any article or list changing |
-| `routes` | `getContentDesks` | a route changing |
+| `articles` | the fact-check listings | any article changing |
+| `content-list:<name>` | `getContentListArticles`, `getPage` | that list changing |
+| `content-lists` | the same calls, collectively | any article or list changing |
+| `routes` | `getContentDesks`, `getRoutes` | a route changing |
 | `navigation` | `getSiteMenus` | a menu changing |
 | `filter-options` | `getFilterOptions` | nothing automatic — hourly TTL |
 
@@ -68,11 +68,14 @@ Two rules worth keeping when adding a query:
   costs an edit that never appears, which nobody notices until a reader does.
   This is why any article change busts every listing rather than trying to work
   out which listings contained it.
-- **Nothing read in the root layout should carry `articles`.** The layout
-  renders on every page, so its tags land on every page — Privacy Policy
-  included. `getFilterOptions` is in the layout and derives from article
-  taxonomy, which is exactly why it has its own tag instead: otherwise one
-  article edit would rebuild the entire site and tagging would buy nothing.
+- **Nothing read in the root layout may carry a tag an article edit busts** —
+  that means neither `articles` nor `content-lists`. A layout tag lands on
+  every page, so either one turns a single fact-check publish into a full
+  site rebuild, and tagging buys nothing. Two reads are affected:
+  `getFilterOptions` has its own `filter-options` tag, and the footer logo
+  walls pass `inLayout` to `getContentListArticles`, which drops
+  `content-lists` and keeps the per-list name tag. Both then refresh on their
+  TTL, which suits content that changes a few times a year.
 
 ### Why the reads are explicitly cached
 
@@ -96,8 +99,9 @@ convincing illusion of a broken query.
 
 So `gql()` skips the data cache when `NODE_ENV === "development"`: local reads
 always hit Hasura, and an edit in Superdesk shows up on the next reload. The
-cost is a slower dev server — six round trips per homepage render instead of
-six cache reads. Confirm which you are getting by adding
+cost is a slower dev server: every render of a page makes its Hasura round
+trips again instead of reading them from cache. Confirm which you are getting
+by adding
 `logging: { fetches: {} }` to `next.config.ts`; the dev server then annotates
 each fetch `(cache skip)` or `(cache hit)`.
 
