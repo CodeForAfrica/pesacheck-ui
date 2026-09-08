@@ -1,4 +1,5 @@
 import { renderBody } from "@/lib/data/body";
+import { TAGS } from "@/lib/data/cache";
 import { gql, TENANT_CODE } from "@/lib/data/client";
 import {
   articleExtra,
@@ -127,9 +128,12 @@ type SectionsResponse = {
 
 /** Every route for the tenant — the set of pages that can exist. */
 export async function getRoutes(): Promise<RawRoute[]> {
-  const { routes } = await gql<{ routes: RawRoute[] }>(GET_ROUTES, {
-    tenant: TENANT_CODE,
-  });
+  const { routes } = await gql<{ routes: RawRoute[] }>(
+    GET_ROUTES,
+    { tenant: TENANT_CODE },
+    // Same table as the content desks, so the same tag.
+    { tags: [TAGS.routes] },
+  );
   return routes;
 }
 
@@ -213,10 +217,13 @@ export async function getPage(path: string): Promise<Page | null> {
   const route = (await getRoutes()).find((r) => r.staticprefix === wanted);
   if (!route?.name) return null;
 
-  const { list } = await gql<SectionsResponse>(GET_PAGE_SECTIONS, {
-    tenant: TENANT_CODE,
-    name: pageListName(route.name),
-  });
+  const listName = pageListName(route.name);
+  const { list } = await gql<SectionsResponse>(
+    GET_PAGE_SECTIONS,
+    { tenant: TENANT_CODE, name: listName },
+    // A page's sections are a content list, tagged like any other.
+    { tags: [TAGS.contentList(listName), TAGS.contentLists] },
+  );
 
   const articles = (list[0]?.items ?? [])
     .map((item) => item.article)

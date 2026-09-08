@@ -10,6 +10,10 @@ import {
   isTeamProfile,
 } from "@/lib/data/map";
 
+// Floor for when the revalidation webhook doesn't arrive. Next's default for
+// a static route is an hour, which is too long for a correction.
+export const revalidate = 300;
+
 type Params = Promise<{ desk: string; slug: string }>;
 
 export function generateStaticParams() {

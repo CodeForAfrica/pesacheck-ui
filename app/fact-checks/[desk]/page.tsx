@@ -22,6 +22,10 @@ import {
 } from "@/lib/data/stories";
 import { FEATURE, FEATURE_SECONDARY, STORIES } from "@/lib/fact-checks-content";
 
+// Floor for when the revalidation webhook doesn't arrive. Next's default for
+// a static route is an hour, which is too long for a correction.
+export const revalidate = 300;
+
 type Params = Promise<{ desk: string }>;
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 

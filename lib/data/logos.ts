@@ -42,9 +42,16 @@ function toLogo(article: RawArticle): Logo | null {
   return null;
 }
 
-/** Logos in curated order, or `[]` when the list is missing or empty. */
+/**
+ * Logos in curated order, or `[]` when the list is missing or empty.
+ *
+ * `inLayout` because the footer wall renders on every page: the list is
+ * tagged by name only, so publishing a fact-check does not rebuild the site.
+ */
 export async function getLogos(listName: string): Promise<Logo[]> {
-  const articles = await getContentListArticles(listName, ANY_ROUTE);
+  const articles = await getContentListArticles(listName, ANY_ROUTE, {
+    inLayout: true,
+  });
   return articles.map(toLogo).filter((logo): logo is Logo => logo != null);
 }
 

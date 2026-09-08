@@ -1,3 +1,4 @@
+import { TAGS } from "@/lib/data/cache";
 import { gql, TENANT_CODE } from "@/lib/data/client";
 import type { FilterDimension } from "@/lib/data/fact-check-filters";
 import { GET_MENUS } from "@/lib/data/queries/navigation";
@@ -109,9 +110,11 @@ export async function getNavigation(
 
 /** Every menu row for the tenant. One query serves all three site menus. */
 async function fetchMenus(): Promise<RawMenu[]> {
-  const { menus } = await gql<{ menus: RawMenu[] }>(GET_MENUS, {
-    tenant: TENANT_CODE,
-  });
+  const { menus } = await gql<{ menus: RawMenu[] }>(
+    GET_MENUS,
+    { tenant: TENANT_CODE },
+    { tags: [TAGS.navigation] },
+  );
   return menus;
 }
 

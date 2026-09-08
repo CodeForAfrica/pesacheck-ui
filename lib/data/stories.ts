@@ -1,3 +1,4 @@
+import { TAGS } from "@/lib/data/cache";
 import { gql, TENANT_CODE } from "@/lib/data/client";
 import {
   buildFactCheckWhere,
@@ -77,20 +78,35 @@ export const FACT_CHECKS_PAGE_SIZE = 10;
 export async function getContentListArticles(
   name: string,
   routeSlugs: string[] = LANGUAGE_ROUTE_SLUGS,
+  { inLayout = false }: { inLayout?: boolean } = {},
 ): Promise<RawArticle[]> {
+  // By list name and collectively: reordering one list refreshes only its
+  // pages, while any article edit refreshes them all.
+  //
+  // A list read by the root layout takes the name tag alone. `content-lists`
+  // is busted by every article edit, and a layout tag lands on every page, so
+  // the pair would rebuild the whole site each time a fact-check is
+  // published. Those lists change rarely and refresh on their TTL.
+  const cache = {
+    tags: inLayout
+      ? [TAGS.contentList(name)]
+      : [TAGS.contentList(name), TAGS.contentLists],
+  };
+
   // An empty `_in` matches nothing in Hasura, so "any route" is a different
   // query rather than an empty filter.
   const { list } =
     routeSlugs.length > 0
-      ? await gql<ContentListResponse>(GET_CONTENT_LIST_ITEMS, {
-          tenant: TENANT_CODE,
-          name,
-          routeSlugs,
-        })
-      : await gql<ContentListResponse>(GET_CONTENT_LIST_ITEMS_ANY_ROUTE, {
-          tenant: TENANT_CODE,
-          name,
-        });
+      ? await gql<ContentListResponse>(
+          GET_CONTENT_LIST_ITEMS,
+          { tenant: TENANT_CODE, name, routeSlugs },
+          cache,
+        )
+      : await gql<ContentListResponse>(
+          GET_CONTENT_LIST_ITEMS_ANY_ROUTE,
+          { tenant: TENANT_CODE, name },
+          cache,
+        );
 
   const items = list[0]?.items ?? [];
   return items
@@ -233,11 +249,15 @@ async function getFactCheckListing(
   page: number,
 ): Promise<FactCheckListing> {
   const fetchPage = (p: number) =>
-    gql<FactCheckResponse>(GET_FACT_CHECK_ARTICLES, {
-      where,
-      limit: FACT_CHECKS_PAGE_SIZE,
-      offset: pageOffset(p, FACT_CHECKS_PAGE_SIZE),
-    });
+    gql<FactCheckResponse>(
+      GET_FACT_CHECK_ARTICLES,
+      {
+        where,
+        limit: FACT_CHECKS_PAGE_SIZE,
+        offset: pageOffset(p, FACT_CHECKS_PAGE_SIZE),
+      },
+      { tags: [TAGS.articles] },
+    );
 
   let { total, items } = await fetchPage(page);
   const count = total.aggregate.totalCount;
