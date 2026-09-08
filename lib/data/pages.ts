@@ -44,6 +44,26 @@ export const CTA_FIELDS = {
   url: "cta_url",
 } as const;
 
+/**
+ * Vocabulary naming which built-in section a `Page List Section` renders —
+ * the FAQ question grid, the team grid, and so on. The qcodes are a contract
+ * with `LIST_SECTIONS` in `components/pages/ListSection.tsx`: a component
+ * cannot come from a CMS, so an editor places one from the set this build
+ * ships rather than inventing one.
+ */
+export const SECTION_TEMPLATE_SCHEME = "page_section_template";
+
+/**
+ * Which content list feeds a list section. Optional: a template knows its own
+ * default list, and naming one by hand is only for the case where a page needs
+ * a second instance of the same section fed from somewhere else.
+ *
+ * Free text rather than a vocabulary, since lists are created in Publisher and
+ * a vocabulary would be a second place to keep in sync — the cost is that a
+ * typo yields an empty section rather than an error.
+ */
+export const SECTION_LIST_FIELD = "content_list";
+
 /** The role an article is tagged with on its page, if any. */
 function roleOf(article: RawArticle): string | undefined {
   return findSubject(parseMetadata(article.metadata), PAGE_SECTION_SCHEME)
@@ -73,6 +93,13 @@ export type PageSection = {
   /** Sanitised HTML — paragraphs, lists and images as authored. */
   bodyHtml: string;
   image?: string;
+  /**
+   * A built-in section to render in place of the body, keyed into
+   * `LIST_SECTIONS`. Undefined for an ordinary prose section.
+   */
+  template?: string;
+  /** The list feeding `template`, when the page overrides its default. */
+  listName?: string;
 };
 
 export type Page = {
@@ -228,6 +255,11 @@ export async function getPage(path: string): Promise<Page | null> {
     sections: rest.map((article) => ({
       id: sectionAnchor(article.slug, route.slug ?? ""),
       title: article.title,
+      template: findSubject(
+        parseMetadata(article.metadata),
+        SECTION_TEMPLATE_SCHEME,
+      )?.code,
+      listName: articleExtra(article, SECTION_LIST_FIELD),
       // The body carries the section's paragraphs, bullet lists and images as
       // authored, which is what lets one renderer serve pages whose designs
       // differ only in the blocks they use.

@@ -10,8 +10,11 @@ const ROLE_ICONS = {
 
 export function EcosystemRoles({
   roles = ECOSYSTEM_ROLES,
+  title = "How we build the ecosystem",
 }: {
   roles?: EcosystemRole[];
+  /** The page section's title, when this is placed rather than hardcoded. */
+  title?: string;
 }) {
   return (
     <section className="py-16">
@@ -20,7 +23,7 @@ export function EcosystemRoles({
           <div className="flex items-center gap-[14px]">
             <span className="h-7 w-[5px] shrink-0 rounded-sm bg-pesacheck-blue" />
             <h2 className="text-[28px] font-extrabold leading-[1.1] tracking-[-0.02em] text-[#021d32]">
-              How we build the ecosystem
+              {title}
             </h2>
           </div>
           <div className="mt-[18px] h-px bg-[#e4e5e8]" />

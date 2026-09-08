@@ -333,3 +333,59 @@ describe("call to action", () => {
     expect(page?.sections.map((s) => s.id)).toEqual(["faqs-cta"]);
   });
 });
+
+describe("list sections", () => {
+  beforeEach(() => gql.mockReset());
+
+  /** A section naming a built-in template, optionally overriding its list. */
+  function templated(code: string, list?: string) {
+    return {
+      id: 5,
+      title: "Frequently asked questions",
+      slug: "questions",
+      metadata: JSON.stringify({
+        subject: [{ scheme: "page_section_template", code, name: code }],
+      }),
+      swp_article_extra: list
+        ? [{ field_name: "content_list", value: list }]
+        : [],
+    };
+  }
+
+  it("carries the template and list override onto the section", async () => {
+    respond(
+      [route],
+      [
+        { id: 1, title: "FAQs", slug: "hero" },
+        templated("faq-questions", "Page — FAQs — Questions"),
+      ],
+    );
+
+    const section = (await getPage("knowledge"))?.sections[0];
+    expect(section?.template).toBe("faq-questions");
+    expect(section?.listName).toBe("Page — FAQs — Questions");
+  });
+
+  it("leaves the list undefined so the template uses its own default", async () => {
+    respond(
+      [route],
+      [{ id: 1, title: "FAQs", slug: "hero" }, templated("faq-questions")],
+    );
+
+    const section = (await getPage("knowledge"))?.sections[0];
+    expect(section?.template).toBe("faq-questions");
+    expect(section?.listName).toBeUndefined();
+  });
+
+  it("leaves an ordinary section with no template", async () => {
+    respond(
+      [route],
+      [
+        { id: 1, title: "Knowledge", slug: "hero" },
+        { id: 2, title: "Training", slug: "training", body: "<p>Copy.</p>" },
+      ],
+    );
+
+    expect((await getPage("knowledge"))?.sections[0].template).toBeUndefined();
+  });
+});

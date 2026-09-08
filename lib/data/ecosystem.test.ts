@@ -3,7 +3,10 @@ import { getEcosystemGroups, getEcosystemRoles } from "@/lib/data/ecosystem";
 import type { RawArticle } from "@/lib/data/map";
 
 const getContentListArticles = vi.hoisted(() => vi.fn());
-vi.mock("@/lib/data/stories", () => ({ getContentListArticles }));
+vi.mock("@/lib/data/stories", () => ({
+  getContentListArticles,
+  ANY_ROUTE: [],
+}));
 
 function partner(name: string, group?: string): RawArticle {
   return {

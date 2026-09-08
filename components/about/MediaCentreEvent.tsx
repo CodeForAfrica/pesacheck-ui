@@ -49,76 +49,87 @@ export function MediaCentreEvent({
   event = EVENT,
   upcoming = UPCOMING,
   limit = UPCOMING_LIMIT,
+  title = "Event spotlight",
+  bare = false,
 }: {
   event?: SpotlightEvent;
   upcoming?: UpcomingEvent[];
   limit?: number;
+  /** The page section's heading, when placed rather than hardcoded. */
+  title?: string;
+  bare?: boolean;
 }) {
+  const inner = (
+    <>
+      <SectionHeading title={title} />
+
+      <div className="mt-9 grid gap-8 lg:grid-cols-[546px_1fr] lg:items-center lg:gap-11">
+        <div className="relative aspect-[13/9] w-full overflow-hidden rounded-lg">
+          <Image
+            src={event.image}
+            alt={event.alt}
+            fill
+            sizes="(max-width: 1024px) 100vw, 546px"
+            className="object-cover"
+          />
+        </div>
+
+        <div>
+          {event.meta && (
+            <p className="text-xs leading-[18px] text-[#8b9099]">
+              {event.meta}
+            </p>
+          )}
+          <h3 className="mt-3 text-[26px] font-extrabold leading-[1.2] text-pesacheck-black sm:text-[30px]">
+            {event.title}
+          </h3>
+          <p className="mt-4 max-w-[510px] text-md font-medium leading-[26px] text-neutral-800">
+            {event.body}
+          </p>
+
+          {event.details.length > 0 && (
+            <dl className="mt-6 grid grid-cols-2 gap-6 sm:grid-cols-3">
+              {event.details.map((detail) => (
+                <div key={detail.label}>
+                  <dt className="text-xs leading-[18px] text-neutral-500">
+                    {detail.label}
+                  </dt>
+                  <dd className="mt-1 text-sm leading-5 text-neutral-800">
+                    {detail.value}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          )}
+
+          <Link
+            href={event.cta.href}
+            className="mt-8 inline-flex items-center gap-1.5 text-sm font-semibold text-pesacheck-blue transition-colors hover:text-pesacheck-black"
+          >
+            {event.cta.label}
+            <FiArrowUpRight size={14} aria-hidden />
+          </Link>
+        </div>
+      </div>
+
+      {/* Secondary listing: the same events treatment at a quarter of the
+            weight, so the summit above keeps the section's attention. */}
+      <h3 className="mt-12 text-sm font-bold uppercase tracking-wide text-neutral-600">
+        {UPCOMING_LABEL}
+      </h3>
+      <div className="mt-5 grid gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:gap-4">
+        {upcoming.slice(0, limit).map((item) => (
+          <UpcomingCard key={item.title} event={item} />
+        ))}
+      </div>
+    </>
+  );
+
+  if (bare) return inner;
+
   return (
     <section className="py-14 lg:py-16">
-      <Container>
-        <SectionHeading title="Event spotlight" />
-
-        <div className="mt-9 grid gap-8 lg:grid-cols-[546px_1fr] lg:items-center lg:gap-11">
-          <div className="relative aspect-[13/9] w-full overflow-hidden rounded-lg">
-            <Image
-              src={event.image}
-              alt={event.alt}
-              fill
-              sizes="(max-width: 1024px) 100vw, 546px"
-              className="object-cover"
-            />
-          </div>
-
-          <div>
-            {event.meta && (
-              <p className="text-xs leading-[18px] text-[#8b9099]">
-                {event.meta}
-              </p>
-            )}
-            <h3 className="mt-3 text-[26px] font-extrabold leading-[1.2] text-pesacheck-black sm:text-[30px]">
-              {event.title}
-            </h3>
-            <p className="mt-4 max-w-[510px] text-md font-medium leading-[26px] text-neutral-800">
-              {event.body}
-            </p>
-
-            {event.details.length > 0 && (
-              <dl className="mt-6 grid grid-cols-2 gap-6 sm:grid-cols-3">
-                {event.details.map((detail) => (
-                  <div key={detail.label}>
-                    <dt className="text-xs leading-[18px] text-neutral-500">
-                      {detail.label}
-                    </dt>
-                    <dd className="mt-1 text-sm leading-5 text-neutral-800">
-                      {detail.value}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            )}
-
-            <Link
-              href={event.cta.href}
-              className="mt-8 inline-flex items-center gap-1.5 text-sm font-semibold text-pesacheck-blue transition-colors hover:text-pesacheck-black"
-            >
-              {event.cta.label}
-              <FiArrowUpRight size={14} aria-hidden />
-            </Link>
-          </div>
-        </div>
-
-        {/* Secondary listing: the same events treatment at a quarter of the
-            weight, so the summit above keeps the section's attention. */}
-        <h3 className="mt-12 text-sm font-bold uppercase tracking-wide text-neutral-600">
-          {UPCOMING_LABEL}
-        </h3>
-        <div className="mt-5 grid gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:gap-4">
-          {upcoming.slice(0, limit).map((item) => (
-            <UpcomingCard key={item.title} event={item} />
-          ))}
-        </div>
-      </Container>
+      <Container>{inner}</Container>
     </section>
   );
 }
