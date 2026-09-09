@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { SearchExplorer } from "@/components/search/SearchExplorer";
+import { SearchSkeleton } from "@/components/search/SearchSkeleton";
 import {
+  type FilterSelection,
   hasActiveFilters,
   parseFilterParams,
 } from "@/lib/data/fact-check-filters";
@@ -43,15 +46,19 @@ export async function generateMetadata({
   };
 }
 
-export default async function SearchPage({
-  searchParams,
+/**
+ * The results themselves, separated so they can suspend on their own: the
+ * header's search bar and filter panel stay interactive while a query runs.
+ */
+async function Results({
+  q,
+  page,
+  filters,
 }: {
-  searchParams: SearchParams;
+  q: string;
+  page: number;
+  filters: FilterSelection;
 }) {
-  const params = await searchParams;
-  const q = typeof params.q === "string" ? params.q : "";
-  const page = parsePageParam(params.page);
-  const filters = parseFilterParams(params);
   const searched = Boolean(q.trim()) || hasActiveFilters(filters);
 
   // Results + the option labels for the "searched for" line, each degrading on
@@ -84,5 +91,25 @@ export default async function SearchPage({
       // 7 cards fill the strip's two rows in the design.
       latest={latest.slice(0, 7)}
     />
+  );
+}
+
+export default async function SearchPage({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  const params = await searchParams;
+  const q = typeof params.q === "string" ? params.q : "";
+  const page = parsePageParam(params.page);
+  const filters = parseFilterParams(params);
+
+  return (
+    // Keyed on the query so each new search suspends afresh; without it React
+    // reuses the resolved boundary and the previous results sit there with
+    // nothing to say a new search is running.
+    <Suspense key={JSON.stringify(params)} fallback={<SearchSkeleton />}>
+      <Results q={q} page={page} filters={filters} />
+    </Suspense>
   );
 }
