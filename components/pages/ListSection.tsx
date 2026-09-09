@@ -10,6 +10,7 @@ import { MediaCentreNews } from "@/components/about/MediaCentreNews";
 import { MediaCentreResearch } from "@/components/about/MediaCentreResearch";
 import { AlliesSection } from "@/components/partners/AlliesSection";
 import { OurPartnersSection } from "@/components/partners/OurPartnersSection";
+import { PrivacyBody } from "@/components/privacy/PrivacyBody";
 import { ToolsShowcase } from "@/components/tools/ToolsShowcase";
 import { AllyPartnerStrip } from "@/components/ui/AllyPartnerStrip";
 import { Impact } from "@/components/ui/Impact";
@@ -22,6 +23,7 @@ import {
 import { FAQ_LIST, getFaqGroups } from "@/lib/data/faqs";
 import { getImpactStats, IMPACT_LIST } from "@/lib/data/impact";
 import { getIntroImages, INTRO_IMAGES_LIST } from "@/lib/data/intro-images";
+import { getLegalSections, PRIVACY_SECTIONS_LIST } from "@/lib/data/legal";
 import { ALLIES_LIST, getLogos, PARTNERS_LIST } from "@/lib/data/logos";
 import {
   getMediaCentreAnnouncements,
@@ -90,6 +92,20 @@ const LIST_SECTIONS: Record<string, ListSectionEntry> = {
     async render(listName: string) {
       const tools = await getTools(listName).catch(() => null);
       return tools?.length ? <ToolsShowcase tools={tools} bare /> : null;
+    },
+  },
+
+  "legal-sections": {
+    defaultList: PRIVACY_SECTIONS_LIST,
+    // Numbered clauses with their own hairline headings, in a narrow reading
+    // column — nothing the page should add a heading or a rail to.
+    ownHeadings: true,
+    async render(listName: string, section: PageSection) {
+      const sections = await getLegalSections(listName).catch(() => null);
+      if (!sections?.length) return null;
+      // The section body is the closing note the design puts after the
+      // clauses, not a standfirst above them.
+      return <PrivacyBody sections={sections} note={bodyText(section)} bare />;
     },
   },
 
