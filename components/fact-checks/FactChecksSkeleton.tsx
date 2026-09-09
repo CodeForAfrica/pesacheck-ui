@@ -20,7 +20,15 @@ export function FactChecksSkeleton({ title }: { title: string }) {
 
         <div className="mt-10 grid gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            <StoryCardSkeleton imageClassName="aspect-[330/220]" showExcerpt />
+            {/* The feature is horizontal — text left, image right — and its
+                title is a size larger. Stacking it here made the skeleton far
+                taller than the card, so the pager jumped when results landed. */}
+            <StoryCardSkeleton
+              imageClassName="aspect-[330/220]"
+              titleHeight="h-6"
+              showExcerpt
+              horizontal
+            />
           </div>
           <StoryCardSkeleton imageClassName="aspect-[400/203]" />
         </div>

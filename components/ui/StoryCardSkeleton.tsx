@@ -1,44 +1,98 @@
 /**
- * Placeholder in the shape of a `StoryCard`, shown while a listing is being
- * fetched.
+ * Placeholder in the shape of a `StoryCard`, shown while a listing is fetched.
  *
- * It mirrors the card's real proportions — same image ratio, same number of
- * text lines, same gaps — so the grid does not jump when results arrive.
- * Deliberately not animated beyond a slow pulse: a filter change usually
- * resolves in well under a second, and anything busier reads as an error.
+ * It mirrors the card's structure rather than approximating it — the same
+ * wrapper classes, the same gaps, the same horizontal/stacked split — because
+ * a skeleton of the wrong height moves the page twice: once when it appears
+ * and again when the results replace it. Keep this in step with `StoryCard`.
  */
-function Line({ className = "" }: { className?: string }) {
+function Line({ className }: { className: string }) {
   return <span className={`block rounded bg-neutral-100 ${className}`} />;
+}
+
+/** Taxonomy chips, title lines, optional excerpt, then the date row. */
+function TextBlock({
+  showExcerpt,
+  titleHeight,
+  horizontal,
+}: {
+  showExcerpt: boolean;
+  titleHeight: string;
+  horizontal: boolean;
+}) {
+  const body = (
+    <div className="flex flex-col gap-3">
+      <div className="flex gap-2">
+        <Line className="h-5 w-16" />
+        <Line className="h-5 w-20" />
+      </div>
+      <div className="flex flex-col gap-2">
+        <Line className={`${titleHeight} w-full`} />
+        <Line className={`${titleHeight} w-4/5`} />
+      </div>
+      {showExcerpt && (
+        <div className="flex flex-col gap-2">
+          <Line className="h-3 w-full" />
+          <Line className="h-3 w-3/4" />
+        </div>
+      )}
+    </div>
+  );
+
+  // Horizontal cards push the date row to the bottom of the column, the way
+  // `StoryCard` does with justify-between.
+  if (horizontal) {
+    return (
+      <div className="flex flex-1 flex-col justify-between gap-3">
+        {body}
+        <Line className="h-3 w-24" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-3">
+      {body}
+      <Line className="h-3 w-24" />
+    </div>
+  );
 }
 
 export function StoryCardSkeleton({
   imageClassName = "aspect-[295/150]",
   showExcerpt = false,
+  horizontal = false,
+  titleHeight = "h-4",
 }: {
   imageClassName?: string;
   showExcerpt?: boolean;
+  /** Feature layout: text on the left, image on the right. */
+  horizontal?: boolean;
+  /** Matches the card's title size — a feature's title is larger. */
+  titleHeight?: string;
 }) {
+  const text = (
+    <TextBlock
+      showExcerpt={showExcerpt}
+      titleHeight={titleHeight}
+      horizontal={horizontal}
+    />
+  );
+
   return (
-    <div className="animate-pulse" aria-hidden>
-      <div className={`w-full rounded-lg bg-neutral-100 ${imageClassName}`} />
-      <div className="mt-4 flex flex-col gap-2">
-        {/* Verdict badge and taxonomy row */}
-        <div className="flex gap-2">
-          <Line className="h-5 w-16" />
-          <Line className="h-5 w-20" />
-        </div>
-        {/* Title, two lines — the length most titles wrap to */}
-        <Line className="mt-1 h-4 w-full" />
-        <Line className="h-4 w-4/5" />
-        {showExcerpt && (
-          <>
-            <Line className="mt-1 h-3 w-full" />
-            <Line className="h-3 w-3/4" />
-          </>
-        )}
-        {/* Date and read time */}
-        <Line className="mt-1 h-3 w-24" />
-      </div>
+    <div
+      className={`flex animate-pulse gap-6 ${
+        horizontal ? "flex-col sm:flex-row" : "flex-col"
+      }`}
+      aria-hidden
+    >
+      {horizontal && text}
+      <div
+        className={`shrink-0 rounded-lg bg-neutral-100 ${imageClassName} ${
+          horizontal ? "w-full sm:w-[55%]" : "w-full"
+        }`}
+      />
+      {!horizontal && text}
     </div>
   );
 }

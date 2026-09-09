@@ -27,6 +27,25 @@ describe("StoryGridSkeleton", () => {
     expect(html).toContain("aspect-[330/220]");
   });
 
+  it("mirrors StoryCard's horizontal layout", () => {
+    // The feature card puts text left and image right at 55% width. Stacking
+    // the placeholder instead made it far taller than the card, so the pager
+    // jumped when results landed. These classes are the mirror — keep them in
+    // step with StoryCard.
+    const html = renderToStaticMarkup(
+      <StoryCardSkeleton horizontal imageClassName="aspect-[330/220]" />,
+    );
+    expect(html).toContain("flex-col sm:flex-row");
+    expect(html).toContain("sm:w-[55%]");
+    expect(html).toContain("flex-1");
+  });
+
+  it("stacks when not horizontal", () => {
+    const html = renderToStaticMarkup(<StoryCardSkeleton />);
+    expect(html).not.toContain("sm:flex-row");
+    expect(html).toContain("w-full");
+  });
+
   it("adds excerpt lines only when the real card would show them", () => {
     const plain = renderToStaticMarkup(<StoryCardSkeleton />);
     const withExcerpt = renderToStaticMarkup(<StoryCardSkeleton showExcerpt />);
