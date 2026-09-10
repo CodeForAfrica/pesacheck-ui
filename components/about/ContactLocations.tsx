@@ -22,15 +22,28 @@ function LocationTile({ loc }: { loc: LocationCard }) {
   );
 }
 
-export function ContactLocations() {
+export function ContactLocations({
+  locations = CONTACT_LOCATIONS,
+  bare = false,
+}: {
+  locations?: LocationCard[];
+  /** Rendered inside a page's column, which supplies container and heading. */
+  bare?: boolean;
+} = {}) {
+  const grid = (
+    <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      {locations.map((loc) => (
+        <LocationTile key={loc.country} loc={loc} />
+      ))}
+    </div>
+  );
+
+  if (bare) return grid;
+
   return (
     <Container className="py-14 lg:py-[70px]">
       <SectionHeading title="Locations" />
-      <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {CONTACT_LOCATIONS.map((loc) => (
-          <LocationTile key={loc.country} loc={loc} />
-        ))}
-      </div>
+      {grid}
     </Container>
   );
 }

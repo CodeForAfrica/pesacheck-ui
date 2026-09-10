@@ -1,6 +1,10 @@
 import type { ReactNode } from "react";
 import { AboutIntro } from "@/components/about/AboutIntro";
 import { AboutTeam } from "@/components/about/AboutTeam";
+import { ContactFactCheckCta } from "@/components/about/ContactFactCheckCta";
+import { ContactForm } from "@/components/about/ContactForm";
+import { ContactLocations } from "@/components/about/ContactLocations";
+import { ContactWhatsapp } from "@/components/about/ContactWhatsapp";
 import { EcosystemGroups } from "@/components/about/EcosystemGroups";
 import { EcosystemRoles } from "@/components/about/EcosystemRoles";
 import { FaqGroups } from "@/components/about/FaqGroups";
@@ -14,6 +18,13 @@ import { PrivacyBody } from "@/components/privacy/PrivacyBody";
 import { ToolsShowcase } from "@/components/tools/ToolsShowcase";
 import { AllyPartnerStrip } from "@/components/ui/AllyPartnerStrip";
 import { Impact } from "@/components/ui/Impact";
+import {
+  CONTACT_FIELDS,
+  CONTACT_LOCATIONS_LIST,
+  CONTACT_WHATSAPP_LIST,
+  getContactLocations,
+  getWhatsappColumns,
+} from "@/lib/data/contact";
 import {
   ECOSYSTEM_LIST,
   ECOSYSTEM_ROLES_LIST,
@@ -41,14 +52,22 @@ import { getTools, TOOLS_LIST } from "@/lib/data/tools";
  * traits the page needs to lay it out.
  */
 type ListSectionEntry = {
-  /** The list this reads when the page names none. */
-  defaultList: string;
+  /**
+   * The list this reads when the page names none. Absent for a built-in that
+   * reads no list — one whose content is entirely the section's own fields.
+   */
+  defaultList?: string;
   /** Renders its own headings, so the page omits the one above it. */
   ownHeadings?: boolean;
   /** Spans the viewport rather than sitting in the page's column. */
   fullBleed?: boolean;
   render: (listName: string, section: PageSection) => Promise<ReactNode>;
 };
+
+/** One of a section's custom fields, or undefined so a default stands in. */
+function sectionExtra(section: PageSection, field: string): string | undefined {
+  return section.fields[field] || undefined;
+}
 
 /** A section's body as plain text — some built-ins take a standfirst. */
 function bodyText(section: PageSection): string | undefined {
@@ -97,9 +116,11 @@ const LIST_SECTIONS: Record<string, ListSectionEntry> = {
 
   "legal-sections": {
     defaultList: PRIVACY_SECTIONS_LIST,
-    // Numbered clauses with their own hairline headings, in a narrow reading
-    // column — nothing the page should add a heading or a rail to.
-    ownHeadings: true,
+    // The clauses carry their own numbered hairline headings, but the block as
+    // a whole takes the section's heading from the page: borrowed onto a page
+    // about something else — the imprint on Contact Us — it needs a name, and
+    // on a page of its own the editor's section title supplies one under the
+    // hero. So this does not opt out of the page's heading.
     async render(listName: string, section: PageSection) {
       const sections = await getLegalSections(listName).catch(() => null);
       if (!sections?.length) return null;
@@ -286,6 +307,61 @@ const LIST_SECTIONS: Record<string, ListSectionEntry> = {
       ) : null;
     },
   },
+
+  // The form is deliberately not authored: it posts to /api/contact and
+  // validates as it types, which is behaviour. What surrounds it — the
+  // heading and the ways to reach HQ — comes from the section's own fields,
+  // so this built-in reads no list.
+  "contact-form": {
+    async render(_listName: string, section: PageSection) {
+      return (
+        <ContactForm
+          address={sectionExtra(section, CONTACT_FIELDS.address)}
+          email={sectionExtra(section, CONTACT_FIELDS.email)}
+          phone={sectionExtra(section, CONTACT_FIELDS.phone)}
+          bare
+        />
+      );
+    },
+  },
+
+  "contact-locations": {
+    defaultList: CONTACT_LOCATIONS_LIST,
+    async render(listName: string) {
+      const locations = await getContactLocations(listName).catch(() => null);
+      return locations?.length ? (
+        <ContactLocations locations={locations} bare />
+      ) : null;
+    },
+  },
+
+  "contact-whatsapp": {
+    defaultList: CONTACT_WHATSAPP_LIST,
+    // Carries its own heading and the number set large beneath it.
+    ownHeadings: true,
+    async render(listName: string, section: PageSection) {
+      const columns = await getWhatsappColumns(listName).catch(() => null);
+      return (
+        <ContactWhatsapp
+          heading={section.title}
+          body={bodyText(section)}
+          phone={sectionExtra(section, CONTACT_FIELDS.phone)}
+          columns={columns?.length ? columns : undefined}
+          bare
+        />
+      );
+    },
+  },
+
+  "contact-fact-check": {
+    // A centred sentence with no heading above it.
+    ownHeadings: true,
+    async render(_listName: string, section: PageSection) {
+      return (
+        <ContactFactCheckCta bodyHtml={section.bodyHtml || undefined} bare />
+      );
+    },
+  },
 };
 
 function entryFor(template: string | undefined): ListSectionEntry | undefined {
@@ -320,5 +396,8 @@ export async function ListSection({ section }: { section: PageSection }) {
   const entry = entryFor(section.template);
   if (!entry) return null;
 
-  return entry.render(section.listName?.trim() || entry.defaultList, section);
+  return entry.render(
+    section.listName?.trim() || entry.defaultList || "",
+    section,
+  );
 }

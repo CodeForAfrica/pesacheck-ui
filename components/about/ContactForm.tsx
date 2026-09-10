@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { FiMail, FiMapPin, FiPhoneCall } from "react-icons/fi";
+import { Toaster } from "sonner";
 import { ContactMessageForm } from "@/components/about/ContactMessageForm";
 import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import { CONTACT_HQ, CONTACT_SOCIALS } from "@/lib/contact-content";
@@ -19,10 +20,33 @@ function ContactRow({
   );
 }
 
-export function ContactForm() {
-  return (
-    <Container className="py-14 lg:py-[70px]">
-      <SectionHeading title={CONTACT_HQ.heading} />
+/**
+ * The message form and the ways to reach headquarters.
+ *
+ * The form itself stays in code — it posts to `/api/contact` and validates as
+ * it goes, which is behaviour rather than content — but everything printed
+ * around it is authored, so an office move needs no deploy.
+ */
+export function ContactForm({
+  heading = CONTACT_HQ.heading,
+  address = CONTACT_HQ.address,
+  email = CONTACT_HQ.email,
+  phone = CONTACT_HQ.phone,
+  bare = false,
+}: {
+  heading?: string;
+  address?: string;
+  email?: string;
+  phone?: string;
+  /** Rendered inside a page's column, which supplies container and heading. */
+  bare?: boolean;
+} = {}) {
+  const inner = (
+    <>
+      {/* The toaster lives with the form that raises it: this section is
+          placed by an editor, so nothing else on the page can be relied on to
+          mount one. */}
+      <Toaster position="bottom-right" richColors />
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_400px] lg:gap-12">
         {/* Message form */}
@@ -42,9 +66,9 @@ export function ContactForm() {
 
       {/* HQ contact details */}
       <div className="mt-10 flex flex-col gap-3">
-        <ContactRow icon={FiMapPin}>{CONTACT_HQ.address}</ContactRow>
-        <ContactRow icon={FiMail}>{CONTACT_HQ.email}</ContactRow>
-        <ContactRow icon={FiPhoneCall}>{CONTACT_HQ.phone}</ContactRow>
+        {address && <ContactRow icon={FiMapPin}>{address}</ContactRow>}
+        {email && <ContactRow icon={FiMail}>{email}</ContactRow>}
+        {phone && <ContactRow icon={FiPhoneCall}>{phone}</ContactRow>}
 
         <div className="mt-2 flex items-center gap-4">
           <span className="text-sm font-medium text-neutral-900">
@@ -65,6 +89,15 @@ export function ContactForm() {
           </div>
         </div>
       </div>
+    </>
+  );
+
+  if (bare) return inner;
+
+  return (
+    <Container className="py-14 lg:py-[70px]">
+      <SectionHeading title={heading} />
+      {inner}
     </Container>
   );
 }
