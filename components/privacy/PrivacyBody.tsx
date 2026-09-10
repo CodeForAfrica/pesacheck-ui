@@ -20,7 +20,7 @@ const PROSE = [
  */
 export function PrivacyBody({
   sections,
-  note = PRIVACY_ABOUT,
+  note,
   bare = false,
 }: {
   /** Live clauses; without them the static policy is rendered. */
@@ -28,6 +28,12 @@ export function PrivacyBody({
   note?: string;
   bare?: boolean;
 }) {
+  // The static closing note is part of the static policy, so it stands in only
+  // when the clauses do too. Defaulting it in live mode gave the imprint the
+  // privacy policy's boilerplate: this template serves any legal document, and
+  // an empty section body means no note rather than someone else's.
+  const closing = note ?? (sections ? undefined : PRIVACY_ABOUT);
+
   const inner = (
     <div className="max-w-[612px]">
       {sections
@@ -63,9 +69,11 @@ export function PrivacyBody({
             </section>
           ))}
 
-      {note && (
+      {closing && (
         <div className="border-t border-neutral-200 pt-6">
-          <p className="text-[13px] leading-[1.7] text-neutral-500">{note}</p>
+          <p className="text-[13px] leading-[1.7] text-neutral-500">
+            {closing}
+          </p>
         </div>
       )}
     </div>
