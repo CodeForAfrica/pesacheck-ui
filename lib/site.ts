@@ -251,7 +251,7 @@ export const FOOTER_NAV: { label: string; href: string }[] = [
 // Linked legal items only — the copyright line is rendered separately in the
 // footer with the current year (see `Footer`).
 export const LEGAL: { label: string; href: string }[] = [
-  { label: "Imprint", href: "/about/contact-us#imprint" },
+  { label: "Imprint", href: "/imprint" },
   { label: "Privacy policy", href: "/privacy-policy" },
 ];
 

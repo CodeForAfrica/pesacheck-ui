@@ -8,20 +8,9 @@ export function ContactLicensing() {
 
       <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,610px)_1fr] lg:gap-12">
         <div className="text-sm font-medium leading-5 text-neutral-900">
+          {/* The imprint moved to its own page, which the footer links to
+              — keeping a copy here would leave two, one of them uneditable. */}
           <p>{CONTACT_LICENSING.body}</p>
-
-          {/* Anchor target for the footer "Imprint" link. */}
-          <h3
-            id="imprint"
-            className="mt-8 scroll-mt-28 text-sm font-bold text-neutral-900"
-          >
-            {CONTACT_LICENSING.imprintHeading}
-          </h3>
-          <div className="mt-2 flex flex-col gap-1">
-            {CONTACT_LICENSING.imprint.map((line) => (
-              <p key={line}>{line}</p>
-            ))}
-          </div>
         </div>
 
         {/* Image placeholder */}
