@@ -101,6 +101,13 @@ export type PageSection = {
   template?: string;
   /** The list feeding `template`, when the page overrides its default. */
   listName?: string;
+  /**
+   * The section's Superdesk custom fields, by field name, with their HTML
+   * wrapper stripped. A built-in that needs a value with nowhere else to
+   * live — a phone number, a postal address — reads it from here rather than
+   * gaining a column on every section that has no use for one.
+   */
+  fields: Record<string, string>;
 };
 
 export type Page = {
@@ -164,6 +171,18 @@ function sectionAnchor(slug: string, routeSlug: string): string {
   return slug.startsWith(prefix) && slug.length > prefix.length
     ? slug.slice(prefix.length)
     : slug;
+}
+
+/** Every custom field set on a section, by name, unwrapped from its HTML. */
+function sectionFields(article: RawArticle): Record<string, string> {
+  const fields: Record<string, string> = {};
+  for (const extra of article.swp_article_extra ?? []) {
+    const name = extra.field_name;
+    if (!name) continue;
+    const value = articleExtra(article, name);
+    if (value) fields[name] = value;
+  }
+  return fields;
 }
 
 function sectionImage(article: RawArticle): string | undefined {
@@ -267,6 +286,7 @@ export async function getPage(path: string): Promise<Page | null> {
         SECTION_TEMPLATE_SCHEME,
       )?.code,
       listName: articleExtra(article, SECTION_LIST_FIELD),
+      fields: sectionFields(article),
       // The body carries the section's paragraphs, bullet lists and images as
       // authored, which is what lets one renderer serve pages whose designs
       // differ only in the blocks they use.
