@@ -199,25 +199,24 @@ export function getByDesk(
 }
 
 /**
- * Fact-checks of one editorial article type as a `FactCheckListing` — backs the
- * Quick Reads, Explainers and Longform pages (`/fact-checks/<type>`). Same
- * `Debunk` definition, pagination and reader filters as `getFactChecks`, scoped
- * to articles Superdesk tagged with one of `codes` on the `content_type` scheme
- * (see `lib/article-types.ts`).
+ * Fact-checks of one article type as a `FactCheckListing` — backs the Quick
+ * Reads, Explainers and Longform pages (`/fact-checks/<type>`). Same `Debunk`
+ * definition, pagination and reader filters as `getFactChecks`, scoped to the
+ * articles the type names (see `lib/article-types.ts`): by `content_type` code
+ * for the editorial types, or by Project for Longform.
  *
  * A type nobody has published yet simply returns no stories — the listing's
  * empty state, not an error.
  */
-export function getByContentType(
-  codes: string[],
+export function getByArticleType(
+  type: { codes?: string[]; projects?: number[] },
   page = 1,
   filters: FilterSelection = EMPTY_FILTERS,
-  schemes?: string[],
 ): Promise<FactCheckListing> {
   return getFactCheckListing(
     buildFactCheckWhere(filters, TENANT_CODE, {
-      contentTypes: codes,
-      typeSchemes: schemes,
+      contentTypes: type.codes,
+      projects: type.projects,
     }),
     page,
   );
@@ -243,7 +242,7 @@ export function searchFactChecks(
 
 /**
  * Shared paged fetch behind every listing (`getFactChecks`, `getByDesk`,
- * `getByContentType`, `searchFactChecks`): runs `where` for the
+ * `getByArticleType`, `searchFactChecks`): runs `where` for the
  * requested page, clamps an over-range `?page=` to the last real page (so it
  * shows the last slice rather than an empty grid that reads as "no matches"),
  * and re-fetches only when the clamp actually moved the page.

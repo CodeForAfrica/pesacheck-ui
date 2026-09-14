@@ -133,7 +133,7 @@ describe("buildFactCheckWhere", () => {
     expect(where._and).toContainEqual({
       swp_article_metadata: {
         swp_article_metadata_subjects: {
-          scheme: { _in: ["content_type"] },
+          scheme: { _eq: "content_type" },
           code: { _in: ["quickread", "shortform"] },
         },
       },
@@ -141,22 +141,23 @@ describe("buildFactCheckWhere", () => {
     expect(where._and).toHaveLength(2);
   });
 
-  it("matches every named scheme, for a vocabulary that was replaced", () => {
-    // Longform is filed under Project, whose live vocabulary is `priority` and
-    // whose predecessor is `project`; an article tagged with either belongs on
-    // the page.
-    const where = buildFactCheckWhere(EMPTY_FILTERS, "t", {
-      contentTypes: ["9", "projlongform"],
-      typeSchemes: ["priority", "project"],
-    });
+  it("scopes to a Project on the priority column, not a subject", () => {
+    // Project drives Superdesk's built-in priority field, so Longform is an
+    // integer on swp_article_metadata rather than an entry in subject[].
+    const where = buildFactCheckWhere(EMPTY_FILTERS, "t", { projects: [9] });
     expect(where._and).toContainEqual({
-      swp_article_metadata: {
-        swp_article_metadata_subjects: {
-          scheme: { _in: ["priority", "project"] },
-          code: { _in: ["9", "projlongform"] },
-        },
-      },
+      swp_article_metadata: { priority: { _in: [9] } },
     });
+    expect(JSON.stringify(where)).not.toContain("content_type");
+    expect(where._and).toHaveLength(2);
+  });
+
+  it("omits the Project clause when no values are given", () => {
+    for (const scope of [{}, { projects: [] }]) {
+      const where = buildFactCheckWhere(EMPTY_FILTERS, "t", scope);
+      expect(JSON.stringify(where)).not.toContain("priority");
+      expect(where._and).toHaveLength(1);
+    }
   });
 
   it("omits the content-type clause when no codes are given", () => {

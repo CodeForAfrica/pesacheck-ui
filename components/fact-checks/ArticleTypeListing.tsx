@@ -7,7 +7,7 @@ import {
   parseFilterParams,
 } from "@/lib/data/fact-check-filters";
 import { parsePageParam } from "@/lib/data/pagination";
-import { getByContentType } from "@/lib/data/stories";
+import { getByArticleType } from "@/lib/data/stories";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -20,12 +20,9 @@ async function Listing({
   page: number;
   filters: FilterSelection;
 }) {
-  const listing = (await getByContentType(
-    type.codes,
-    page,
-    filters,
-    type.schemes,
-  ).catch(() => null)) ?? { stories: [], page: 1, totalPages: 1, total: 0 };
+  const listing = (await getByArticleType(type, page, filters).catch(
+    () => null,
+  )) ?? { stories: [], page: 1, totalPages: 1, total: 0 };
 
   return (
     <FactChecksExplorer

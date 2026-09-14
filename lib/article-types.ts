@@ -14,14 +14,14 @@ export type ArticleType = {
   slug: string;
   /** Page heading and nav label. */
   title: string;
-  /** Accepted codes in Superdesk. */
-  codes: string[];
+  /** Accepted `content_type` codes in Superdesk. */
+  codes?: string[];
   /**
-   * The Superdesk schemes `codes` are matched on. Defaults to `content_type`,
-   * the editorial article type; a page filed under a different taxonomy names
-   * its own, and may name more than one where a vocabulary was replaced.
+   * Accepted **Project** values, for a type filed under that vocabulary rather
+   * than the editorial article type. Integers because Project drives
+   * Superdesk's built-in `priority` field.
    */
-  schemes?: string[];
+  projects?: number[];
   /** Page metadata description — also what the type means editorially. */
   description: string;
 };
@@ -44,20 +44,17 @@ export const EXPLAINERS: ArticleType = {
 
 /**
  * Longform is filed under **Project** — "the entity/funding body under which
- * this claim belongs" — rather than the editorial article type, so it is
- * scoped by that vocabulary instead of `content_type`.
+ * this claim belongs" — rather than the editorial article type.
  *
- * Two schemes and two codes for one option: the live vocabulary's id is
- * `priority`, a name left over from an earlier use of the same record, and its
- * options are numbered (`9` is "Long Form"). `project` is its deprecated
- * predecessor, whose codes were named. Matching both keeps articles filed
- * before the switch on the page.
+ * Project's vocabulary drives Superdesk's built-in `priority` field (its id is
+ * `priority`, though it is labelled "Project"), so the selection is an integer
+ * on `swp_article_metadata` rather than an entry in `metadata.subject[]`. `9`
+ * is "Long Form".
  */
 export const LONGFORM: ArticleType = {
   slug: "longform",
   title: "Longform",
-  schemes: ["priority", "project"],
-  codes: ["9", "projlongform"],
+  projects: [9],
   description:
     "In-depth fact-checks of a speech or incident, where multiple statements are checked and each carries its own verdict.",
 };
