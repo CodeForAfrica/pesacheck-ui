@@ -14,8 +14,14 @@ export type ArticleType = {
   slug: string;
   /** Page heading and nav label. */
   title: string;
-  /** Accepted `content_type` codes in Superdesk. */
+  /** Accepted codes in Superdesk. */
   codes: string[];
+  /**
+   * The Superdesk schemes `codes` are matched on. Defaults to `content_type`,
+   * the editorial article type; a page filed under a different taxonomy names
+   * its own, and may name more than one where a vocabulary was replaced.
+   */
+  schemes?: string[];
   /** Page metadata description — also what the type means editorially. */
   description: string;
 };
@@ -36,10 +42,22 @@ export const EXPLAINERS: ArticleType = {
     "Longer articles that explain a topic or guide readers on spotting misinformation in a specific area.",
 };
 
+/**
+ * Longform is filed under **Project** — "the entity/funding body under which
+ * this claim belongs" — rather than the editorial article type, so it is
+ * scoped by that vocabulary instead of `content_type`.
+ *
+ * Two schemes and two codes for one option: the live vocabulary's id is
+ * `priority`, a name left over from an earlier use of the same record, and its
+ * options are numbered (`9` is "Long Form"). `project` is its deprecated
+ * predecessor, whose codes were named. Matching both keeps articles filed
+ * before the switch on the page.
+ */
 export const LONGFORM: ArticleType = {
   slug: "longform",
   title: "Longform",
-  codes: ["longform"],
+  schemes: ["priority", "project"],
+  codes: ["9", "projlongform"],
   description:
     "In-depth fact-checks of a speech or incident, where multiple statements are checked and each carries its own verdict.",
 };

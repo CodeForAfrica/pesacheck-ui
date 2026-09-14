@@ -212,9 +212,13 @@ export function getByContentType(
   codes: string[],
   page = 1,
   filters: FilterSelection = EMPTY_FILTERS,
+  schemes?: string[],
 ): Promise<FactCheckListing> {
   return getFactCheckListing(
-    buildFactCheckWhere(filters, TENANT_CODE, { contentTypes: codes }),
+    buildFactCheckWhere(filters, TENANT_CODE, {
+      contentTypes: codes,
+      typeSchemes: schemes,
+    }),
     page,
   );
 }

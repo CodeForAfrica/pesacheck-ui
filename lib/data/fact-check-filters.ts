@@ -90,7 +90,7 @@ export const DEBUNK_LANG_SCHEME = "Debunklang";
 type SubjectClause = {
   swp_article_metadata: {
     swp_article_metadata_subjects: {
-      scheme: { _eq: string };
+      scheme: { _eq: string } | { _in: string[] };
       code?: { _in: string[] };
     };
   };
@@ -120,11 +120,19 @@ export type FactCheckScope = {
   /** A content-desk route (`swp_route.slug`) — backs the desk pages. */
   routeSlug?: string;
   /**
-   * Accepted `content_type` codes — backs the article-type pages. Several
-   * codes per type because Superdesk's vocabulary and the site's page names
-   * have drifted apart (a Quick Read is filed as `quickread` or `shortform`).
+   * Accepted type codes — backs the article-type pages. Several codes per type
+   * because Superdesk's vocabulary and the site's page names have drifted
+   * apart (a Quick Read is filed as `quickread` or `shortform`).
    */
   contentTypes?: string[];
+  /**
+   * The schemes `contentTypes` are matched on, defaulting to
+   * `CONTENT_TYPE_SCHEME`. A page can be filed under a different taxonomy
+   * than the editorial article type without becoming a second code path, and
+   * more than one because a vocabulary that has been replaced leaves articles
+   * tagged with its predecessor.
+   */
+  typeSchemes?: string[];
   /**
    * Free-text query matched against title/lead/body — backs `/search`. This is
    * the one scope the reader types rather than the page choosing it.
@@ -186,7 +194,7 @@ export function buildFactCheckWhere(
     and.push({
       swp_article_metadata: {
         swp_article_metadata_subjects: {
-          scheme: { _eq: CONTENT_TYPE_SCHEME },
+          scheme: { _in: scope.typeSchemes ?? [CONTENT_TYPE_SCHEME] },
           code: { _in: scope.contentTypes },
         },
       },

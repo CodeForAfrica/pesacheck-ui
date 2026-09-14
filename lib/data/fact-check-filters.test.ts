@@ -133,12 +133,30 @@ describe("buildFactCheckWhere", () => {
     expect(where._and).toContainEqual({
       swp_article_metadata: {
         swp_article_metadata_subjects: {
-          scheme: { _eq: "content_type" },
+          scheme: { _in: ["content_type"] },
           code: { _in: ["quickread", "shortform"] },
         },
       },
     });
     expect(where._and).toHaveLength(2);
+  });
+
+  it("matches every named scheme, for a vocabulary that was replaced", () => {
+    // Longform is filed under Project, whose live vocabulary is `priority` and
+    // whose predecessor is `project`; an article tagged with either belongs on
+    // the page.
+    const where = buildFactCheckWhere(EMPTY_FILTERS, "t", {
+      contentTypes: ["9", "projlongform"],
+      typeSchemes: ["priority", "project"],
+    });
+    expect(where._and).toContainEqual({
+      swp_article_metadata: {
+        swp_article_metadata_subjects: {
+          scheme: { _in: ["priority", "project"] },
+          code: { _in: ["9", "projlongform"] },
+        },
+      },
+    });
   });
 
   it("omits the content-type clause when no codes are given", () => {
