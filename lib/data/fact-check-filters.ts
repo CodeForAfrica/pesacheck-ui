@@ -102,10 +102,18 @@ type LanguageClause = { _or: (LanguageColumnClause | SubjectClause)[] };
 type RouteClause = {
   swp_route: { slug: { _eq: string } };
 };
+type ProjectClause = {
+  swp_article_metadata: { priority: { _in: number[] } };
+};
 type SearchClause = {
   _or: { [column in "title" | "lead" | "body"]?: { _ilike: string } }[];
 };
-type WhereClause = SubjectClause | LanguageClause | RouteClause | SearchClause;
+type WhereClause =
+  | SubjectClause
+  | LanguageClause
+  | RouteClause
+  | ProjectClause
+  | SearchClause;
 type SearchParams = Record<string, string | string[] | undefined>;
 
 /**
@@ -115,16 +123,33 @@ type SearchParams = Record<string, string | string[] | undefined>;
  */
 export const CONTENT_TYPE_SCHEME = "content_type";
 
+/**
+ * **Project** — "the entity/funding body under which this claim belongs" — is
+ * not a subject. Its Superdesk vocabulary has `_id: "priority"` and drives the
+ * built-in priority field, so a selection lands in `metadata.priority` as a
+ * bare integer (`9` is "Long Form") rather than in `metadata.subject[]`.
+ *
+ * The vocabulary's display label is "Project" while its id is `priority`; the
+ * id is what reaches the data, which is why this filters a column and not a
+ * scheme. A `project` subject vocabulary exists but is deprecated and unused.
+ */
+
 /** Narrows a listing beyond the filter dimensions the reader controls. */
 export type FactCheckScope = {
   /** A content-desk route (`swp_route.slug`) — backs the desk pages. */
   routeSlug?: string;
   /**
-   * Accepted `content_type` codes — backs the article-type pages. Several
-   * codes per type because Superdesk's vocabulary and the site's page names
-   * have drifted apart (a Quick Read is filed as `quickread` or `shortform`).
+   * Accepted type codes — backs the article-type pages. Several codes per type
+   * because Superdesk's vocabulary and the site's page names have drifted
+   * apart (a Quick Read is filed as `quickread` or `shortform`).
    */
   contentTypes?: string[];
+  /**
+   * Accepted **Project** values — backs the Longform page. Numbers because
+   * Superdesk files Project on the built-in `priority` field rather than as a
+   * subject, so the vocabulary's qcodes are that field's integers.
+   */
+  projects?: number[];
   /**
    * Free-text query matched against title/lead/body — backs `/search`. This is
    * the one scope the reader types rather than the page choosing it.
@@ -180,6 +205,10 @@ export function buildFactCheckWhere(
 
   if (scope.routeSlug) {
     and.push({ swp_route: { slug: { _eq: scope.routeSlug } } });
+  }
+
+  if (scope.projects && scope.projects.length > 0) {
+    and.push({ swp_article_metadata: { priority: { _in: scope.projects } } });
   }
 
   if (scope.contentTypes && scope.contentTypes.length > 0) {
