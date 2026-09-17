@@ -76,7 +76,7 @@ export function Pagination({
         className={`${ARROW_BASE} ${
           atStart
             ? "cursor-not-allowed text-neutral-300"
-            : "text-neutral-900 hover:border-pesacheck-blue hover:text-pesacheck-blue"
+            : "cursor-pointer text-neutral-900 hover:border-pesacheck-blue hover:text-pesacheck-blue"
         }`}
       >
         <Arrow direction="left" />
@@ -104,7 +104,7 @@ export function Pagination({
             className={`flex size-10 items-center justify-center rounded-[10px] border-[0.5px] text-sm font-semibold transition-colors ${
               item === page
                 ? "border-pesacheck-blue text-pesacheck-blue"
-                : "border-transparent text-neutral-600 hover:text-pesacheck-blue"
+                : "cursor-pointer border-transparent text-neutral-600 hover:text-pesacheck-blue"
             }`}
           >
             {item}
@@ -120,7 +120,7 @@ export function Pagination({
         className={`${ARROW_BASE} ${
           atEnd
             ? "cursor-not-allowed text-neutral-300"
-            : "text-pesacheck-blue hover:border-pesacheck-blue"
+            : "cursor-pointer text-pesacheck-blue hover:border-pesacheck-blue"
         }`}
       >
         <Arrow direction="right" />
