@@ -340,6 +340,28 @@ export function isPageSectionProfile(
   );
 }
 
+/**
+ * The profile the archive's articles are authored against — every published
+ * fact-check carries it, and nothing else in the CMS does.
+ */
+const ARCHIVE_PROFILE = normaliseProfile("Article");
+
+/**
+ * Whether an article belongs in the fact-check archive at all.
+ *
+ * Deliberately an allowlist. The `/fact-checks` routes resolve by slug and
+ * ignore the desk segment, so anything they accept is served as a fact-check;
+ * naming the profiles to *exclude* meant every profile added since — FAQ
+ * questions, ecosystem partners, page sections on the one-segment route — was
+ * served as an article until someone noticed. Listing the one profile that
+ * does belong makes a new CMS profile safe by default.
+ */
+export function isArchiveProfile(profile: string | null | undefined): boolean {
+  return (
+    Boolean(profile) && normaliseProfile(profile as string) === ARCHIVE_PROFILE
+  );
+}
+
 /** A staff member's own page: `/about/team/<slug>`. */
 export function teamHref(slug: string): string {
   return `${TEAM_BASE}/${slug}`;
