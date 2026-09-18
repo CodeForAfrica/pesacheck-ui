@@ -1,17 +1,7 @@
 import Image from "next/image";
-import { FiArrowUpRight } from "react-icons/fi";
 import type { Story } from "@/lib/home-content";
 import { DateRow, TaxonomyRow } from "./MetaRow";
 import { VerdictBadge } from "./VerdictBadge";
-
-/** Circular translucent arrow button overlaid on a thumbnail (top-right). */
-function ArrowButton() {
-  return (
-    <span className="flex size-[30px] items-center justify-center rounded-full bg-black/30 backdrop-blur-[2px]">
-      <FiArrowUpRight size={10} className="brightness-0 invert" aria-hidden />
-    </span>
-  );
-}
 
 export function StoryCard({
   story,
@@ -87,10 +77,6 @@ export function StoryCard({
             <VerdictBadge label={story.verdict} />
           </span>
         )}
-        {/* Same inset as the verdict pill so the two line up across the card. */}
-        <span className="absolute right-[14px] top-[14px] z-10">
-          <ArrowButton />
-        </span>
       </div>
 
       {/* Text — stacked layout only */}
