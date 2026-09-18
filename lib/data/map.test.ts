@@ -7,6 +7,7 @@ import {
   formatLongDate,
   formatStoryDate,
   getVerdict,
+  isArchiveProfile,
   isMediaCentreProfile,
   isPageSectionProfile,
   mapAnnouncement,
@@ -911,6 +912,31 @@ describe("mapEcosystemItem", () => {
   it("cycles the accent by position, every four", () => {
     const tones = [0, 1, 2, 3, 4].map((i) => mapEcosystemItem(partner, i).tone);
     expect(tones).toEqual(["blue", "green", "ink", "red", "blue"]);
+  });
+});
+
+describe("isArchiveProfile", () => {
+  it("accepts only the archive's own profile", () => {
+    expect(isArchiveProfile("Article")).toBe(true);
+  });
+
+  it("rejects every CMS profile, so a new one cannot leak into /fact-checks", () => {
+    for (const profile of [
+      "FAQ",
+      "Ecosystem Partner",
+      "EcosystemPartner",
+      "Page Section",
+      "PageSection",
+      "Team Member",
+      "Research Citations",
+      "Event",
+      "Announcement",
+      undefined,
+      null,
+      "",
+    ]) {
+      expect(isArchiveProfile(profile)).toBe(false);
+    }
   });
 });
 

@@ -4,11 +4,7 @@ import { ArticleView } from "@/components/article/ArticleView";
 import { ARTICLES, getArticleBySlug } from "@/lib/article-content";
 import { CONTENT_DESKS } from "@/lib/content-desks";
 import { getArticle } from "@/lib/data/article";
-import {
-  isMediaCentreProfile,
-  isPageSectionProfile,
-  isTeamProfile,
-} from "@/lib/data/map";
+import { isArchiveProfile } from "@/lib/data/map";
 
 // Floor for when the revalidation webhook doesn't arrive. Next's default for
 // a static route is an hour, which is too long for a correction.
@@ -24,16 +20,11 @@ export function generateStaticParams() {
 
 async function resolveArticle(slug: string) {
   const live = await getArticle(slug).catch(() => null);
-  // Media Centre entries, staff profiles and page sections are not
-  // fact-checks. This route resolves by slug and ignores the desk segment, so
-  // without this it would serve every one of them as an article.
-  if (live) {
-    const elsewhere =
-      isMediaCentreProfile(live.profile) ||
-      isTeamProfile(live.profile) ||
-      isPageSectionProfile(live.profile);
-    return elsewhere ? null : live;
-  }
+  // This route resolves by slug and ignores the desk segment, so anything it
+  // accepts is served as a fact-check. Naming the profiles to exclude left
+  // every profile added since being served as one, so it asks instead whether
+  // the entry belongs in the archive.
+  if (live) return isArchiveProfile(live.profile) ? live : null;
   return getArticleBySlug(slug);
 }
 

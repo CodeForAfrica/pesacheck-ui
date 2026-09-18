@@ -13,6 +13,7 @@ import {
   type FilterSelection,
   parseFilterParams,
 } from "@/lib/data/fact-check-filters";
+import { isArchiveProfile } from "@/lib/data/map";
 import {
   clampPage,
   pageOffset,
@@ -57,7 +58,12 @@ export function generateStaticParams() {
 }
 
 async function resolveArticle(slug: string) {
-  return (await getArticle(slug).catch(() => null)) ?? getArticleBySlug(slug);
+  const live = await getArticle(slug).catch(() => null);
+  // This segment is either a desk or an article slug, so an entry that is not
+  // in the archive would be served here as a fact-check. Page sections and FAQ
+  // questions were.
+  if (live) return isArchiveProfile(live.profile) ? live : null;
+  return getArticleBySlug(slug);
 }
 
 export async function generateMetadata({
