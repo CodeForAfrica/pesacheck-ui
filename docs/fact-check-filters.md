@@ -15,7 +15,7 @@ on staging and their Superdesk labels:
 | --- | --- | --- | --- |
 | `countrymention1` | Primary country / "First country mentioned" | single | **Region** |
 | `countries` | Countries mentioned | multi | — |
-| `Harm_type` | Claim Topic | multi | **Topic** |
+| `Harm_type` | Claim Topic | multi | **Topic**, content desks |
 | `01harm` | Harm Type | multi | — |
 | `claimtype` | Claim Type | multi | — |
 | `claimformat` | Claim Format | multi | — |
@@ -36,6 +36,10 @@ subject `name`.
 
 ### Topic → `Harm_type`
 "Claim Topic" (multi; codes like `elections`, `employment`, `finance`, `gender`).
+
+This is also what a **content desk** is: `/fact-checks/<slug>` lists the
+fact-checks carrying one Claim Topic, and the desk row is the set of topics
+published fact-checks actually carry. See "Content desks" below.
 
 ### Language → `Debunklang`, falling back to the article language
 The Language filter is keyed on the Debunk language, and falls back to the
@@ -77,12 +81,40 @@ Sizing and caching are env-tunable:
 `FALLBACK_FILTER_OPTIONS` (`lib/fact-checks-content.ts`) is used only in degraded
 mode, when the taxonomy read fails.
 
+## Content desks
+
+A content desk **is** a Claim Topic (`lib/content-desks.ts`, `lib/data/desks.ts`).
+The desk row on the home page and at the foot of each desk page is the live
+catalog; `/fact-checks/<slug>` lists that topic's fact-checks.
+
+The catalog is derived separately from the dropdown options, and the difference
+matters. The dropdowns sample the newest `TAXONOMY_SAMPLE_SIZE` fact-checks
+*whatever their tagging*; because Claim Topic is sparse, the topics that sample
+happens to contain vary with the slice, and the sample can name a topic the
+listing's own `where` then finds nothing for. An option that yields an empty
+grid is a small annoyance; a desk that appears and disappears between renders is
+a link that 404s. So `GET_CLAIM_TOPICS` puts "carries a Claim Topic" in the
+`where` and folds the desks off exactly the corpus `getByDesk` pages through.
+Every desk therefore has content behind it, and `$limit` bounds *tagged*
+articles, reaching much further back for the same cost.
+
+Two things stay curated, because Superdesk has no field for them: the desk
+thumbnails (keyed by topic code, with a default for a topic nobody has drawn
+artwork for yet) and `CONTENT_DESKS`, the degraded-mode catalog. `CONTENT_DESKS`
+also aliases the design-era URLs — `/fact-checks/climate-change` still resolves,
+to the same `climate` topic as `/fact-checks/climate`.
+
+On a desk page the Topic dropdown composes with the desk as an intersection:
+Claim Topic is multi-valued, so `/fact-checks/climate?topic=gender` asks for
+fact-checks tagged both.
+
 ## Coverage
 
 The country and language fields populate on most content; Claim Topic is applied
-to a small fraction, so the Topic dropdown stays short until more content carries
-it. Existing articles are tagged going forward rather than backfilled, so option
-lists and filter results fill in over time.
+to a small fraction, so the Topic dropdown stays short — and the desk row with
+it — until more content carries it. Existing articles are tagged going forward
+rather than backfilled, so option lists, desks and filter results fill in over
+time.
 
 ## Related / downstream
 

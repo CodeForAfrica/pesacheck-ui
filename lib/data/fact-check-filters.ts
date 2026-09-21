@@ -5,9 +5,9 @@ export type FilterSelection = Record<FilterDimension, string[]>;
 
 /**
  * One dropdown entry: the `code` is the real Superdesk taxonomy key sent to the
- * server (region → `countries` ISO3, topic → `01harm`, language → ISO code); the
- * `label` is what the reader sees. Both are derived from live Superdesk data —
- * see `lib/data/filter-options.ts`.
+ * server (region → `countrymention1` ISO3, topic → `Harm_type`, language → ISO
+ * code); the `label` is what the reader sees. Both are derived from live
+ * Superdesk data — see `lib/data/filter-options.ts`.
  */
 export type FilterOption = { code: string; label: string };
 
@@ -99,9 +99,6 @@ type LanguageColumnClause = {
   swp_article_metadata: { language: { _in: string[] } };
 };
 type LanguageClause = { _or: (LanguageColumnClause | SubjectClause)[] };
-type RouteClause = {
-  swp_route: { slug: { _eq: string } };
-};
 type ProjectClause = {
   swp_article_metadata: { priority: { _in: number[] } };
 };
@@ -111,7 +108,6 @@ type SearchClause = {
 type WhereClause =
   | SubjectClause
   | LanguageClause
-  | RouteClause
   | ProjectClause
   | SearchClause;
 type SearchParams = Record<string, string | string[] | undefined>;
@@ -136,8 +132,20 @@ export const CONTENT_TYPE_SCHEME = "content_type";
 
 /** Narrows a listing beyond the filter dimensions the reader controls. */
 export type FactCheckScope = {
-  /** A content-desk route (`swp_route.slug`) — backs the desk pages. */
-  routeSlug?: string;
+  /**
+   * Accepted **Claim Topic** codes (`Harm_type`) — backs the content-desk
+   * pages, where a desk *is* a Claim Topic (see `lib/content-desks.ts`).
+   * Composes with the reader's Topic dropdown as an intersection: on
+   * `/fact-checks/climate`, selecting Gender narrows to fact-checks tagged
+   * both, the same way the desk route used to compose with it.
+   */
+  topics?: string[];
+  /**
+   * Restrict to fact-checks carrying *any* Claim Topic. Backs the desk catalog
+   * (`getContentDesks`), which folds the desks off exactly those articles — so
+   * every desk it lists has content the desk page's own `topics` scope finds.
+   */
+  anyTopic?: boolean;
   /**
    * Accepted type codes — backs the article-type pages. Several codes per type
    * because Superdesk's vocabulary and the site's page names have drifted
@@ -166,6 +174,18 @@ export type FactCheckWhere = {
 /** Columns a free-text query is matched against (case-insensitively). */
 const SEARCH_COLUMNS = ["title", "lead", "body"] as const;
 
+/** One `subject[]` clause: articles carrying any of `codes` under `scheme`. */
+function subjectClause(scheme: string, codes: string[]): SubjectClause {
+  return {
+    swp_article_metadata: {
+      swp_article_metadata_subjects: {
+        scheme: { _eq: scheme },
+        code: { _in: codes },
+      },
+    },
+  };
+}
+
 /**
  * Escape a user-supplied term for a SQL `LIKE` pattern: `%` and `_` are
  * wildcards and `\` is the escape character, so all three must be escaped
@@ -183,8 +203,9 @@ function likePattern(term: string): string {
  * Inactive dimensions are omitted entirely — an empty `_in: []` would match
  * nothing in Hasura, so we never emit one.
  *
- * `scope` narrows the listing further: `routeSlug` to one content desk
- * (`getByDesk`), `contentTypes` to one article type (`getByContentType`), and
+ * `scope` narrows the listing further: `topics` to one content desk
+ * (`getByDesk`), `anyTopic` to the topic-tagged corpus the desk catalog is
+ * folded from, `contentTypes` to one article type (`getByContentType`), and
  * `search` to a free-text query (`searchFactChecks`). All are still fact-check
  * listings, so the `Debunk` clause stays and each is one more `_and` clause on
  * top — the search clause being an `_or` across `title`/`lead`/`body`, so a
@@ -203,8 +224,17 @@ export function buildFactCheckWhere(
     },
   ];
 
-  if (scope.routeSlug) {
-    and.push({ swp_route: { slug: { _eq: scope.routeSlug } } });
+  if (scope.topics && scope.topics.length > 0) {
+    and.push(subjectClause(SUBJECT_SCHEME.topic, scope.topics));
+  } else if (scope.anyTopic) {
+    // Scheme with no `code` — "tagged with something under Claim Topic".
+    and.push({
+      swp_article_metadata: {
+        swp_article_metadata_subjects: {
+          scheme: { _eq: SUBJECT_SCHEME.topic },
+        },
+      },
+    });
   }
 
   if (scope.projects && scope.projects.length > 0) {
@@ -212,14 +242,7 @@ export function buildFactCheckWhere(
   }
 
   if (scope.contentTypes && scope.contentTypes.length > 0) {
-    and.push({
-      swp_article_metadata: {
-        swp_article_metadata_subjects: {
-          scheme: { _eq: CONTENT_TYPE_SCHEME },
-          code: { _in: scope.contentTypes },
-        },
-      },
-    });
+    and.push(subjectClause(CONTENT_TYPE_SCHEME, scope.contentTypes));
   }
 
   const search = scope.search?.trim();
@@ -232,16 +255,7 @@ export function buildFactCheckWhere(
 
   for (const dim of ["region", "topic"] as const) {
     const codes = filters[dim];
-    if (codes.length > 0) {
-      and.push({
-        swp_article_metadata: {
-          swp_article_metadata_subjects: {
-            scheme: { _eq: SUBJECT_SCHEME[dim] },
-            code: { _in: codes },
-          },
-        },
-      });
-    }
+    if (codes.length > 0) and.push(subjectClause(SUBJECT_SCHEME[dim], codes));
   }
 
   if (filters.language.length > 0) {
