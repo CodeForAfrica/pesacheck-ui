@@ -92,34 +92,77 @@ describe("buildFactCheckWhere", () => {
     expect(where._and).toHaveLength(1);
   });
 
-  it("scopes to a desk route when routeSlug is given (still Debunk)", () => {
+  it("scopes a desk to its Claim Topic, not a route (still Debunk)", () => {
     const where = buildFactCheckWhere(EMPTY_FILTERS, "t", {
-      routeSlug: "climate-change",
-    });
-    expect(where._and).toContainEqual({
-      swp_route: { slug: { _eq: "climate-change" } },
-    });
-    // Debunk clause kept; route is an additional AND clause.
-    expect(where._and).toHaveLength(2);
-  });
-
-  it("omits the route clause when routeSlug is absent", () => {
-    const where = buildFactCheckWhere(EMPTY_FILTERS, "t");
-    expect(JSON.stringify(where)).not.toContain("swp_route");
-  });
-
-  it("ANDs a desk route together with active filters", () => {
-    const where = buildFactCheckWhere(sel({ topic: ["elections"] }), "t", {
-      routeSlug: "elections",
-    });
-    expect(where._and).toContainEqual({
-      swp_route: { slug: { _eq: "elections" } },
+      topics: ["climate"],
     });
     expect(where._and).toContainEqual({
       swp_article_metadata: {
         swp_article_metadata_subjects: {
           scheme: { _eq: "Harm_type" },
-          code: { _in: ["elections"] },
+          code: { _in: ["climate"] },
+        },
+      },
+    });
+    // Debunk clause kept; the desk topic is an additional AND clause.
+    expect(where._and).toHaveLength(2);
+    // Desks are a taxonomy scope now — nothing keys off swp_route.
+    expect(JSON.stringify(where)).not.toContain("swp_route");
+  });
+
+  it("omits the desk clause when no topics are given", () => {
+    for (const scope of [{}, { topics: [] }]) {
+      const where = buildFactCheckWhere(EMPTY_FILTERS, "t", scope);
+      expect(JSON.stringify(where)).not.toContain("Harm_type");
+      expect(where._and).toHaveLength(1);
+    }
+  });
+
+  it("requires any Claim Topic for the desk catalog (scheme, no codes)", () => {
+    const where = buildFactCheckWhere(EMPTY_FILTERS, "t", { anyTopic: true });
+    expect(where._and).toContainEqual({
+      swp_article_metadata: {
+        swp_article_metadata_subjects: { scheme: { _eq: "Harm_type" } },
+      },
+    });
+    expect(where._and).toHaveLength(2);
+  });
+
+  it("prefers explicit topics over anyTopic (a desk page, not the catalog)", () => {
+    const where = buildFactCheckWhere(EMPTY_FILTERS, "t", {
+      anyTopic: true,
+      topics: ["climate"],
+    });
+    expect(where._and).toContainEqual({
+      swp_article_metadata: {
+        swp_article_metadata_subjects: {
+          scheme: { _eq: "Harm_type" },
+          code: { _in: ["climate"] },
+        },
+      },
+    });
+    expect(where._and).toHaveLength(2);
+  });
+
+  it("ANDs a desk topic together with the reader's Topic filter", () => {
+    // Claim Topic is multi-valued, so a desk plus a selected topic is the
+    // intersection: fact-checks tagged with both.
+    const where = buildFactCheckWhere(sel({ topic: ["gender"] }), "t", {
+      topics: ["climate"],
+    });
+    expect(where._and).toContainEqual({
+      swp_article_metadata: {
+        swp_article_metadata_subjects: {
+          scheme: { _eq: "Harm_type" },
+          code: { _in: ["climate"] },
+        },
+      },
+    });
+    expect(where._and).toContainEqual({
+      swp_article_metadata: {
+        swp_article_metadata_subjects: {
+          scheme: { _eq: "Harm_type" },
+          code: { _in: ["gender"] },
         },
       },
     });
@@ -168,9 +211,9 @@ describe("buildFactCheckWhere", () => {
     }
   });
 
-  it("ANDs an article type together with a desk route and active filters", () => {
+  it("ANDs an article type together with a desk topic and active filters", () => {
     const where = buildFactCheckWhere(sel({ language: ["en"] }), "t", {
-      routeSlug: "elections",
+      topics: ["elections"],
       contentTypes: ["longform"],
     });
     expect(where._and).toHaveLength(4);
@@ -205,12 +248,12 @@ describe("buildFactCheckWhere — free-text search", () => {
     }
   });
 
-  it("ANDs the query with active filters and a desk route", () => {
+  it("ANDs the query with active filters and a desk topic", () => {
     const where = buildFactCheckWhere(sel({ language: ["en"] }), "t", {
-      routeSlug: "elections",
+      topics: ["elections"],
       search: "vote",
     });
-    // Debunk + route + search + language
+    // Debunk + desk topic + search + language
     expect(where._and).toHaveLength(4);
   });
 });

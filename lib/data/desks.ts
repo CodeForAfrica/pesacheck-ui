@@ -1,32 +1,87 @@
-import { CONTENT_DESKS, type ContentDesk } from "@/lib/content-desks";
+import {
+  type ContentDesk,
+  deskBySlug,
+  deskFromTopic,
+} from "@/lib/content-desks";
 import { TAGS } from "@/lib/data/cache";
 import { gql, TENANT_CODE } from "@/lib/data/client";
-import { GET_COLLECTION_ROUTES } from "@/lib/data/queries/routes";
+import {
+  buildFactCheckWhere,
+  EMPTY_FILTERS,
+  SUBJECT_SCHEME,
+} from "@/lib/data/fact-check-filters";
+import { TAXONOMY_SAMPLE_SIZE } from "@/lib/data/filter-options";
+import { parseMetadata } from "@/lib/data/map";
+import { GET_CLAIM_TOPICS } from "@/lib/data/queries/taxonomy";
 
-type RoutesResponse = {
-  swp_route: { id: number; name: string; slug: string; type: string }[];
-};
+type ClaimTopicsResponse = { items: { metadata?: string | null }[] };
 
 /**
- * Fetch content desks from Hasura, in the curated order, with curated images and
- * live names. Throws on network/GraphQL error — callers use `?? CONTENT_DESKS`.
+ * The live content desks, from Superdesk.
  *
- * Content desks ARE routes (`swp_route` where type="collection"). But routes
- * carry no image, so we keep the curated images/order/labels from
- * `lib/content-desks` as the catalog; the backend drives which desks appear (a
- * desk shows only if a matching collection route exists). Display names stay
- * curated — staging route names have inconsistent casing ("health" vs "Gender").
+ * A desk is a **Claim Topic** (the `Harm_type` vocabulary): the catalog is the
+ * distinct Claim Topics carried by published fact-checks, under their Superdesk
+ * display names. Tagging an article with a new Claim Topic adds a desk; nothing
+ * here is curated except the thumbnails (`deskImage`), which Superdesk has no
+ * field for.
  *
- * Known gap: the Figma "migration" desk has no route on staging, so it drops out
+ * Reading the tagged articles rather than the vocabulary is forced — this
+ * GraphQL API exposes no vocabulary table (`docs/fact-check-filters.md`). It
+ * also means the row can only ever show desks with content behind them: the
+ * corpus read here is the same one, under the same `Debunk`/tenant/published
+ * definition, that `getByDesk` pages through.
+ *
+ * Throws on network/GraphQL error — callers use `?? CONTENT_DESKS`.
  */
 export async function getContentDesks(): Promise<ContentDesk[]> {
-  const { swp_route } = await gql<RoutesResponse>(
-    GET_COLLECTION_ROUTES,
-    { tenant: TENANT_CODE },
-    { tags: [TAGS.routes] },
+  const { items } = await gql<ClaimTopicsResponse>(
+    GET_CLAIM_TOPICS,
+    {
+      where: buildFactCheckWhere(EMPTY_FILTERS, TENANT_CODE, {
+        anyTopic: true,
+      }),
+      limit: TAXONOMY_SAMPLE_SIZE,
+    },
+    { tags: [TAGS.articles] },
   );
 
-  const liveSlugs = new Set(swp_route.map((r) => r.slug));
+  // `{code → label}`, first non-empty label winning: the display name lives in
+  // the `metadata` jsonb, and not every row spells it out.
+  const labels = new Map<string, string>();
+  for (const item of items) {
+    for (const subject of parseMetadata(item.metadata).subject ?? []) {
+      if (subject.scheme !== SUBJECT_SCHEME.topic) continue;
+      const code = subject.code?.trim();
+      if (!code) continue;
+      const known = labels.get(code);
+      if (known && known !== code) continue;
+      labels.set(code, subject.name?.trim() || code);
+    }
+  }
 
-  return CONTENT_DESKS.filter((desk) => liveSlugs.has(desk.slug));
+  const desks = new Map<string, ContentDesk>();
+  for (const [code, label] of labels) {
+    const desk = deskFromTopic({ code, label });
+    // A code with nothing URL-safe in it has no page to link to; two codes that
+    // normalise alike would collide, so the first one wins.
+    if (desk.slug && !desks.has(desk.slug)) desks.set(desk.slug, desk);
+  }
+
+  // Alphabetical, like the Topic dropdown — an order that doesn't reshuffle
+  // the row every time something is published.
+  return [...desks.values()].sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/**
+ * Resolve a `/fact-checks/<slug>` segment to a desk. The live catalog first,
+ * then the static one — which both covers Hasura being unreachable and keeps
+ * the design-era URLs (`/fact-checks/climate-change`) working now that slugs
+ * come from topic codes (`/fact-checks/climate`).
+ *
+ * `undefined` means the segment names no desk; the page then treats it as an
+ * article slug, and 404s if that fails too.
+ */
+export async function getDesk(slug: string): Promise<ContentDesk | undefined> {
+  const desks = await getContentDesks().catch(() => null);
+  return desks?.find((desk) => desk.slug === slug) ?? deskBySlug(slug);
 }

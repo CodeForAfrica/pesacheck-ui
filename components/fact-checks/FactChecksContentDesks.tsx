@@ -1,12 +1,17 @@
 import { ContentDesksRow } from "@/components/ui/ContentDesksRow";
 import { Container } from "@/components/ui/SectionHeading";
+import type { ContentDesk } from "@/lib/content-desks";
 
-// `activeSlug` defaults to "climate-change" — the desk highlighted in the Figma
-// design for the main fact-checks page. The single-desk page passes its own slug.
+/**
+ * The "Content Desks" row at the foot of a desk page. `desks` is the live
+ * catalog the page already fetched; omitting it falls back to the static one.
+ */
 export function FactChecksContentDesks({
-  activeSlug = "climate-change",
+  activeSlug,
+  desks,
 }: {
   activeSlug?: string;
+  desks?: ContentDesk[];
 }) {
   return (
     <section className="pb-16 lg:pb-20">
@@ -18,7 +23,7 @@ export function FactChecksContentDesks({
           </h2>
         </div>
 
-        <ContentDesksRow activeSlug={activeSlug} />
+        <ContentDesksRow activeSlug={activeSlug} desks={desks} />
       </Container>
     </section>
   );

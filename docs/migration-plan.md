@@ -201,8 +201,8 @@ Source of truth for queries/mappers: `pesacheck-pwa-app-router/services/`
 | `author` (Article) | `swp_article_authors` → `swp_author` | |
 | body paragraphs / inline image | `swp_article.body` | Convert via `articleBodyService.js:convertBodyImages` (rewrites img src to MEDIA_URL — already the non-S3 branch) |
 | `relatedStories` | `swp_article_related` | |
-| `ContentDesk{name,slug}` | `swp_route` where `type: "collection"` | **Confirmed 1:1** on staging: climate-change, gender, elections, public-finances, health, … |
-| `ContentDesk.image` | **TBD** | Routes carry no image — use a curated map or a representative article rendition |
+| `ContentDesk{name,slug,topic}` | `metadata.subject[]` where `scheme: "Harm_type"` (Claim Topic) | A desk is a Claim Topic, not a route: `swp_route` collections mix language desks, `team`, page routes, and carry no topic. See `docs/fact-check-filters.md`. |
+| `ContentDesk.image` | **curated** (`lib/content-desks.ts`) | No vocabulary table is exposed, so a term carries no artwork; keyed by topic code with a default |
 
 ### Already verified on staging (`tenant_code = e6lkum`)
 - Routes match the Figma content desks almost exactly (Climate Change, Gender,
@@ -242,7 +242,7 @@ Each phase keeps the static fallback; flip sections as they're proven.
   conversion, authors, tags, related stories.
 - **Phase 4 — Filters & pagination.** region / language / topic wired to real
   taxonomy; offset pagination (cf. `collectionService`).
-- **Phase 5 — Desk pages.** `/fact-checks/[desk]` from route collections.
+- **Phase 5 — Desk pages.** `/fact-checks/[desk]` scoped to the desk's Claim Topic.
 - **Phase 6 (optional) — Marketing pages** from `type: "content"` routes.
 
 ### Config changes to this repo (Phase 1)

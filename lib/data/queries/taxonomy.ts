@@ -33,3 +33,28 @@ export const GET_FACT_CHECK_TAXONOMY = /* GraphQL */ `
     }
   }
 `;
+
+/**
+ * `metadata` for the newest published fact-checks that carry a **Claim Topic**
+ * — the source of the content-desk catalog (`lib/data/desks.ts`).
+ *
+ * Narrower than `GET_FACT_CHECK_TAXONOMY` on purpose. That one samples the
+ * newest fact-checks whatever their tagging, and Claim Topic is applied to a
+ * small fraction of the corpus, so which slice it reads decides which topics
+ * it sees. The desk row can't live with that — a desk appearing and vanishing
+ * between renders means links that 404. Pushing "has a Claim Topic" into the
+ * `where` makes the server do the narrowing: `$limit` then bounds the
+ * *tagged* articles read, which reaches far deeper into the corpus for the
+ * same cost, and every topic it returns has published fact-checks behind it.
+ */
+export const GET_CLAIM_TOPICS = /* GraphQL */ `
+  query GetClaimTopics($where: swp_article_bool_exp!, $limit: Int!) {
+    items: swp_article(
+      where: $where
+      order_by: { published_at: desc }
+      limit: $limit
+    ) {
+      metadata
+    }
+  }
+`;

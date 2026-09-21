@@ -182,18 +182,22 @@ export function getFactChecks(
 
 /**
  * Fact-checks for a single content desk as a `FactCheckListing` — backs the desk
- * landing pages (`/fact-checks/<slug>`). A desk is a `swp_route` collection, so
- * this is `getFactChecks` scoped to that route via `buildFactCheckWhere`'s
- * `routeSlug` argument: same `Debunk` definition, same server-side pagination and
- * filtering, just narrowed to articles published on `slug`'s route.
+ * landing pages (`/fact-checks/<slug>`). A desk is a **Claim Topic**
+ * (`Harm_type`), so this is `getFactChecks` scoped to that topic via
+ * `buildFactCheckWhere`'s `topics` argument: same `Debunk` definition, same
+ * server-side pagination and filtering, narrowed to articles tagged `topic`.
+ *
+ * Takes the topic code, not the URL slug — the two differ (`/fact-checks/climate`
+ * is code `climate`, but so is the design-era `/fact-checks/climate-change`).
+ * `getDesk` in `lib/data/desks.ts` resolves one to the other.
  */
 export function getByDesk(
-  slug: string,
+  topic: string,
   page = 1,
   filters: FilterSelection = EMPTY_FILTERS,
 ): Promise<FactCheckListing> {
   return getFactCheckListing(
-    buildFactCheckWhere(filters, TENANT_CODE, { routeSlug: slug }),
+    buildFactCheckWhere(filters, TENANT_CODE, { topics: [topic] }),
     page,
   );
 }

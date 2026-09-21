@@ -458,6 +458,54 @@ PR1 (foundation) ─┬─ PR2a (home listings)
 ```
 PR1 must land first. PR2a / PR2b / PR3 can then proceed in parallel.
 
+## Content desks ← Claim Topic (supersedes the route-based desks of PR1/PR5)
+
+The desk row was still curated: `getContentDesks()` fetched `swp_route`
+collections only to decide which of the seven hardcoded `CONTENT_DESKS`
+survived, so names, images, order and the desk set were all frontend
+constants. Desks now come from Superdesk.
+
+- [x] **A desk is a Claim Topic** (`Harm_type`), not a `swp_route` collection.
+      Routes were never the right key: the collections mix language desks
+      (`english`, `somali`), `team`, and page routes, and carry no topic.
+      `ContentDesk` gains `topic` (the qcode); `slug` is the normalised code.
+- [x] `lib/data/desks.ts` — `getContentDesks()` folds the distinct Claim Topics
+      off published fact-checks via `GET_CLAIM_TOPICS`, with their Superdesk
+      display names. `getDesk(slug)` resolves a URL segment: live catalog first,
+      then `CONTENT_DESKS`.
+- [x] `buildFactCheckWhere`: `routeSlug` scope → `topics` (desk pages) and
+      `anyTopic` (the catalog read). Nothing keys off `swp_route` any more.
+- [x] `getByDesk` takes a topic code, not a slug. `app/fact-checks/[desk]`
+      fetches the catalog once for the listing, the metadata and the row;
+      `generateStaticParams` unions live slugs with the static ones.
+- [x] `FactChecksContentDesks` takes `desks`, so the row at the foot of a desk
+      page is live too (it was static).
+
+**Notes:**
+- **Why not reuse `getFilterOptions().topic`:** it samples the newest N
+  fact-checks whatever their tagging, and Claim Topic is sparse, so the topic
+  set moved between renders — desks appeared and vanished, and a linked desk
+  404'd. Verified in dev before the fix. `GET_CLAIM_TOPICS` pushes "carries a
+  Claim Topic" into the `where`, so the same `$limit` reaches much deeper and
+  every desk has content behind it. Rationale in
+  [`fact-check-filters.md`](./fact-check-filters.md#content-desks).
+- **Empty desks are gone by construction** — the catalog is folded off the same
+  corpus `getByDesk` pages through, under the same `Debunk`/tenant/published
+  definition. This replaces the PR5 note above about desk pages legitimately
+  showing the empty state.
+- **URLs changed; old ones still work.** Slugs are topic codes now
+  (`/fact-checks/climate`, not `/fact-checks/climate-change`). `CONTENT_DESKS`
+  doubles as the alias table, so the design-era URLs resolve to the same topic.
+- **Still curated, and why:** thumbnails (Superdesk has no artwork for a
+  vocabulary term, and no vocabulary table is exposed at all) and
+  `CONTENT_DESKS` as the degraded-mode fallback per the standing seam.
+- **Staging today:** Climate, Gender, Politics — 10 / 4 / 1 fact-checks. Health
+  is tagged but its article isn't a published fact-check, so it is correctly
+  absent rather than an empty desk.
+- **Caching:** the catalog is tagged `articles` (not `routes`), so a publish
+  refreshes the desk row. It is not read in the root layout, so this does not
+  put the whole site behind an article edit.
+
 ## Cross-cutting conventions (set in PR1, reused everywhere)
 - **Fallback pattern:** pages own data; `const data = (await getX().catch(() => null)) ?? fallback`.
 - **Keep `lib/*-content.ts`** as the typed fallback through the whole track.
