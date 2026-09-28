@@ -287,6 +287,30 @@ None of these show an error. The page simply comes out wrong.
   `content_list`, or a renamed list, produces an empty section rather than a
   warning.
 
+### Three of these are a profile setting, not a fact of life
+
+The first three cases are an empty field reaching the site, so marking the field
+**required** on its content profile turns each one into a validation error in
+Superdesk instead of a wrong page: `cta_url` on the tools profile, the body on
+clauses, `contact_email` on offices. Worth doing — an editor cannot then publish
+the broken state at all.
+
+The rest do not have that fix, which is why they are listed here rather than
+filed:
+
+- `cta_url` **cannot** be required on page sections. Only sections tagged `cta`
+  need it, and a profile requires a field of every article that uses it, so
+  requiring it would block every ordinary section on the site.
+- Sluglines, two heroes, shared lists and empty template sections are not empty
+  fields. They are relationships between articles, or between an article and a
+  list, and a profile can only validate one article at a time.
+- A mistyped `content_list` would be fixed by making it a vocabulary rather than
+  free text, so editors pick a list instead of spelling one.
+
+Content profiles cannot be edited through the API
+([`superdesk-setup.md`](./superdesk-setup.md#known-instance-problems)), so these
+are all administrator tasks in the Superdesk UI.
+
 ## Known problems
 
 Two things that are broken now and cannot be fixed by editing content.
@@ -300,5 +324,11 @@ the `Page Section` profile.
 **The imprint page returns "not found".** `/imprint` has no route in Publisher,
 so the page 404s even though its content is intact — `Page — Imprint` and
 `Page — Imprint — Sections` are both still populated, and the footer still links
-to it. Recreating a route with the slug `imprint` restores the page. The same
-clauses continue to appear on Contact Us in the meantime.
+to it. Still true as of 25 September 2026: staging has 18 routes and none of them
+is `imprint`.
+
+This is a fault to repair, not a behaviour to work around. The repair is one
+administrator action — create a Publisher route with the slug `imprint` — after
+which the existing content renders with no edit. It is recorded here only so that
+an editor who finds the page missing knows the content is safe and what to ask
+for. The same clauses continue to appear on Contact Us in the meantime.
