@@ -1,7 +1,11 @@
-import type { Article } from "@/lib/article-content";
+import { type Article, getArticleBySlug } from "@/lib/article-content";
 import { TAGS } from "@/lib/data/cache";
 import { gql, TENANT_CODE } from "@/lib/data/client";
-import { mapArticle, type RawFullArticle } from "@/lib/data/map";
+import {
+  isArchiveProfile,
+  mapArticle,
+  type RawFullArticle,
+} from "@/lib/data/map";
 import { GET_ARTICLE_BY_SLUG } from "@/lib/data/queries/article";
 
 type ArticleResponse = { article: RawFullArticle[] };
@@ -33,4 +37,18 @@ export async function getArticle(slug: string): Promise<Article> {
   if (!raw) throw new Error(`Article not found: ${slug}`);
 
   return mapArticle(raw);
+}
+
+/**
+ * The fact-check served at `/<slug>`, falling back to static content when the
+ * API has nothing. Null when the slug names something that isn't a fact-check.
+ *
+ * Asks whether the entry belongs in the archive rather than naming the
+ * profiles to exclude: the URL is resolved by slug alone, so naming exclusions
+ * left every profile added since being served as a fact-check.
+ */
+export async function getFactCheck(slug: string): Promise<Article | null> {
+  const live = await getArticle(slug).catch(() => null);
+  if (live) return isArchiveProfile(live.profile) ? live : null;
+  return getArticleBySlug(slug) ?? null;
 }

@@ -1,5 +1,7 @@
+// Images keep the `width` the body gives them (a 200px logo, ~70px social
+// icons): stretching them to the column is what made them dominate the band.
 const FOOTNOTE_CLASS =
-  "text-xs font-medium italic leading-[18px] text-neutral-700 [&_a]:underline [&_a]:text-pesacheck-blue";
+  "text-xs font-medium italic leading-[18px] text-neutral-700 [&_a]:underline [&_a]:text-pesacheck-blue [&_img]:h-auto [&_img]:max-w-full [&_img+*]:mt-2";
 
 export function ArticleFootnotes({ footnotes }: { footnotes: string[] }) {
   if (footnotes.length === 0) return null;
@@ -15,7 +17,7 @@ export function ArticleFootnotes({ footnotes }: { footnotes: string[] }) {
                   <div className="my-5 h-px w-full rounded-full bg-neutral-200" />
                 )}
                 {/* Sanitized in renderArticleBody; static footnotes are plain text. */}
-                <p
+                <div
                   className={FOOTNOTE_CLASS}
                   // biome-ignore lint/security/noDangerouslySetInnerHtml: sanitized in renderArticleBody
                   dangerouslySetInnerHTML={{ __html: html }}

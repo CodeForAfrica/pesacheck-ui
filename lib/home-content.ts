@@ -22,7 +22,7 @@ export type Story = {
 const PLACEHOLDER_TITLE =
   "Subtitle - different from title in the image - 20 words Max 3 lines";
 
-const ARTICLE_HREF = "/fact-checks/south-africas-manufacturing-surge";
+const ARTICLE_HREF = "/south-africas-manufacturing-surge";
 
 const EXCERPT =
   "Through strategic investments in technology, innovation, and workforce development, the nation is revitalizing its industrial base, creating jobs, and enhancing export opportunities in an...";

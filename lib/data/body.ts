@@ -61,19 +61,49 @@ export function renderBody(
   return clean || undefined;
 }
 
-/** Opener of PesaCheck's standard footer boilerplate. */
-const FOOTER_MARKER = "This post is part of an ongoing series of PesaCheck";
+/**
+ * Openers of PesaCheck's standard footer boilerplate, one per publishing
+ * language. Each article carries the footer in its own language, so matching
+ * only the English one left every other language's footer in the body, where
+ * its logos render at full article width.
+ *
+ * Kept to the opening words of the first text run: the rest of the sentence is
+ * split across `<i>`/`<b>` tags and its apostrophes vary.
+ */
+const FOOTER_MARKERS = [
+  "This post is part of an ongoing series of PesaCheck",
+  "Cette publication fait partie d",
+  "Chapisho hili ni miongoni mwa muendelezo",
+  "Maxxansi kun qaama hojii dhugaa baasuu PesaCheck",
+  "Qoraalkan ayaa qeyb ka ah taxane",
+  "ይህ ልጥፍ በፌስቡክ",
+];
+
+/** Position of the earliest footer marker in `html`, or -1. */
+function footerMarkerAt(html: string): number {
+  const found = FOOTER_MARKERS.map((m) => html.indexOf(m)).filter(
+    (i) => i >= 0,
+  );
+  return found.length > 0 ? Math.min(...found) : -1;
+}
 
 /**
- * Inner HTML of each `<p>` in an (already-sanitized) fragment, whitespace
- * collapsed. Tags are kept so footnote links (`<a href>`, `<br>`, `<b>`) survive
- * — footers often hyperlink "report" / "methodology".
+ * Each top-level block of an (already-sanitized) footer: paragraphs, and the
+ * `embed-block` divs and `figure`s that hold its images. Blocks are kept whole
+ * — the social icons are an `<img>` with its caption ("Follow Us") as a nested
+ * `<p>`, so taking paragraphs alone drops the icon and keeps a bare caption.
+ *
+ * A `div` match stops at the first `</div>`, which is safe because embed
+ * blocks do not nest.
  */
-function paragraphHtml(html: string): string[] {
+function footerBlocks(html: string): string[] {
   const out: string[] = [];
-  for (const match of html.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/g)) {
-    const inner = match[1].replace(/\s+/g, " ").trim();
-    if (inner) out.push(inner);
+  for (const match of html.matchAll(/<(p|div|figure)\b[^>]*>[\s\S]*?<\/\1>/g)) {
+    const block = match[0].replace(/\s+/g, " ").trim();
+    // Skip blocks with neither text nor an image, e.g. `<p> </p>` spacers.
+    if (/<img\b/.test(block) || block.replace(/<[^>]+>/g, "").trim()) {
+      out.push(block);
+    }
   }
   return out;
 }
@@ -82,10 +112,10 @@ export type RenderedBody = { bodyHtml?: string; footnotes: string[] };
 
 /**
  * Render a body and split the trailing PesaCheck boilerplate into footnotes.
- * `bodyHtml` is the main article (footer removed); `footnotes` are the boilerplate
- * paragraphs as **sanitized HTML** (links preserved — rendered via
- * `dangerouslySetInnerHTML` in `ArticleFootnotes`). When the marker is absent, the
- * whole body stays in `bodyHtml`.
+ * `bodyHtml` is the main article (footer removed); `footnotes` are the
+ * boilerplate's blocks as **sanitized HTML** (links and images preserved —
+ * rendered via `dangerouslySetInnerHTML` in `ArticleFootnotes`). When no
+ * marker is found, the whole body stays in `bodyHtml`.
  */
 export function renderArticleBody(
   html: string | null | undefined,
@@ -93,13 +123,18 @@ export function renderArticleBody(
   const clean = renderBody(html);
   if (!clean) return { footnotes: [] };
 
-  const markerAt = clean.indexOf(FOOTER_MARKER);
+  const markerAt = footerMarkerAt(clean);
   if (markerAt === -1) return { bodyHtml: clean, footnotes: [] };
 
-  // Cut at the <p> that opens the boilerplate so the band gets whole paragraphs.
+  // Cut at the <p> that opens the boilerplate so the band gets whole blocks.
   const footerStart = clean.lastIndexOf("<p", markerAt);
   if (footerStart === -1) return { bodyHtml: clean, footnotes: [] };
 
-  const bodyHtml = clean.slice(0, footerStart).trim() || undefined;
-  return { bodyHtml, footnotes: paragraphHtml(clean.slice(footerStart)) };
+  // Non-English footers are preceded by an `<hr>`; the band replaces it.
+  const bodyHtml =
+    clean
+      .slice(0, footerStart)
+      .replace(/(\s*<hr\s*\/?>)+\s*$/, "")
+      .trim() || undefined;
+  return { bodyHtml, footnotes: footerBlocks(clean.slice(footerStart)) };
 }

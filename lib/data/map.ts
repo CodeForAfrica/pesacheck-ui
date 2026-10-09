@@ -260,12 +260,13 @@ export function computeReadTime(
   return `${Math.max(1, Math.round(words / 200))} min`;
 }
 
-/** Article link: `/fact-checks/<desk>/<slug>` (canonical [desk]/[slug] route). */
+/**
+ * Article link: `/<slug>`, the URL the Ghost site served it at, so links into
+ * the archive from before the move keep resolving. Served by the `[...slug]`
+ * catch-all; Superdesk slugs are Ghost's, mangled accents included.
+ */
 function storyHref(article: RawArticle): string {
-  const desk = article.swp_route?.slug;
-  return desk
-    ? `/fact-checks/${desk}/${article.slug}`
-    : `/fact-checks/${article.slug}`;
+  return `/${article.slug}`;
 }
 
 /**
@@ -369,7 +370,7 @@ export function teamHref(slug: string): string {
 
 /**
  * Link to an entry's own page. A Media Centre entry is not a fact-check and
- * reads wrongly under `/fact-checks`, so it gets its own URL; anything else
+ * reads wrongly among fact-checks, so it gets its own URL; anything else
  * keeps the archive's.
  */
 function entryHref(article: RawArticle): string {

@@ -159,7 +159,7 @@ export const HERO_PREVIEW: Story[] = [
 // A featured trio (one large feature + two stacked secondaries) followed by a
 // 4-column grid. Every card is tagged so the filter bar can narrow the set.
 
-const ARTICLE_HREF = "/fact-checks/south-africas-manufacturing-surge";
+const ARTICLE_HREF = "/south-africas-manufacturing-surge";
 
 export const FEATURE: Story = {
   image: "/images/spotlight/long-format6-5.png",

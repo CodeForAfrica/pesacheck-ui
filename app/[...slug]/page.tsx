@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { ArticleView } from "@/components/article/ArticleView";
 import { PageView } from "@/components/pages/PageView";
+import { getFactCheck } from "@/lib/data/article";
 import { getPage } from "@/lib/data/pages";
 
 type Params = Promise<{ slug: string[] }>;
@@ -11,9 +13,26 @@ function pathOf(segments: string[]): string {
   return segments.join("/");
 }
 
+/**
+ * What a path names: a Publisher page, else — for a single segment — a
+ * fact-check, which lives at `/<slug>` so Ghost-era URLs keep resolving.
+ *
+ * A page wins a clash because an editor chose its URL; an article's slug is
+ * derived from its headline.
+ */
+async function resolve(segments: string[]) {
+  const page = await getPage(pathOf(segments)).catch(() => null);
+  if (page) return { kind: "page", page } as const;
+  if (segments.length !== 1) return null;
+  const article = await getFactCheck(segments[0]);
+  return article ? ({ kind: "article", article } as const) : null;
+}
+
 export const revalidate = 300;
 
 /**
+ * A fact-check, at `/<slug>` — see `resolve`. Or:
+ *
  * A page defined entirely in Publisher: a route declares it exists and a
  * `Page — <name>` content list holds its sections. Adding one needs no deploy.
  *
@@ -35,9 +54,17 @@ export async function generateMetadata({
   params: Params;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const page = await getPage(pathOf(slug)).catch(() => null);
-  if (!page) return {};
+  const found = await resolve(slug);
+  if (!found) return {};
 
+  if (found.kind === "article") {
+    return {
+      title: `${found.article.title} — PesaCheck`,
+      description: found.article.leadParagraphs[0],
+    };
+  }
+
+  const { page } = found;
   return {
     title: `${page.title} — PesaCheck`,
     description: page.description ?? (page.hero.subtitle || undefined),
@@ -46,8 +73,12 @@ export async function generateMetadata({
 
 export default async function PublisherPage({ params }: { params: Params }) {
   const { slug } = await params;
-  const page = await getPage(pathOf(slug)).catch(() => null);
-  if (!page) notFound();
+  const found = await resolve(slug);
+  if (!found) notFound();
 
-  return <PageView page={page} />;
+  return found.kind === "article" ? (
+    <ArticleView article={found.article} />
+  ) : (
+    <PageView page={found.page} />
+  );
 }

@@ -211,7 +211,7 @@ describe("mapStory", () => {
       excerpt: "The claim that...",
       date: "Jul 28",
       readTime: "1 min",
-      href: "/fact-checks/english/false-equating-somalia-and-al-shabab-is-untrue",
+      href: "/false-equating-somalia-and-al-shabab-is-untrue",
     });
   });
 
@@ -304,7 +304,7 @@ describe("mapStory", () => {
     expect(story.excerpt).toBeUndefined();
     expect(story.date).toBeUndefined();
     expect(story.readTime).toBeUndefined();
-    expect(story.href).toBe("/fact-checks/bare");
+    expect(story.href).toBe("/bare");
   });
 });
 
@@ -360,7 +360,7 @@ describe("Media Centre mappers", () => {
       title: "Global newsrooms credit PesaCheck on cross-border debunks",
       date: "Jul 15",
       readTime: "1 min",
-      href: "/fact-checks/english/global-newsrooms-credit-pesacheck",
+      href: "/global-newsrooms-credit-pesacheck",
     });
   });
 
@@ -370,7 +370,7 @@ describe("Media Centre mappers", () => {
       tag: "International newsrooms",
       title: "Global newsrooms credit PesaCheck on cross-border debunks",
       excerpt: "Coverage of the network's work.",
-      href: "/fact-checks/english/global-newsrooms-credit-pesacheck",
+      href: "/global-newsrooms-credit-pesacheck",
     });
   });
 
@@ -397,7 +397,7 @@ describe("Media Centre mappers", () => {
       kind: "International newsrooms",
       body: "Coverage of the network's work.",
       tone: "blue",
-      href: "/fact-checks/english/global-newsrooms-credit-pesacheck",
+      href: "/global-newsrooms-credit-pesacheck",
     });
   });
 
@@ -419,7 +419,7 @@ describe("Media Centre mappers", () => {
     ]);
     expect(event.cta).toEqual({
       label: "Request an invitation",
-      href: "/fact-checks/english/global-newsrooms-credit-pesacheck",
+      href: "/global-newsrooms-credit-pesacheck",
     });
   });
 
@@ -435,7 +435,7 @@ describe("Media Centre mappers", () => {
       title: "Global newsrooms credit PesaCheck on cross-border debunks",
       body: "Coverage of the network's work.",
       kind: "International newsrooms",
-      href: "/fact-checks/english/global-newsrooms-credit-pesacheck",
+      href: "/global-newsrooms-credit-pesacheck",
     });
   });
 
@@ -517,19 +517,17 @@ describe("Media Centre mappers", () => {
     // The fixture carries no profile — as every article did before the Media
     // Centre profiles existed.
     expect(mapAnnouncement(article).href).toBe(
-      "/fact-checks/english/global-newsrooms-credit-pesacheck",
+      "/global-newsrooms-credit-pesacheck",
     );
     const factCheck = {
       ...article,
       metadata: JSON.stringify({ subject: [], profile: "Article" }),
     };
     expect(mapNewsItem(factCheck).href).toBe(
-      "/fact-checks/english/global-newsrooms-credit-pesacheck",
+      "/global-newsrooms-credit-pesacheck",
     );
     // mapStory always points at the archive, whatever the profile.
-    expect(mapStory(factCheck).href).toBe(
-      "/fact-checks/english/global-newsrooms-credit-pesacheck",
-    );
+    expect(mapStory(factCheck).href).toBe("/global-newsrooms-credit-pesacheck");
   });
 
   it("takes a strand's accent from its position, cycling every four", () => {
@@ -607,9 +605,37 @@ describe("renderArticleBody", () => {
     expect(bodyHtml).not.toContain("This post is part");
     expect(bodyHtml).not.toContain("public finance fact-checking");
     expect(footnotes).toEqual([
-      "This post is part of an ongoing series of PesaCheck fact-checks examining misinformation.",
-      "PesaCheck is East Africa’s first public finance fact-checking initiative.",
+      "<p>This post is part of an ongoing series of PesaCheck fact-checks examining misinformation.</p>",
+      "<p>PesaCheck is East Africa’s first public finance fact-checking initiative.</p>",
     ]);
+  });
+
+  it("keeps footer images with their captions (the social icons)", () => {
+    // English bodies wrap each icon and its caption in an embed block.
+    const html = [
+      "<p>The claim is false.</p>",
+      "<p><i>This post is part of an ongoing series of PesaCheck fact-checks.</i></p>",
+      '<div class="embed-block"><img src="https://example.org/follow.png" width="70" height="53"><p class="embed-block__description">Follow Us</p></div>',
+    ].join("\n");
+    const { footnotes } = renderArticleBody(html);
+    expect(footnotes).toHaveLength(2);
+    expect(footnotes[1]).toContain(
+      '<img src="https://example.org/follow.png" width="70"',
+    );
+    expect(footnotes[1]).toContain("Follow Us");
+  });
+
+  it("finds the footer in other languages, dropping the rule before it", () => {
+    // Non-English bodies use figures, and an <hr> above the footer.
+    const html = [
+      "<p>PesaCheck a conclu qu’elle est FAUSSE.</p><hr>",
+      "<p><em>Cette publication fait partie d’une série continue de vérifications.</em></p>",
+      '<figure class="kg-card"><img src="https://example.org/logo.png" width="200" height="200"></figure>',
+    ].join("");
+    const { bodyHtml, footnotes } = renderArticleBody(html);
+    expect(bodyHtml).toBe("<p>PesaCheck a conclu qu’elle est FAUSSE.</p>");
+    expect(footnotes).toHaveLength(2);
+    expect(footnotes[1]).toContain('width="200"');
   });
 
   it("keeps the whole body when the marker is absent", () => {
@@ -699,9 +725,7 @@ describe("mapArticle", () => {
     expect(article.bodyParagraphs).toEqual([]);
     expect(article.bodyHtml).toContain('href="https://archive.ph/x"');
     expect(article.relatedStories).toHaveLength(1);
-    expect(article.relatedStories[0].href).toBe(
-      "/fact-checks/english/related-one",
-    );
+    expect(article.relatedStories[0].href).toBe("/related-one");
   });
 
   it("is null-safe for sparse staging data (no media, authors, keywords, related)", () => {
@@ -743,7 +767,7 @@ describe("mapArticle", () => {
     expect(article.bodyHtml).toContain("The claim is false.");
     expect(article.bodyHtml).not.toContain("This post is part");
     expect(article.footnotes).toEqual([
-      "This post is part of an ongoing series of PesaCheck fact-checks examining misinformation.",
+      "<p>This post is part of an ongoing series of PesaCheck fact-checks examining misinformation.</p>",
     ]);
   });
 
@@ -906,7 +930,7 @@ describe("mapEcosystemItem", () => {
         { field_name: "partner_role", value: "<p>Network member</p>" },
       ],
     };
-    expect(mapEcosystemItem(noUrl, 0).href).toBe("/fact-checks/english/ifcn");
+    expect(mapEcosystemItem(noUrl, 0).href).toBe("/ifcn");
   });
 
   it("cycles the accent by position, every four", () => {
