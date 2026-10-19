@@ -110,6 +110,38 @@ export function getVerdict(raw: string | null | undefined): string | undefined {
 }
 
 /**
+ * The approved verdict illustration for each Debunk rating, served from
+ * `public/images/verdicts/`. Keyed by `verdictKey`, so "Partly false" and
+ * "Partly False" find the same image.
+ *
+ * A fact-check shows its rating's image instead of its own feature media.
+ * Editors used to upload the verdict graphic with every post, which filled
+ * media storage with copies and let the graphic disagree with the rating;
+ * deriving it means old posts get the new style without being edited.
+ *
+ * A rating missing here (Satire, Misleading, …) keeps the post's own image.
+ */
+const VERDICT_IMAGES: Record<string, string> = {
+  false: "/images/verdicts/false.jpg",
+  hoax: "/images/verdicts/hoax.jpg",
+  altered: "/images/verdicts/altered.jpg",
+  "partly-false": "/images/verdicts/partly-false.jpg",
+  "missing-context": "/images/verdicts/missing-context.jpg",
+};
+
+function verdictKey(verdict: string): string {
+  return verdict
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+/** The illustration for a verdict, or undefined when it has none. */
+export function verdictImage(verdict: string | undefined): string | undefined {
+  return verdict ? VERDICT_IMAGES[verdictKey(verdict)] : undefined;
+}
+
+/**
  * Display labels for the ISO language codes PesaCheck publishes in. The card's
  * `Story.language` is a human label (parity with the static design data), while
  * the server-side language *filter* keys off the raw `swp_article_metadata.language`
@@ -414,18 +446,22 @@ export function mapArticle(raw: RawFullArticle): Article {
 
   const { bodyHtml, footnotes } = renderArticleBody(raw.body);
 
+  const verdict = findSubject(meta, "Debunk")?.name;
+  const verdictSrc = verdictImage(verdict);
   const media = raw.swp_article_feature_media;
-  const alt = featureMediaAlt(media, raw.title);
-  const featureSrc = pickExactImage(media?.renditions ?? undefined);
+  const alt =
+    verdictSrc && verdict ? verdict : featureMediaAlt(media, raw.title);
+  const featureSrc =
+    verdictSrc ?? pickExactImage(media?.renditions ?? undefined);
 
   return {
     slug: raw.slug,
     format: "short",
-    image: pickStoryImage(media?.renditions ?? undefined),
+    image: verdictSrc ?? pickStoryImage(media?.renditions ?? undefined),
     featureImage: featureSrc ? { src: featureSrc, alt } : undefined,
     alt,
     title: raw.title,
-    verdict: findSubject(meta, "Debunk")?.name,
+    verdict,
     tags,
     date: formatStoryDate(raw.published_at) ?? "",
     readTime: computeReadTime(raw.body) ?? "",
@@ -449,12 +485,19 @@ export function mapArticle(raw: RawFullArticle): Article {
 export function mapStory(article: RawArticle): Story {
   const meta = parseMetadata(article.metadata);
   const lead = article.lead ? stripHtml(article.lead) : "";
+  const verdict = findSubject(meta, "Debunk")?.name;
+  const verdictSrc = verdictImage(verdict);
   return {
-    image: pickStoryImage(
-      article.swp_article_feature_media?.renditions ?? undefined,
-    ),
-    alt: featureMediaAlt(article.swp_article_feature_media, article.title),
-    verdict: findSubject(meta, "Debunk")?.name,
+    image:
+      verdictSrc ??
+      pickStoryImage(
+        article.swp_article_feature_media?.renditions ?? undefined,
+      ),
+    alt:
+      verdictSrc && verdict
+        ? verdict
+        : featureMediaAlt(article.swp_article_feature_media, article.title),
+    verdict,
     title: article.title,
     excerpt: lead || undefined,
     // Display taxonomy from the jsonb `subject[]` / `language` (the server-side
