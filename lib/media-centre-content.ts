@@ -109,7 +109,7 @@ export const NEWS: NewsItem[] = [
     alt: "",
     outlet: "International newsrooms",
     title: "Global newsrooms credit PesaCheck on cross-border debunks",
-    date: "Jul 24",
+    date: "Jul 24, 2026",
     readTime: "4 min",
     href: "#",
   },
@@ -119,7 +119,7 @@ export const NEWS: NewsItem[] = [
     outlet: "Platform reporting",
     title:
       "Third-party reporting on how fact-checking operates across African markets",
-    date: "Jul 11",
+    date: "Jul 11, 2026",
     readTime: "5 min",
     href: "#",
   },
@@ -129,7 +129,7 @@ export const NEWS: NewsItem[] = [
     outlet: "Sector review",
     title:
       "Annual reviews of the field cite the scale of African verification networks",
-    date: "Jun 28",
+    date: "Jun 28, 2026",
     readTime: "6 min",
     href: "#",
   },
@@ -139,7 +139,7 @@ export const NEWS: NewsItem[] = [
     outlet: "Broadcast",
     title:
       "Our editors on air explaining how a viral claim was traced to its source",
-    date: "Jun 09",
+    date: "Jun 09, 2026",
     readTime: "3 min",
     href: "#",
   },

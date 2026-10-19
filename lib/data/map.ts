@@ -235,7 +235,11 @@ function featureMediaAlt(
   return description || title;
 }
 
-/** Short month + day (e.g. "Jul 28"), in UTC for deterministic output. */
+/**
+ * Short month, day and year (e.g. "Jul 28, 2024"), in UTC for deterministic
+ * output. The year is part of the card date because the archive runs back
+ * nearly a decade — "Jul 28" alone reads as recent whatever its age.
+ */
 export function formatStoryDate(
   published: string | null | undefined,
 ): string | undefined {
@@ -245,6 +249,7 @@ export function formatStoryDate(
   return new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric",
+    year: "numeric",
     timeZone: "UTC",
   }).format(date);
 }
