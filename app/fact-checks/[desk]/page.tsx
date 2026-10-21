@@ -150,7 +150,7 @@ export default async function ContentDeskOrArticlePage({
 
   // Only the hero is awaited here: it does not change with filters, so it
   // should not be replaced by a placeholder every time one is applied.
-  const heroStories = await getDeskHero(desk.name).catch(() => null);
+  const heroStories = await getDeskHero(desk).catch(() => null);
 
   return (
     <>

@@ -135,22 +135,34 @@ export function getHeroPreview(): Promise<Story[]> {
   return getContentListStories("Homepage — Hero");
 }
 
+/** How many of a desk's newest fact-checks fill its hero when none are curated. */
+export const DESK_HERO_SIZE = 5;
+
 /**
  * Hero carousel stories for a single content desk — backs the desk landing
- * page's `FactChecksHero`. Each desk is expected to have its own curated content
- * list named `"<Desk Name> — Hero"` (e.g. `"Climate Change — Hero"`), mirroring
- * the homepage's `"Homepage — Hero"` list.
+ * page's `FactChecksHero`. An editor can curate one as a content list named
+ * `"<Desk Name> — Hero"` (e.g. `"Climate — Hero"`), mirroring the homepage's
+ * `"Homepage — Hero"`.
  *
- * When the per-desk lists don't exist, this returns `[]` for both
- * cases `getContentListStories` collapses together: the list is **missing**
- * (`swp_content_list` matches nothing) and the list **exists but has no
- * (article) items**.
- * The component treats an empty result as "no featured fact-checks yet" and renders
- * its empty state. A thrown network/GraphQL error is caught by the page and also
- * yields the empty state.
+ * Without one — the usual case, since desks come from Claim Topics and a new
+ * topic has no list — the hero shows the desk's newest fact-checks. Leaving it
+ * empty read as "this desk has nothing" above a listing full of fact-checks.
+ *
+ * Takes the desk's name (for the list) and its topic code (for the fallback);
+ * see `getByDesk` for why the code is not the slug.
  */
-export function getDeskHero(deskName: string): Promise<Story[]> {
-  return getContentListStories(`${deskName} — Hero`);
+export async function getDeskHero(desk: {
+  name: string;
+  topic: string;
+}): Promise<Story[]> {
+  const curated = await getContentListStories(`${desk.name} — Hero`).catch(
+    () => [],
+  );
+  if (curated.length > 0) return curated;
+
+  // Page 1 unfiltered is the query the listing below makes, so it is cached once.
+  const { stories } = await getByDesk(desk.topic);
+  return stories.slice(0, DESK_HERO_SIZE);
 }
 
 /**
