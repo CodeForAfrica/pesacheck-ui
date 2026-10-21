@@ -119,6 +119,35 @@ the set this build ships; a role tagged with anything else falls back to the
 default rather than rendering an empty badge. **Adding a fourth icon is a code
 change**, and that is the one part of these pages an editor cannot do alone.
 
+### `verdict_image` — labelled **Verdict Image**
+
+A subject vocabulary (single selection) on the fact-check profile. A
+fact-check shows the approved illustration for its Debunk rating
+(`public/images/verdicts/`, mapped in `VERDICT_IMAGES` in `lib/data/map.ts`)
+instead of its own feature image. This vocabulary is how an editor opts out for
+one post:
+
+| qcode | Name | Shows |
+| --- | --- | --- |
+| `default` | Default | the rating's illustration |
+| `uploaded` | Use uploaded image | the post's own feature image |
+
+**The qcodes are the contract**, read by `VERDICT_IMAGE_UPLOADED`; the names
+are free to change.
+
+Untagged means `default`, deliberately. Every post migrated from Ghost carries
+the old verdict graphic as its feature image, so treating any upload as an
+override would have put those graphics back. A rating with no illustration
+(Satire, Misleading, False headline) shows the feature image whatever this is
+set to.
+
+`scripts/create-verdict-image-vocabulary.py` creates the vocabulary through the
+API (dry run by default; `--apply` to write; safe to re-run). Adding it to the
+Article profile's Subject field is then a UI step, since profiles cannot be
+edited through the API — and a profile edit made only in the UI is reverted by
+the next `superdesk-bootstrap`, so the field also belongs in the tracked
+`server/data/content_types.json` in `superdesk-pesacheck`.
+
 ### Team and ecosystem custom fields
 
 All `field_type: "text"`, so each is its own field and lands in
