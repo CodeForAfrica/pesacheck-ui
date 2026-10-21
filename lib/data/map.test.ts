@@ -23,6 +23,7 @@ import {
   type RawArticle,
   type RawFullArticle,
   type Rendition,
+  verdictImage,
 } from "@/lib/data/map";
 
 // MEDIA_URL is set to "https://media.test/" in vitest.config.ts.
@@ -188,7 +189,7 @@ describe("mapStory", () => {
     body: `<p>${"word ".repeat(200)}</p>`,
     published_at: "2024-07-28T10:00:00+00:00",
     metadata: JSON.stringify({
-      subject: [{ scheme: "Debunk", code: "false", name: "False" }],
+      subject: [{ scheme: "Debunk", code: "satire", name: "Satire" }],
     }),
     swp_route: { slug: "english", staticprefix: "/english" },
     swp_article_feature_media: {
@@ -206,7 +207,7 @@ describe("mapStory", () => {
     expect(mapStory(article)).toEqual({
       image: "https://media.test/abc.webp",
       alt: "A photo caption",
-      verdict: "False",
+      verdict: "Satire",
       title: "Equating Somalia and Al-Shabaab is untrue",
       excerpt: "The claim that...",
       date: "Jul 28, 2024",
@@ -221,7 +222,7 @@ describe("mapStory", () => {
       metadata: JSON.stringify({
         language: "en",
         subject: [
-          { scheme: "Debunk", code: "false", name: "False" },
+          { scheme: "Debunk", code: "satire", name: "Satire" },
           { scheme: "countries", code: "UGA", name: "Uganda" },
           { scheme: "01harm", code: "polit_harm", name: "Political" },
         ],
@@ -671,7 +672,7 @@ describe("mapArticle", () => {
     body: `<p><a href="https://archive.ph/x">${"word ".repeat(200)}</a></p>`,
     published_at: "2024-04-02T14:40:08",
     metadata: JSON.stringify({
-      subject: [{ scheme: "Debunk", code: "false", name: "False" }],
+      subject: [{ scheme: "Debunk", code: "satire", name: "Satire" }],
     }),
     swp_route: { slug: "english", staticprefix: "/english" },
     swp_article_metadata: { byline: "Desk byline" },
@@ -708,7 +709,7 @@ describe("mapArticle", () => {
     const article = mapArticle(full);
     expect(article.slug).toBe("false-equating-somalia-and-al-shabab-is-untrue");
     expect(article.format).toBe("short");
-    expect(article.verdict).toBe("False");
+    expect(article.verdict).toBe("Satire");
     expect(article.tags).toEqual(["Somalia", "Security"]);
     expect(article.author).toBe("Jane Doe, John Roe");
     expect(article.date).toBe("Apr 2, 2024");
@@ -738,7 +739,7 @@ describe("mapArticle", () => {
       body: "<p>Some <b>claim</b>.</p>",
       published_at: "2024-04-02T14:40:08",
       metadata: JSON.stringify({
-        subject: [{ scheme: "Debunk", code: "false", name: "False" }],
+        subject: [{ scheme: "Debunk", code: "satire", name: "Satire" }],
       }),
       swp_route: { slug: "english", staticprefix: "/english" },
       swp_article_metadata: { byline: null },
@@ -750,7 +751,7 @@ describe("mapArticle", () => {
     expect(article.tags).toEqual([]);
     expect(article.relatedStories).toEqual([]);
     expect(article.author).toBe("PesaCheck");
-    expect(article.verdict).toBe("False");
+    expect(article.verdict).toBe("Satire");
     expect(article.image).toBe("/images/spotlight/long-format3-2.png");
     expect(article.featureImage).toBeUndefined();
     expect(article.bodyHtml).toContain("<b>claim</b>");
@@ -974,5 +975,62 @@ describe("isPageSectionProfile", () => {
     expect(isPageSectionProfile("Article")).toBe(false);
     expect(isPageSectionProfile("Team Member")).toBe(false);
     expect(isPageSectionProfile(undefined)).toBe(false);
+  });
+});
+
+describe("verdict images", () => {
+  const rated = (name: string): RawArticle => ({
+    id: 9,
+    title: "A rated fact-check",
+    slug: "a-rated-fact-check",
+    lead: null,
+    body: null,
+    published_at: null,
+    metadata: JSON.stringify({
+      subject: [{ scheme: "Debunk", code: "x", name }],
+    }),
+    swp_route: { slug: "english", staticprefix: "/english" },
+    swp_article_feature_media: {
+      description: "<p>false</p>",
+      renditions: [
+        {
+          name: "viewImage",
+          image: { asset_id: "old", file_extension: "png", variants: [] },
+        },
+      ],
+    },
+  });
+
+  it("maps each illustrated rating, whatever its casing", () => {
+    expect(verdictImage("False")).toBe("/images/verdicts/false.jpg");
+    expect(verdictImage("Partly False")).toBe(
+      "/images/verdicts/partly-false.jpg",
+    );
+    expect(verdictImage("Missing context")).toBe(
+      "/images/verdicts/missing-context.jpg",
+    );
+  });
+
+  it("is undefined for a rating with no illustration, or none at all", () => {
+    expect(verdictImage("Satire")).toBeUndefined();
+    expect(verdictImage(undefined)).toBeUndefined();
+  });
+
+  it("replaces the uploaded feature media on cards and the article page", () => {
+    // The uploaded graphic can disagree with the rating: this one is Hoax.
+    const story = mapStory(rated("Hoax"));
+    expect(story.image).toBe("/images/verdicts/hoax.jpg");
+    expect(story.alt).toBe("Hoax");
+
+    const article = mapArticle(rated("Hoax") as RawFullArticle);
+    expect(article.image).toBe("/images/verdicts/hoax.jpg");
+    expect(article.featureImage).toEqual({
+      src: "/images/verdicts/hoax.jpg",
+      alt: "Hoax",
+    });
+  });
+
+  it("keeps the post's own image for a rating with no illustration", () => {
+    expect(mapStory(rated("Satire")).image).not.toContain("/images/verdicts/");
   });
 });
