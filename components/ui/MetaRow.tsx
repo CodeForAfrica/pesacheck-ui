@@ -33,7 +33,7 @@ export function TaxonomyRow({
 
 /** Date / read-time row: calendar · clock (text-sm, 6px dot separator). */
 export function DateRow({
-  date = "Jul 28",
+  date = "Jul 28, 2026",
   readTime = "3 min",
 }: {
   date?: string;

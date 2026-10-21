@@ -146,8 +146,8 @@ describe("getVerdict", () => {
 });
 
 describe("formatStoryDate", () => {
-  it("formats an ISO timestamp as short month + day (UTC)", () => {
-    expect(formatStoryDate("2024-07-28T23:30:00+00:00")).toBe("Jul 28");
+  it("formats an ISO timestamp as short month + day + year (UTC)", () => {
+    expect(formatStoryDate("2024-07-28T23:30:00+00:00")).toBe("Jul 28, 2024");
   });
 
   it("returns undefined for null/undefined/invalid input", () => {
@@ -209,7 +209,7 @@ describe("mapStory", () => {
       verdict: "False",
       title: "Equating Somalia and Al-Shabaab is untrue",
       excerpt: "The claim that...",
-      date: "Jul 28",
+      date: "Jul 28, 2024",
       readTime: "1 min",
       href: "/false-equating-somalia-and-al-shabab-is-untrue",
     });
@@ -358,7 +358,7 @@ describe("Media Centre mappers", () => {
       alt: "A photo caption",
       outlet: "International newsrooms",
       title: "Global newsrooms credit PesaCheck on cross-border debunks",
-      date: "Jul 15",
+      date: "Jul 15, 2026",
       readTime: "1 min",
       href: "/global-newsrooms-credit-pesacheck",
     });
@@ -711,7 +711,7 @@ describe("mapArticle", () => {
     expect(article.verdict).toBe("False");
     expect(article.tags).toEqual(["Somalia", "Security"]);
     expect(article.author).toBe("Jane Doe, John Roe");
-    expect(article.date).toBe("Apr 2");
+    expect(article.date).toBe("Apr 2, 2024");
     expect(article.readTime).toBe("1 min");
     expect(article.image).toBe("https://media.test/abc.webp");
     expect(article.alt).toBe("A caption");
