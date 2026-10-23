@@ -119,7 +119,8 @@ export function getVerdict(raw: string | null | undefined): string | undefined {
  * media storage with copies and let the graphic disagree with the rating;
  * deriving it means old posts get the new style without being edited.
  *
- * A rating missing here (Satire, Misleading, …) keeps the post's own image.
+ * A rating missing here (Satire, Misleading, …) keeps the post's own image,
+ * and so does a post an editor overrides — see `VERDICT_IMAGE_SCHEME`.
  */
 const VERDICT_IMAGES: Record<string, string> = {
   false: "/images/verdicts/false.jpg",
@@ -136,9 +137,31 @@ function verdictKey(verdict: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
+/**
+ * Subject vocabulary ("Verdict Image" in Superdesk) letting an editor show the
+ * post's own feature image instead of its rating's illustration. Opt-in by
+ * design: every post migrated from Ghost carries the old verdict graphic as
+ * its feature image, so preferring an upload whenever one exists would undo
+ * the backfill. Untagged, or tagged `default`, means the illustration.
+ */
+export const VERDICT_IMAGE_SCHEME = "verdict_image";
+export const VERDICT_IMAGE_UPLOADED = "uploaded";
+
 /** The illustration for a verdict, or undefined when it has none. */
 export function verdictImage(verdict: string | undefined): string | undefined {
   return verdict ? VERDICT_IMAGES[verdictKey(verdict)] : undefined;
+}
+
+/**
+ * The illustration a post shows in place of its feature media: its rating's,
+ * unless the editor chose the uploaded image. Undefined means use the media.
+ */
+function verdictImageFor(
+  meta: ArticleMetadata,
+  verdict: string | undefined,
+): string | undefined {
+  const choice = findSubject(meta, VERDICT_IMAGE_SCHEME)?.code;
+  return choice === VERDICT_IMAGE_UPLOADED ? undefined : verdictImage(verdict);
 }
 
 /**
@@ -452,7 +475,7 @@ export function mapArticle(raw: RawFullArticle): Article {
   const { bodyHtml, footnotes } = renderArticleBody(raw.body);
 
   const verdict = findSubject(meta, "Debunk")?.name;
-  const verdictSrc = verdictImage(verdict);
+  const verdictSrc = verdictImageFor(meta, verdict);
   const media = raw.swp_article_feature_media;
   const alt =
     verdictSrc && verdict ? verdict : featureMediaAlt(media, raw.title);
@@ -491,7 +514,7 @@ export function mapStory(article: RawArticle): Story {
   const meta = parseMetadata(article.metadata);
   const lead = article.lead ? stripHtml(article.lead) : "";
   const verdict = findSubject(meta, "Debunk")?.name;
-  const verdictSrc = verdictImage(verdict);
+  const verdictSrc = verdictImageFor(meta, verdict);
   return {
     image:
       verdictSrc ??

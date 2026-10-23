@@ -979,7 +979,7 @@ describe("isPageSectionProfile", () => {
 });
 
 describe("verdict images", () => {
-  const rated = (name: string): RawArticle => ({
+  const rated = (name: string, imageChoice?: string): RawArticle => ({
     id: 9,
     title: "A rated fact-check",
     slug: "a-rated-fact-check",
@@ -987,7 +987,12 @@ describe("verdict images", () => {
     body: null,
     published_at: null,
     metadata: JSON.stringify({
-      subject: [{ scheme: "Debunk", code: "x", name }],
+      subject: [
+        { scheme: "Debunk", code: "x", name },
+        ...(imageChoice
+          ? [{ scheme: "verdict_image", code: imageChoice, name: imageChoice }]
+          : []),
+      ],
     }),
     swp_route: { slug: "english", staticprefix: "/english" },
     swp_article_feature_media: {
@@ -1032,5 +1037,20 @@ describe("verdict images", () => {
 
   it("keeps the post's own image for a rating with no illustration", () => {
     expect(mapStory(rated("Satire")).image).not.toContain("/images/verdicts/");
+  });
+
+  it("shows the uploaded image when the editor chooses it", () => {
+    const story = mapStory(rated("Hoax", "uploaded"));
+    expect(story.image).not.toContain("/images/verdicts/");
+    expect(story.alt).toBe("false");
+
+    const article = mapArticle(rated("Hoax", "uploaded") as RawFullArticle);
+    expect(article.featureImage?.src).not.toContain("/images/verdicts/");
+  });
+
+  it("keeps the illustration when the editor chooses the default", () => {
+    expect(mapStory(rated("Hoax", "default")).image).toBe(
+      "/images/verdicts/hoax.jpg",
+    );
   });
 });
