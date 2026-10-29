@@ -33,10 +33,14 @@ export function Footer({
                 href="https://codeforafrica.org/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm font-bold"
               >
-                <span className="text-[#0d0d0d]">Code for </span>
-                <span className="text-[#0049a7]">Africa</span>
+                <Image
+                  src="/images/footer/cfa-logo-colored.svg"
+                  alt="Code for Africa"
+                  width={280}
+                  height={126}
+                  className="h-9 w-auto grayscale transition hover:grayscale-0"
+                />
               </Link>
             </div>
 
