@@ -7,14 +7,11 @@ interface HeroProps {
   stories?: Story[];
 }
 
-const HERO_GRADIENT =
-  "linear-gradient(100.768deg, rgba(4, 26, 109, 0.9) 45.439%, rgba(102, 102, 102, 0) 66.403%)";
-
 export function Hero({ stories }: HeroProps = {}) {
   const preview = stories?.length ? stories : HERO_PREVIEW;
 
   return (
-    <HeroBanner bgSrc="/images/hero/hero-bg.png" gradient={HERO_GRADIENT}>
+    <HeroBanner bgSrc="/images/hero/hero-bg.png">
       <Container className="relative pt-16 lg:pt-[88px]">
         <div className="max-w-[611px]">
           <span className="mb-5 block h-[3px] w-[190px] rounded bg-white/70" />

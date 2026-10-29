@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import {
   hasOwnHeadings,
@@ -7,35 +6,9 @@ import {
   ListSection,
 } from "@/components/pages/ListSection";
 import { SectionNav } from "@/components/pages/SectionNav";
+import { HeroBanner } from "@/components/ui/HeroBanner";
 import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import type { Page } from "@/lib/data/pages";
-
-/**
- * Blue wash over the hero artwork. Two of them, because how much of the banner
- * the heading covers depends on the width.
- *
- * Wide: the heading is held to `max-w-[611px]` inside a 1240px container, so
- * the furthest right it ever reaches is ~64% of the screen — at the `lg`
- * breakpoint itself, where the container is still full-width and padded.
- * (Wider than that, centring pushes the text's share back toward 49%.) So the
- * wash holds at 0.7 to 68%, then clears, and the last third of the artwork is
- * seen as drawn. 0.7 is the floor that keeps the 90%-white subtitle at 4.5:1
- * (AA for body text) even where the illustration underneath is blown out to
- * white; the heading, being large text, has margin to spare. The old single
- * wash sat at 0.92 across the left two-thirds and never fell below 0.25,
- * which is what dulled the artwork.
- *
- * Narrow: the text runs the full width of the screen, so there is no clear
- * side to give back. A near-flat wash, slightly deeper at the top.
- *
- * Both also read correctly over the flat background of a page with no hero
- * image — blue into the section's black rather than a flat slab of blue.
- */
-const HERO_WASH_WIDE =
-  "linear-gradient(95deg, rgba(4, 26, 109, 0.84) 0%, rgba(4, 26, 109, 0.70) 68%, rgba(4, 26, 109, 0.16) 86%, rgba(4, 26, 109, 0) 97%)";
-
-const HERO_WASH_NARROW =
-  "linear-gradient(180deg, rgba(4, 26, 109, 0.78) 0%, rgba(4, 26, 109, 0.70) 100%)";
 
 /**
  * Body styling for an authored section — the blocks Superdesk's editor emits,
@@ -55,28 +28,7 @@ const PROSE = [
 
 function PageHero({ page }: { page: Page }) {
   return (
-    <section className="relative overflow-hidden bg-pesacheck-black">
-      {/* A page with no hero image keeps the wash over the flat background
-          rather than showing a stock photo that means nothing. */}
-      {page.hero.image && (
-        <Image
-          src={page.hero.image}
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover"
-        />
-      )}
-      <div
-        className="absolute inset-0 lg:hidden"
-        style={{ backgroundImage: HERO_WASH_NARROW }}
-      />
-      <div
-        className="absolute inset-0 hidden lg:block"
-        style={{ backgroundImage: HERO_WASH_WIDE }}
-      />
-
+    <HeroBanner bgSrc={page.hero.image}>
       <Container className="relative flex min-h-[420px] flex-col justify-center py-16 sm:min-h-[520px] lg:min-h-[640px] lg:py-[88px]">
         <div className="max-w-[611px]">
           <span className="mb-5 block h-[3px] w-[190px] rounded bg-white/80" />
@@ -90,7 +42,7 @@ function PageHero({ page }: { page: Page }) {
           )}
         </div>
       </Container>
-    </section>
+    </HeroBanner>
   );
 }
 
