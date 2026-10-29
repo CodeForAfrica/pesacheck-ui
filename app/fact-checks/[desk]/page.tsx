@@ -9,7 +9,6 @@ import { FactChecksSkeleton } from "@/components/fact-checks/FactChecksSkeleton"
 import { ARTICLES, getArticleBySlug } from "@/lib/article-content";
 import { CONTENT_DESKS, deskBySlug } from "@/lib/content-desks";
 import { getArticle } from "@/lib/data/article";
-import { getContentDesks, getDesk } from "@/lib/data/desks";
 import {
   type FilterSelection,
   parseFilterParams,
@@ -51,17 +50,15 @@ function staticPage(page: number): FactCheckListing {
   };
 }
 
-// Prerender every content desk + all known article slugs. Live desks first,
-// with the static catalog unioned in so the design-era slugs stay prerendered
-// (they still resolve — see `getDesk`).
+// Prerender every content desk + all known article slugs. The catalog is the
+// whole set of desk URLs — a desk with no published fact-checks behind it is
+// dropped from the row, but its page is still routable.
 export async function generateStaticParams() {
-  const live = (await getContentDesks().catch(() => null)) ?? [];
-  const slugs = new Set([
-    ...live.map((desk) => desk.slug),
-    ...CONTENT_DESKS.map((desk) => desk.slug),
-  ]);
   const articleParams = Object.keys(ARTICLES).map((slug) => ({ desk: slug }));
-  return [...[...slugs].map((desk) => ({ desk })), ...articleParams];
+  return [
+    ...CONTENT_DESKS.map((desk) => ({ desk: desk.slug })),
+    ...articleParams,
+  ];
 }
 
 async function resolveArticle(slug: string) {
@@ -88,7 +85,7 @@ export async function generateMetadata({
     };
   }
 
-  const desk = await getDesk(slug);
+  const desk = deskBySlug(slug);
   if (desk) {
     return {
       title: `${desk.name} Fact-Checks — PesaCheck`,
@@ -100,17 +97,17 @@ export async function generateMetadata({
 }
 
 async function DeskListing({
-  topic,
+  topics,
   page,
   filters,
 }: {
-  /** The desk's Claim Topic code (`Harm_type`), not its URL slug. */
-  topic: string;
+  /** The desk's Claim Topic codes (`Harm_type`), not its URL slug. */
+  topics: string[];
   page: number;
   filters: FilterSelection;
 }) {
   const listing =
-    (await getByDesk(topic, page, filters).catch(() => null)) ??
+    (await getByDesk(topics, page, filters).catch(() => null)) ??
     staticPage(page);
 
   return (
@@ -138,10 +135,8 @@ export default async function ContentDeskOrArticlePage({
     return <ArticleView article={article} />;
   }
 
-  const desks = (await getContentDesks().catch(() => null)) ?? CONTENT_DESKS;
-  // The live catalog first, then the static one — which covers Hasura being
-  // unreachable and keeps the design-era slugs resolving.
-  const desk = desks.find((d) => d.slug === slug) ?? deskBySlug(slug);
+  // The catalog is curated, so the slug resolves without a round-trip.
+  const desk = deskBySlug(slug);
   if (!desk) notFound();
 
   const sp = await searchParams;
@@ -159,9 +154,9 @@ export default async function ContentDeskOrArticlePage({
         key={JSON.stringify(sp)}
         fallback={<FactChecksSkeleton title="Fact Checks" />}
       >
-        <DeskListing topic={desk.topic} page={page} filters={filters} />
+        <DeskListing topics={desk.topics} page={page} filters={filters} />
       </Suspense>
-      <FactChecksContentDesks activeSlug={desk.slug} desks={desks} />
+      <FactChecksContentDesks activeSlug={desk.slug} desks={CONTENT_DESKS} />
     </>
   );
 }
