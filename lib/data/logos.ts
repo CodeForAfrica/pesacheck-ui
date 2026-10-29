@@ -4,8 +4,8 @@ import { ANY_ROUTE, getContentListArticles } from "@/lib/data/stories";
 import type { Logo } from "@/lib/site";
 
 /**
- * The two logo walls: allies on the Partners page and in the footer, partners
- * likewise. One article per organisation — headline is the name, feature media
+ * The two logo walls: allies on the Partners page and at the foot of the home
+ * page, partners likewise. One article per organisation — headline is the name, feature media
  * the logo, and `cta_url` its website, reusing the link fields the tools and
  * page call-outs already use.
  */
@@ -45,8 +45,9 @@ function toLogo(article: RawArticle): Logo | null {
 /**
  * Logos in curated order, or `[]` when the list is missing or empty.
  *
- * `inLayout` because the footer wall renders on every page: the list is
- * tagged by name only, so publishing a fact-check does not rebuild the site.
+ * `inLayout` because a wall's membership changes a few times a year: the list
+ * is tagged by name only, so publishing a fact-check does not refresh it. An
+ * editor's change to the list still busts the name tag.
  */
 export async function getLogos(listName: string): Promise<Logo[]> {
   const articles = await getContentListArticles(listName, ANY_ROUTE, {
@@ -56,8 +57,8 @@ export async function getLogos(listName: string): Promise<Logo[]> {
 }
 
 /**
- * Both walls in one call. The footer renders them on every page, so they are
- * fetched together rather than twice, and each falls back on its own.
+ * Both walls in one call, for a surface that places the pair together — the
+ * home page's strip. Each falls back on its own.
  */
 export async function getLogoWalls(): Promise<{
   allies: Logo[];
