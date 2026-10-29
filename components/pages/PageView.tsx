@@ -10,11 +10,32 @@ import { SectionNav } from "@/components/pages/SectionNav";
 import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import type { Page } from "@/lib/data/pages";
 
-// Left-to-right blue wash over the hero artwork — darker on the left so the
-// heading stays legible, fading toward the image on the right. Also reads
-// correctly over the flat background when a page has no hero image.
-const HERO_GRADIENT =
-  "linear-gradient(95deg, rgba(4, 26, 109, 0.92) 30%, rgba(4, 26, 109, 0.55) 70%, rgba(11, 42, 234, 0.25) 100%)";
+/**
+ * Blue wash over the hero artwork. Two of them, because how much of the banner
+ * the heading covers depends on the width.
+ *
+ * Wide: the heading is held to `max-w-[611px]` inside a 1240px container, so
+ * the furthest right it ever reaches is ~64% of the screen — at the `lg`
+ * breakpoint itself, where the container is still full-width and padded.
+ * (Wider than that, centring pushes the text's share back toward 49%.) So the
+ * wash holds at 0.7 to 68%, then clears, and the last third of the artwork is
+ * seen as drawn. 0.7 is the floor that keeps the 90%-white subtitle at 4.5:1
+ * (AA for body text) even where the illustration underneath is blown out to
+ * white; the heading, being large text, has margin to spare. The old single
+ * wash sat at 0.92 across the left two-thirds and never fell below 0.25,
+ * which is what dulled the artwork.
+ *
+ * Narrow: the text runs the full width of the screen, so there is no clear
+ * side to give back. A near-flat wash, slightly deeper at the top.
+ *
+ * Both also read correctly over the flat background of a page with no hero
+ * image — blue into the section's black rather than a flat slab of blue.
+ */
+const HERO_WASH_WIDE =
+  "linear-gradient(95deg, rgba(4, 26, 109, 0.84) 0%, rgba(4, 26, 109, 0.70) 68%, rgba(4, 26, 109, 0.16) 86%, rgba(4, 26, 109, 0) 97%)";
+
+const HERO_WASH_NARROW =
+  "linear-gradient(180deg, rgba(4, 26, 109, 0.78) 0%, rgba(4, 26, 109, 0.70) 100%)";
 
 /**
  * Body styling for an authored section — the blocks Superdesk's editor emits,
@@ -48,8 +69,12 @@ function PageHero({ page }: { page: Page }) {
         />
       )}
       <div
-        className="absolute inset-0"
-        style={{ backgroundImage: HERO_GRADIENT }}
+        className="absolute inset-0 lg:hidden"
+        style={{ backgroundImage: HERO_WASH_NARROW }}
+      />
+      <div
+        className="absolute inset-0 hidden lg:block"
+        style={{ backgroundImage: HERO_WASH_WIDE }}
       />
 
       <Container className="relative flex min-h-[420px] flex-col justify-center py-16 sm:min-h-[520px] lg:min-h-[640px] lg:py-[88px]">
