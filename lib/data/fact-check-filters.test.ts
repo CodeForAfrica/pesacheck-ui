@@ -118,26 +118,15 @@ describe("buildFactCheckWhere", () => {
     }
   });
 
-  it("requires any Claim Topic for the desk catalog (scheme, no codes)", () => {
-    const where = buildFactCheckWhere(EMPTY_FILTERS, "t", { anyTopic: true });
-    expect(where._and).toContainEqual({
-      swp_article_metadata: {
-        swp_article_metadata_subjects: { scheme: { _eq: "Harm_type" } },
-      },
-    });
-    expect(where._and).toHaveLength(2);
-  });
-
-  it("prefers explicit topics over anyTopic (a desk page, not the catalog)", () => {
+  it("takes a desk's topics as one clause, so Health gathers Covid-19 too", () => {
     const where = buildFactCheckWhere(EMPTY_FILTERS, "t", {
-      anyTopic: true,
-      topics: ["climate"],
+      topics: ["health", "covid"],
     });
     expect(where._and).toContainEqual({
       swp_article_metadata: {
         swp_article_metadata_subjects: {
           scheme: { _eq: "Harm_type" },
-          code: { _in: ["climate"] },
+          code: { _in: ["health", "covid"] },
         },
       },
     });

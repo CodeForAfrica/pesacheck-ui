@@ -2,130 +2,105 @@
  * Content desks — the "Content Desks" row on the home page and the
  * `/fact-checks/<slug>` landing pages.
  *
- * A desk is a **Claim Topic** (the `Harm_type` vocabulary in Superdesk), not a
- * route. The live catalog is folded out of the Claim Topics that published
- * fact-checks actually carry (`lib/data/desks.ts`), and a desk page lists the
- * fact-checks tagged with its topic code. Tagging content with a new Claim
- * Topic adds a desk; no code change.
+ * A desk gathers one or more **Claim Topics** (the `Harm_type` vocabulary in
+ * Superdesk). The catalog below is editorial, not derived: PesaCheck runs five
+ * desks, in this order, and the row shows those and nothing else. Tagging an
+ * article with a new Claim Topic no longer adds a desk — it files the article
+ * under an existing one, or under none.
  *
- * Superdesk carries no artwork for a vocabulary term and the GraphQL API
- * exposes no vocabulary table at all (see `docs/fact-check-filters.md`), so the
- * thumbnails stay curated here, keyed by topic code.
+ * That curation is why a desk's `name` is here rather than read from the
+ * vocabulary: "Public Finances" is the desk, `finance` is the topic code
+ * behind it, and Covid-19 is not a desk at all — its fact-checks belong to
+ * Health. Superdesk also carries no artwork for a vocabulary term and the
+ * GraphQL API exposes no vocabulary table (see `docs/fact-check-filters.md`),
+ * so the thumbnails are curated here too.
  *
- * `CONTENT_DESKS` is the degraded-mode fallback only — for when Hasura is
- * unreachable. Pages follow the usual seam:
- * `(await getContentDesks().catch(() => null)) ?? CONTENT_DESKS`.
+ * This list is the whole catalog: the row renders it as written, with no read
+ * behind it. See `docs/fact-check-filters.md` for why deriving it from the
+ * topics in use is incompatible with running a fixed five.
  */
 
 export type ContentDesk = {
-  /** Display name — the Claim Topic's label in Superdesk. */
+  /** Display name — editorial, not the Claim Topic's own label. */
   name: string;
-  /** URL segment under `/fact-checks`, derived from `topic`. */
+  /** URL segment under `/fact-checks`. */
   slug: string;
-  /** Card thumbnail — curated, see `deskImage`. */
+  /** Card thumbnail. */
   image: string;
-  /** The Claim Topic qcode (`Harm_type`) whose fact-checks the desk lists. */
-  topic: string;
+  /**
+   * The Claim Topic qcodes (`Harm_type`) whose fact-checks the desk lists.
+   * Usually one; Health gathers two, because Covid-19 is tagged as its own
+   * topic but is not a desk of its own.
+   */
+  topics: string[];
 };
 
 const IMAGES = "/images/content-desks";
 
-/** Shown for a Claim Topic that has no curated artwork yet. */
-export const DEFAULT_DESK_IMAGE = `${IMAGES}/content4.png`;
-
-/**
- * Curated thumbnail per Claim Topic code. Codes are the vocabulary's own
- * qcodes; anything not listed falls back to `DEFAULT_DESK_IMAGE` rather than
- * dropping the desk, so a newly tagged topic still appears in the row.
- */
-const DESK_IMAGES: Record<string, string> = {
-  climate: `${IMAGES}/content2.png`,
-  elections: `${IMAGES}/elections.png`,
-  employment: `${IMAGES}/public-finance.png`,
-  finance: `${IMAGES}/public-finance.png`,
-  gender: `${IMAGES}/gender.png`,
-  health: `${IMAGES}/content3.png`,
-  migration: `${IMAGES}/content4.png`,
-  politics: `${IMAGES}/elections.png`,
-  scams: `${IMAGES}/scams.png`,
-};
-
-export function deskImage(topic: string): string {
-  return DESK_IMAGES[topic.trim().toLowerCase()] ?? DEFAULT_DESK_IMAGE;
-}
-
-/**
- * URL segment for a Claim Topic code. Superdesk qcodes are free-form (they can
- * carry spaces, case and underscores), so they are normalised rather than used
- * raw. Returns `""` for a code with nothing URL-safe in it — `getContentDesks`
- * drops those instead of linking to `/fact-checks/`.
- */
-export function deskSlug(topic: string): string {
-  return topic
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
-
-/** A live Claim Topic option (`lib/data/filter-options.ts`) as a desk. */
-export function deskFromTopic(topic: {
-  code: string;
-  label: string;
-}): ContentDesk {
-  return {
-    name: topic.label,
-    slug: deskSlug(topic.code),
-    image: deskImage(topic.code),
-    topic: topic.code,
-  };
-}
-
-/**
- * Degraded-mode catalog: the desks from the original Figma design, each keyed
- * to the Claim Topic code it corresponds to. Also serves as the alias table for
- * the design-era URLs (`/fact-checks/climate-change` still resolves, even
- * though the live desk for that topic is `/fact-checks/climate`).
- */
+/** The five desks, in the order they are shown. */
 export const CONTENT_DESKS: ContentDesk[] = [
   {
-    name: "Climate Change",
-    slug: "climate-change",
-    image: deskImage("climate"),
-    topic: "climate",
-  },
-  {
-    name: "Gender",
-    slug: "gender",
-    image: deskImage("gender"),
-    topic: "gender",
+    name: "Climate",
+    slug: "climate",
+    image: `${IMAGES}/content2.png`,
+    topics: ["climate"],
   },
   {
     name: "Elections",
     slug: "elections",
-    image: deskImage("elections"),
-    topic: "elections",
+    image: `${IMAGES}/elections.png`,
+    topics: ["elections"],
+  },
+  {
+    name: "Gender",
+    slug: "gender",
+    image: `${IMAGES}/gender.png`,
+    topics: ["gender"],
+  },
+  {
+    name: "Health",
+    slug: "health",
+    image: `${IMAGES}/content3.png`,
+    topics: ["health", "covid"],
   },
   {
     name: "Public Finances",
     slug: "public-finances",
-    image: deskImage("finance"),
-    topic: "finance",
-  },
-  { name: "Scams", slug: "scams", image: deskImage("scams"), topic: "scams" },
-  {
-    name: "Health",
-    slug: "health",
-    image: deskImage("health"),
-    topic: "health",
-  },
-  {
-    name: "Migration",
-    slug: "migration",
-    image: deskImage("migration"),
-    topic: "migration",
+    image: `${IMAGES}/public-finance.png`,
+    topics: ["finance"],
   },
 ];
+
+/**
+ * Desk URLs that no longer exist, and where they go instead.
+ *
+ * Two kinds: Claim Topics that had a desk of their own before the catalog was
+ * cut to five (`/fact-checks/employment`), and the design-era slugs that
+ * predate slugs coming from topic codes (`/fact-checks/climate-change`). A
+ * topic whose content moved keeps its readers — Covid-19 fact-checks are on
+ * the Health desk — and the rest go to the full listing, where the Topic
+ * filter still reaches them.
+ *
+ * Redirects are temporary (307), not permanent: which desks PesaCheck runs is
+ * an editorial decision that may change again, and a 308 is cached by browsers
+ * indefinitely. Applied in `next.config.ts`.
+ */
+export const RETIRED_DESKS: Record<string, string> = {
+  "climate-change": "/fact-checks/climate",
+  covid: "/fact-checks/health",
+  education: "/fact-checks",
+  employment: "/fact-checks",
+  migration: "/fact-checks",
+  nutrition: "/fact-checks",
+  politics: "/fact-checks",
+  religion: "/fact-checks",
+  scams: "/fact-checks",
+  sports: "/fact-checks",
+  tourism: "/fact-checks",
+  transport: "/fact-checks",
+  wildlife: "/fact-checks",
+  xenophobia: "/fact-checks",
+};
 
 export function deskBySlug(slug: string): ContentDesk | undefined {
   return CONTENT_DESKS.find((desk) => desk.slug === slug);

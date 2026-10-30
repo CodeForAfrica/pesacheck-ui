@@ -37,9 +37,9 @@ subject `name`.
 ### Topic → `Harm_type`
 "Claim Topic" (multi; codes like `elections`, `employment`, `finance`, `gender`).
 
-This is also what a **content desk** is: `/fact-checks/<slug>` lists the
-fact-checks carrying one Claim Topic, and the desk row is the set of topics
-published fact-checks actually carry. See "Content desks" below.
+This is also what a **content desk** collects: `/fact-checks/<slug>` lists the
+fact-checks carrying the desk's Claim Topics. Which desks exist is editorial,
+not a fold of the topics in use. See "Content desks" below.
 
 ### Language → `Debunklang`, falling back to the article language
 The Language filter is keyed on the Debunk language, and falls back to the
@@ -83,26 +83,40 @@ mode, when the taxonomy read fails.
 
 ## Content desks
 
-A content desk **is** a Claim Topic (`lib/content-desks.ts`, `lib/data/desks.ts`).
-The desk row on the home page and at the foot of each desk page is the live
-catalog; `/fact-checks/<slug>` lists that topic's fact-checks.
+A content desk **gathers** Claim Topics (`lib/content-desks.ts`). PesaCheck
+runs five — Climate, Elections, Gender, Health,
+Public Finances — and `CONTENT_DESKS` is that list, in that order.
+`/fact-checks/<slug>` lists the fact-checks carrying any of a desk's topics.
 
-The catalog is derived separately from the dropdown options, and the difference
-matters. The dropdowns sample the newest `TAXONOMY_SAMPLE_SIZE` fact-checks
-*whatever their tagging*; because Claim Topic is sparse, the topics that sample
-happens to contain vary with the slice, and the sample can name a topic the
-listing's own `where` then finds nothing for. An option that yields an empty
-grid is a small annoyance; a desk that appears and disappears between renders is
-a link that 404s. So `GET_CLAIM_TOPICS` puts "carries a Claim Topic" in the
-`where` and folds the desks off exactly the corpus `getByDesk` pages through.
-Every desk therefore has content behind it, and `$limit` bounds *tagged*
-articles, reaching much further back for the same cost.
+The catalog is editorial rather than derived, and three things follow from
+that. A desk's name is its own (`Public Finances`, not the `finance` code's
+label). A desk can gather more than one topic: Health lists both `health` and
+`covid`, because Covid-19 is tagged as a topic but is not a desk. And a topic
+nobody runs a desk for — `employment`, `politics` — has no page at all; its
+fact-checks are still reachable through the Topic dropdown on `/fact-checks`.
 
-Two things stay curated, because Superdesk has no field for them: the desk
-thumbnails (keyed by topic code, with a default for a topic nobody has drawn
-artwork for yet) and `CONTENT_DESKS`, the degraded-mode catalog. `CONTENT_DESKS`
-also aliases the design-era URLs — `/fact-checks/climate-change` still resolves,
-to the same `climate` topic as `/fact-checks/climate`.
+Nothing about the row is read from Hasura. An earlier version folded the
+catalog out of the Claim Topics published fact-checks carried, and that is
+incompatible with a fixed list of five: the fold samples the newest
+`TAXONOMY_SAMPLE_SIZE` tagged articles, and Public Finances — one published
+fact-check, well outside that window — simply never appeared. A desk the row
+is supposed to show is not something to discover. The cost of a desk whose
+listing is thin is PesaCheck's to carry; the cost of a desk that silently
+vanishes is a reader's.
+
+Dropping that read also takes a Hasura round-trip off the home page and off
+every desk page.
+
+The thumbnails are curated for the same reason they always were: Superdesk
+has no field for them.
+
+Slugs this site no longer serves redirect rather than 404 (`RETIRED_DESKS`,
+applied in `next.config.ts`): the desks dropped when the catalog was cut to
+five, and the design-era URLs that predate slugs coming from topic codes.
+`/fact-checks/covid` goes to the Health desk that now carries its fact-checks,
+`/fact-checks/climate-change` to `/fact-checks/climate`, and the rest to the
+full listing. They are 307s, not 308s — which desks PesaCheck runs is an
+editorial decision that may change again, and a browser caches a 308 forever.
 
 On a desk page the Topic dropdown composes with the desk as an intersection:
 Claim Topic is multi-valued, so `/fact-checks/climate?topic=gender` asks for

@@ -153,8 +153,7 @@ lib/
     client.ts        # graphql-request client (reads NEXT_PUBLIC_API_URL)
     queries/         # GraphQL docs, ported from pesacheck-pwa-app-router/services/*.queries.js
     map.ts           # swp_article → Story / Article, rendition → image URL
-    desks.ts         # getContentDesks(): ContentDesk[]
-    stories.ts       # getSpotlight(), getFactChecks(filters), getByDesk(slug)
+    stories.ts       # getSpotlight(), getFactChecks(filters), getByDesk(topics)
     article.ts       # getArticle(slug): Article
   *-content.ts       # KEEP as static fallback during transition
 ```
@@ -201,7 +200,7 @@ Source of truth for queries/mappers: `pesacheck-pwa-app-router/services/`
 | `author` (Article) | `swp_article_authors` → `swp_author` | |
 | body paragraphs / inline image | `swp_article.body` | Convert via `articleBodyService.js:convertBodyImages` (rewrites img src to MEDIA_URL — already the non-S3 branch) |
 | `relatedStories` | `swp_article_related` | |
-| `ContentDesk{name,slug,topic}` | `metadata.subject[]` where `scheme: "Harm_type"` (Claim Topic) | A desk is a Claim Topic, not a route: `swp_route` collections mix language desks, `team`, page routes, and carry no topic. See `docs/fact-check-filters.md`. |
+| `ContentDesk{name,slug,topics}` | **curated** (`lib/content-desks.ts`), keyed to `metadata.subject[]` codes where `scheme: "Harm_type"` (Claim Topic) | The five desks PesaCheck runs, each gathering one or more Claim Topics. A desk is not a route: `swp_route` collections mix language desks, `team`, page routes, and carry no topic. See `docs/fact-check-filters.md`. |
 | `ContentDesk.image` | **curated** (`lib/content-desks.ts`) | No vocabulary table is exposed, so a term carries no artwork; keyed by topic code with a default |
 
 ### Already verified on staging (`tenant_code = e6lkum`)

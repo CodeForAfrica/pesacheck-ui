@@ -47,7 +47,7 @@ await gql<Shape>(QUERY, { tenant: TENANT_CODE, slug }, { tags: [TAGS.article(slu
 | Tag | Set by | Busted by |
 | --- | --- | --- |
 | `article:<slug>` | `getRawArticle` | that article changing |
-| `articles` | the fact-check listings, `getContentDesks` | any article changing |
+| `articles` | the fact-check listings | any article changing |
 | `content-list:<name>` | `getContentListArticles`, `getPage` | that list changing |
 | `content-lists` | the same calls, collectively | any article or list changing |
 | `routes` | `getRoutes` | a route changing |
