@@ -1,31 +1,18 @@
 import Image from "next/image";
 import Link from "next/link";
-import { FooterAllySection } from "@/components/layout/FooterAllySection";
 import { Container } from "@/components/ui/SectionHeading";
 import type { FooterLink } from "@/lib/data/navigation";
-import {
-  FOOTER_ABOUT,
-  FOOTER_NAV,
-  LEGAL,
-  type Logo,
-  SOCIAL_ICONS,
-} from "@/lib/site";
+import { FOOTER_ABOUT, FOOTER_NAV, LEGAL, SOCIAL_ICONS } from "@/lib/site";
 
 export function Footer({
   navLinks = FOOTER_NAV,
   legalLinks = LEGAL,
-  allies,
-  partners,
 }: {
   navLinks?: FooterLink[];
   legalLinks?: FooterLink[];
-  allies?: Logo[];
-  partners?: Logo[];
 } = {}) {
   return (
     <footer className="bg-white">
-      <FooterAllySection allies={allies} partners={partners} />
-
       <Container className="pb-16">
         <div className="flex flex-wrap items-start justify-between gap-6 pt-10">
           {/* Masthead and blurb share a column so the IFCN badge sits beside
@@ -46,10 +33,14 @@ export function Footer({
                 href="https://codeforafrica.org/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm font-bold"
               >
-                <span className="text-[#0d0d0d]">Code for </span>
-                <span className="text-[#0049a7]">Africa</span>
+                <Image
+                  src="/images/footer/cfa-logo-colored.svg"
+                  alt="Code for Africa"
+                  width={280}
+                  height={126}
+                  className="h-9 w-auto grayscale transition hover:grayscale-0"
+                />
               </Link>
             </div>
 

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { HeroBanner } from "@/components/ui/HeroBanner";
 import { HeroCarousel } from "@/components/ui/HeroCarousel";
 import { Container } from "@/components/ui/SectionHeading";
@@ -21,12 +22,12 @@ export function Hero({ stories }: HeroProps = {}) {
           <p className="mt-5 max-w-[611px] text-base leading-6 text-white/90 lg:text-lg">
             {HERO.subtitle}
           </p>
-          <a
-            href="#fact-checks"
+          <Link
+            href="/fact-checks"
             className="mt-7 inline-flex h-[54px] items-center justify-center rounded-[10px] bg-pesacheck-purple px-5 text-base font-semibold text-white transition-colors hover:bg-pesacheck-purple/90"
           >
             {HERO.cta}
-          </a>
+          </Link>
         </div>
       </Container>
 
