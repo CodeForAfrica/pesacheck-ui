@@ -23,7 +23,7 @@ export const TAGS = {
   /** Every curated list — what an article edit busts. */
   contentLists: "content-lists",
 
-  /** `swp_route`: the content desks and CMS pages that exist. */
+  /** `swp_route`: the CMS pages that exist. */
   routes: "routes",
 
   /** `swp_menu`: the header and footer links. */
@@ -73,7 +73,7 @@ export function tagsForEvent(
         ? []
         : tagsForArticle(str(subject.slug));
 
-    // Routes decide which desks exist and which desk a listing sits under.
+    // Routes decide which CMS pages exist and where a listing sits.
     case "route":
       return [TAGS.routes, TAGS.articles];
 

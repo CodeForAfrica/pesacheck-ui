@@ -51,8 +51,8 @@ function staticPage(page: number): FactCheckListing {
 }
 
 // Prerender every content desk + all known article slugs. The catalog is the
-// whole set of desk URLs — a desk with no published fact-checks behind it is
-// dropped from the row, but its page is still routable.
+// whole set of desk URLs — a desk with few published fact-checks behind it
+// still has a page, and still appears in the row.
 export async function generateStaticParams() {
   const articleParams = Object.keys(ARTICLES).map((slug) => ({ desk: slug }));
   return [

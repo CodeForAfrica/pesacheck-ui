@@ -47,7 +47,7 @@ await gql<Shape>(QUERY, { tenant: TENANT_CODE, slug }, { tags: [TAGS.article(slu
 | Tag | Set by | Busted by |
 | --- | --- | --- |
 | `article:<slug>` | `getRawArticle` | that article changing |
-| `articles` | the fact-check listings, `getContentDesks` | any article changing |
+| `articles` | the fact-check listings | any article changing |
 | `content-list:<name>` | `getContentListArticles`, `getPage` | that list changing |
 | `content-lists` | the same calls, collectively | any article or list changing |
 | `routes` | `getRoutes` | a route changing |
@@ -71,11 +71,15 @@ Two rules worth keeping when adding a query:
 - **Nothing read in the root layout may carry a tag an article edit busts** —
   that means neither `articles` nor `content-lists`. A layout tag lands on
   every page, so either one turns a single fact-check publish into a full
-  site rebuild, and tagging buys nothing. Two reads are affected:
-  `getFilterOptions` has its own `filter-options` tag, and the footer logo
-  walls pass `inLayout` to `getContentListArticles`, which drops
-  `content-lists` and keeps the per-list name tag. Both then refresh on their
-  TTL, which suits content that changes a few times a year.
+  site rebuild, and tagging buys nothing. `getFilterOptions` is the read this
+  affects: it has its own `filter-options` tag and refreshes on its TTL.
+
+  The same mechanism is available to any read of content that changes a few
+  times a year: `getContentListArticles` takes `inLayout`, which drops
+  `content-lists` and keeps the per-list name tag. The logo walls use it —
+  they render on the home page and the Partners page, not in the layout, but
+  a wall's membership changes rarely and an editor's edit to the list still
+  busts its name tag.
 
 ### Why the reads are explicitly cached
 
