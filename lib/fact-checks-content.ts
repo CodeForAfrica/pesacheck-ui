@@ -96,11 +96,11 @@ export const FILTER_META: {
 ];
 
 // ── Hero ─────────────────────────────────────────────────────────────────--
-// The hero spotlights a single content desk (Climate Change) with a carousel
+// The hero spotlights a single content desk (Climate) with a carousel
 // of recent fact-checks beneath the title.
 
 export const HERO = {
-  topic: "Climate Change",
+  topic: "Climate",
 };
 
 export const HERO_PREVIEW: Story[] = [

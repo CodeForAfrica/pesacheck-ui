@@ -71,37 +71,6 @@ export const CONTENT_DESKS: ContentDesk[] = [
   },
 ];
 
-/**
- * Desk URLs that no longer exist, and where they go instead.
- *
- * Two kinds: Claim Topics that had a desk of their own before the catalog was
- * cut to five (`/fact-checks/employment`), and the design-era slugs that
- * predate slugs coming from topic codes (`/fact-checks/climate-change`). A
- * topic whose content moved keeps its readers — Covid-19 fact-checks are on
- * the Health desk — and the rest go to the full listing, where the Topic
- * filter still reaches them.
- *
- * Redirects are temporary (307), not permanent: which desks PesaCheck runs is
- * an editorial decision that may change again, and a 308 is cached by browsers
- * indefinitely. Applied in `next.config.ts`.
- */
-export const RETIRED_DESKS: Record<string, string> = {
-  "climate-change": "/fact-checks/climate",
-  covid: "/fact-checks/health",
-  education: "/fact-checks",
-  employment: "/fact-checks",
-  migration: "/fact-checks",
-  nutrition: "/fact-checks",
-  politics: "/fact-checks",
-  religion: "/fact-checks",
-  scams: "/fact-checks",
-  sports: "/fact-checks",
-  tourism: "/fact-checks",
-  transport: "/fact-checks",
-  wildlife: "/fact-checks",
-  xenophobia: "/fact-checks",
-};
-
 export function deskBySlug(slug: string): ContentDesk | undefined {
   return CONTENT_DESKS.find((desk) => desk.slug === slug);
 }

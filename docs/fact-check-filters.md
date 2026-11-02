@@ -110,14 +110,6 @@ every desk page.
 The thumbnails are curated for the same reason they always were: Superdesk
 has no field for them.
 
-Slugs this site no longer serves redirect rather than 404 (`RETIRED_DESKS`,
-applied in `next.config.ts`): the desks dropped when the catalog was cut to
-five, and the design-era URLs that predate slugs coming from topic codes.
-`/fact-checks/covid` goes to the Health desk that now carries its fact-checks,
-`/fact-checks/climate-change` to `/fact-checks/climate`, and the rest to the
-full listing. They are 307s, not 308s — which desks PesaCheck runs is an
-editorial decision that may change again, and a browser caches a 308 forever.
-
 On a desk page the Topic dropdown composes with the desk as an intersection:
 Claim Topic is multi-valued, so `/fact-checks/climate?topic=gender` asks for
 fact-checks tagged both.

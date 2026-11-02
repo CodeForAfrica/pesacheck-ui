@@ -41,8 +41,8 @@ describe("tagsForEvent", () => {
     ]);
   });
 
-  it("treats a route change as both the desk set and the listings", () => {
-    expect(tagsForEvent("route[updated]", { slug: "climate-change" })).toEqual([
+  it("treats a route change as both the routes and the listings", () => {
+    expect(tagsForEvent("route[updated]", { slug: "about" })).toEqual([
       TAGS.routes,
       TAGS.articles,
     ]);
@@ -95,7 +95,7 @@ describe("tagsForDelivery", () => {
     expect(
       tagsForDelivery({
         event: "route[updated]",
-        body: { slug: "climate-change" },
+        body: { slug: "about" },
       }),
     ).toEqual([TAGS.routes, TAGS.articles]);
   });

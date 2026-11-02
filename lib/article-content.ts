@@ -138,7 +138,7 @@ export const SAMPLE_ARTICLE: Article = {
   date: "Jul 28, 2026",
   readTime: "3 min",
   author: "Michael Karanja",
-  desk: "climate-change",
+  desk: "climate",
   leadParagraphs: [
     "South Africa is experiencing a manufacturing resurgence that is invigorating local communities and strengthening its position in global markets.",
     "Through strategic investments in technology, innovation, and workforce development, the nation is revitalizing its industrial base, creating jobs, and enhancing export opportunities in an increasingly competitive global economy.",
@@ -172,7 +172,7 @@ export const SAMPLE_DEBUNK: Article = {
   date: "Jul 28, 2026",
   readTime: "3 min",
   author: "Michael Karanja",
-  desk: "climate-change",
+  desk: "climate",
   leadParagraphs: [
     "A TikTok post shared widely in January 2026 claims to show dramatic footage of flooding sweeping through South Africa's Limpopo province, racking up hundreds of thousands of views within days.",
     "PesaCheck traced the clip and found that, while Limpopo did experience flooding, the video being shared is unrelated to those events — it was filmed elsewhere, years earlier.",

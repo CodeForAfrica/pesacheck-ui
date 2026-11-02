@@ -59,7 +59,7 @@ prerendered from it, so `revalidateTag("article:x")` drops both. You can see
 what a page ended up carrying:
 
 ```bash
-cat .next/server/app/fact-checks/climate-change/<slug>.meta
+cat .next/server/app/fact-checks/climate/<slug>.meta
 ```
 
 Two rules worth keeping when adding a query:
