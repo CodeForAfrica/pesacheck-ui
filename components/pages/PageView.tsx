@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import {
   hasOwnHeadings,
@@ -7,14 +6,9 @@ import {
   ListSection,
 } from "@/components/pages/ListSection";
 import { SectionNav } from "@/components/pages/SectionNav";
+import { HeroBanner } from "@/components/ui/HeroBanner";
 import { Container, SectionHeading } from "@/components/ui/SectionHeading";
 import type { Page } from "@/lib/data/pages";
-
-// Left-to-right blue wash over the hero artwork — darker on the left so the
-// heading stays legible, fading toward the image on the right. Also reads
-// correctly over the flat background when a page has no hero image.
-const HERO_GRADIENT =
-  "linear-gradient(95deg, rgba(4, 26, 109, 0.92) 30%, rgba(4, 26, 109, 0.55) 70%, rgba(11, 42, 234, 0.25) 100%)";
 
 /**
  * Body styling for an authored section — the blocks Superdesk's editor emits,
@@ -34,24 +28,7 @@ const PROSE = [
 
 function PageHero({ page }: { page: Page }) {
   return (
-    <section className="relative overflow-hidden bg-pesacheck-black">
-      {/* A page with no hero image keeps the wash over the flat background
-          rather than showing a stock photo that means nothing. */}
-      {page.hero.image && (
-        <Image
-          src={page.hero.image}
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover"
-        />
-      )}
-      <div
-        className="absolute inset-0"
-        style={{ backgroundImage: HERO_GRADIENT }}
-      />
-
+    <HeroBanner bgSrc={page.hero.image}>
       <Container className="relative flex min-h-[420px] flex-col justify-center py-16 sm:min-h-[520px] lg:min-h-[640px] lg:py-[88px]">
         <div className="max-w-[611px]">
           <span className="mb-5 block h-[3px] w-[190px] rounded bg-white/80" />
@@ -65,7 +42,7 @@ function PageHero({ page }: { page: Page }) {
           )}
         </div>
       </Container>
-    </section>
+    </HeroBanner>
   );
 }
 
