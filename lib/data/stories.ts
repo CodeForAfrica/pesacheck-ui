@@ -144,16 +144,15 @@ export const DESK_HERO_SIZE = 5;
  * `"<Desk Name> — Hero"` (e.g. `"Climate — Hero"`), mirroring the homepage's
  * `"Homepage — Hero"`.
  *
- * Without one — the usual case, since desks come from Claim Topics and a new
- * topic has no list — the hero shows the desk's newest fact-checks. Leaving it
- * empty read as "this desk has nothing" above a listing full of fact-checks.
+ * Without one, the hero shows the desk's newest fact-checks. Leaving it empty
+ * read as "this desk has nothing" above a listing full of fact-checks.
  *
- * Takes the desk's name (for the list) and its topic code (for the fallback);
- * see `getByDesk` for why the code is not the slug.
+ * Takes the desk's name (for the list) and its topic codes (for the fallback);
+ * see `getByDesk` for why the codes are not the slug.
  */
 export async function getDeskHero(desk: {
   name: string;
-  topic: string;
+  topics: string[];
 }): Promise<Story[]> {
   const curated = await getContentListStories(`${desk.name} — Hero`).catch(
     () => [],
@@ -161,7 +160,7 @@ export async function getDeskHero(desk: {
   if (curated.length > 0) return curated;
 
   // Page 1 unfiltered is the query the listing below makes, so it is cached once.
-  const { stories } = await getByDesk(desk.topic);
+  const { stories } = await getByDesk(desk.topics);
   return stories.slice(0, DESK_HERO_SIZE);
 }
 
@@ -194,22 +193,24 @@ export function getFactChecks(
 
 /**
  * Fact-checks for a single content desk as a `FactCheckListing` — backs the desk
- * landing pages (`/fact-checks/<slug>`). A desk is a **Claim Topic**
- * (`Harm_type`), so this is `getFactChecks` scoped to that topic via
+ * landing pages (`/fact-checks/<slug>`). A desk gathers one or more **Claim
+ * Topics** (`Harm_type`), so this is `getFactChecks` scoped to them via
  * `buildFactCheckWhere`'s `topics` argument: same `Debunk` definition, same
- * server-side pagination and filtering, narrowed to articles tagged `topic`.
+ * server-side pagination and filtering, narrowed to articles tagged with any
+ * of `topics`. The Health desk is why this is a list — its page lists both
+ * `health` and `covid` fact-checks.
  *
- * Takes the topic code, not the URL slug — the two differ (`/fact-checks/climate`
- * is code `climate`, but so is the design-era `/fact-checks/climate-change`).
- * `getDesk` in `lib/data/desks.ts` resolves one to the other.
+ * Takes the topic codes, not the URL slug — the two differ (`/fact-checks/
+ * public-finances` is code `finance`). `deskBySlug` in `lib/content-desks.ts`
+ * resolves one to the other.
  */
 export function getByDesk(
-  topic: string,
+  topics: string[],
   page = 1,
   filters: FilterSelection = EMPTY_FILTERS,
 ): Promise<FactCheckListing> {
   return getFactCheckListing(
-    buildFactCheckWhere(filters, TENANT_CODE, { topics: [topic] }),
+    buildFactCheckWhere(filters, TENANT_CODE, { topics }),
     page,
   );
 }

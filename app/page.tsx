@@ -7,8 +7,6 @@ import { TrendingStories } from "@/components/home/TrendingStories";
 import { WhatsappBanner } from "@/components/home/WhatsappBanner";
 import { AllyPartnerStrip } from "@/components/ui/AllyPartnerStrip";
 import { Impact } from "@/components/ui/Impact";
-import { CONTENT_DESKS } from "@/lib/content-desks";
-import { getContentDesks } from "@/lib/data/desks";
 import { getLogoWalls } from "@/lib/data/logos";
 import {
   getHeroPreview,
@@ -31,17 +29,15 @@ export const revalidate = 300;
 export default async function Home() {
   // Pages own fetching; fall back to the static content when Hasura is
   // unreachable or unconfigured. Fetched in parallel — each falls back alone.
-  const [desks, heroPreview, spotlight, trending, latest, logos] =
-    await Promise.all([
-      getContentDesks().catch(() => null),
-      getHeroPreview().catch(() => null),
-      getSpotlight().catch(() => null),
-      getTrending().catch(() => null),
-      getLatest().catch(() => null),
-      // Allies and partners read the same two lists the Partners page does —
-      // there is one set of each, not one per surface.
-      getLogoWalls().catch(() => null),
-    ]);
+  const [heroPreview, spotlight, trending, latest, logos] = await Promise.all([
+    getHeroPreview().catch(() => null),
+    getSpotlight().catch(() => null),
+    getTrending().catch(() => null),
+    getLatest().catch(() => null),
+    // Allies and partners read the same two lists the Partners page does —
+    // there is one set of each, not one per surface.
+    getLogoWalls().catch(() => null),
+  ]);
 
   return (
     <>
@@ -58,7 +54,7 @@ export default async function Home() {
       />
       <WhatsappBanner />
       <TrendingStories stories={trending ?? TRENDING} />
-      <ContentDesks desks={desks ?? CONTENT_DESKS} />
+      <ContentDesks />
       <LatestStories stories={latest ?? [LATEST_FEATURE, ...LATEST_GRID]} />
       <Tools />
       <AllyPartnerStrip

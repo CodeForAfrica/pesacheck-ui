@@ -134,18 +134,13 @@ export const CONTENT_TYPE_SCHEME = "content_type";
 export type FactCheckScope = {
   /**
    * Accepted **Claim Topic** codes (`Harm_type`) — backs the content-desk
-   * pages, where a desk *is* a Claim Topic (see `lib/content-desks.ts`).
-   * Composes with the reader's Topic dropdown as an intersection: on
-   * `/fact-checks/climate`, selecting Gender narrows to fact-checks tagged
-   * both, the same way the desk route used to compose with it.
+   * pages, where a desk gathers one or more Claim Topics (see
+   * `lib/content-desks.ts`). Composes with the reader's Topic dropdown as an
+   * intersection: on `/fact-checks/climate`, selecting Gender narrows to
+   * fact-checks tagged both, the same way the desk route used to compose
+   * with it.
    */
   topics?: string[];
-  /**
-   * Restrict to fact-checks carrying *any* Claim Topic. Backs the desk catalog
-   * (`getContentDesks`), which folds the desks off exactly those articles — so
-   * every desk it lists has content the desk page's own `topics` scope finds.
-   */
-  anyTopic?: boolean;
   /**
    * Accepted type codes — backs the article-type pages. Several codes per type
    * because Superdesk's vocabulary and the site's page names have drifted
@@ -204,8 +199,7 @@ function likePattern(term: string): string {
  * nothing in Hasura, so we never emit one.
  *
  * `scope` narrows the listing further: `topics` to one content desk
- * (`getByDesk`), `anyTopic` to the topic-tagged corpus the desk catalog is
- * folded from, `contentTypes` to one article type (`getByContentType`), and
+ * (`getByDesk`), `contentTypes` to one article type (`getByContentType`), and
  * `search` to a free-text query (`searchFactChecks`). All are still fact-check
  * listings, so the `Debunk` clause stays and each is one more `_and` clause on
  * top — the search clause being an `_or` across `title`/`lead`/`body`, so a
@@ -226,15 +220,6 @@ export function buildFactCheckWhere(
 
   if (scope.topics && scope.topics.length > 0) {
     and.push(subjectClause(SUBJECT_SCHEME.topic, scope.topics));
-  } else if (scope.anyTopic) {
-    // Scheme with no `code` — "tagged with something under Claim Topic".
-    and.push({
-      swp_article_metadata: {
-        swp_article_metadata_subjects: {
-          scheme: { _eq: SUBJECT_SCHEME.topic },
-        },
-      },
-    });
   }
 
   if (scope.projects && scope.projects.length > 0) {
