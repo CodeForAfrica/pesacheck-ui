@@ -3,7 +3,6 @@ import Link from "next/link";
 import { FiMessageCircle } from "react-icons/fi";
 import { Container } from "@/components/ui/SectionHeading";
 import {
-  NEWSLETTER_FORM_URL,
   WHATSAPP_BANNER,
   WHATSAPP_COLUMNS,
   type WhatsappColumn,
@@ -42,10 +41,10 @@ function ColumnGraphic({ graphic }: { graphic: WhatsappColumn["graphic"] }) {
   if (graphic === "message")
     return (
       <Link
-        href={NEWSLETTER_FORM_URL}
+        href={SOCIAL_URLS.whatsappContact}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="Subscribe to the PesaCheck newsletter"
+        aria-label="Message the PesaCheck tipline on WhatsApp"
         className="transition-opacity hover:opacity-80"
       >
         <FiMessageCircle size={120} className="size-[120px]" aria-hidden />
