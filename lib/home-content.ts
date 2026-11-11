@@ -143,9 +143,6 @@ export const SPOTLIGHT_GRID: Story[] = [
 
 export const WHATSAPP_BANNER = "/images/whatsapp-banner/banner2.png";
 
-// Hosted Mailchimp signup form — the newsletter CTA links out to it.
-export const NEWSLETTER_FORM_URL = "https://mailchi.mp/04f88cba55d3/subscribe";
-
 export type WhatsappColumn = {
   graphic: "whatsapp" | "qr" | "message" | "";
   title: string;
@@ -172,8 +169,8 @@ export const WHATSAPP_COLUMNS: WhatsappColumn[] = [
   },
   {
     graphic: "message",
-    title: "Subscribe to receive updates from us!",
-    body: "Be the first to know; subscribe to receive updates from PesaCheck",
+    title: "Message us on WhatsApp",
+    body: "Tap to open a chat with our tipline and send us a claim to check",
   },
 ];
 
