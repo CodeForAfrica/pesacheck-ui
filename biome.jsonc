@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.5.9/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.6.4/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
@@ -47,6 +47,19 @@
   "javascript": {
     "formatter": {
       "quoteStyle": "double"
+    }
+  },
+  "markdown": {
+    "parser": {
+      "frontmatter": true
+    },
+    "formatter": {
+      "enabled": true,
+      "formatEmbeds": true,
+      "proseWrap": "always",
+      "indentStyle": "space",
+      "indentWidth": 2,
+      "lineWidth": 120
     }
   },
   "assist": {
