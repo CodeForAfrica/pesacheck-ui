@@ -11,19 +11,19 @@ Every editorial field is a `subject` entry in the article `metadata` jsonb:
 `{ scheme: <vocabulary id>, code: <qcode>, name: <label> }`. The schemes present
 on staging and their Superdesk labels:
 
-| scheme (in data) | Superdesk label | select | used by |
-| --- | --- | --- | --- |
-| `countrymention1` | Primary country / "First country mentioned" | single | **Region** |
-| `countries` | Countries mentioned | multi | — |
-| `Harm_type` | Claim Topic | multi | **Topic**, content desks |
-| `01harm` | Harm Type | multi | — |
-| `claimtype` | Claim Type | multi | — |
-| `claimformat` | Claim Format | multi | — |
-| `GEC` | GEC category | multi | — |
-| `Debunklang` | Debunk language | single | **Language** (primary) |
-| `platform` | Primary platform | single | — |
-| `content_type` | Content Type | single | article-type pages |
-| `Debunk` | Verdict | single | verdict |
+| scheme (in data)  | Superdesk label                             | select | used by                  |
+| ----------------- | ------------------------------------------- | ------ | ------------------------ |
+| `countrymention1` | Primary country / "First country mentioned" | single | **Region**               |
+| `countries`       | Countries mentioned                         | multi  | —                        |
+| `Harm_type`       | Claim Topic                                 | multi  | **Topic**, content desks |
+| `01harm`          | Harm Type                                   | multi  | —                        |
+| `claimtype`       | Claim Type                                  | multi  | —                        |
+| `claimformat`     | Claim Format                                | multi  | —                        |
+| `GEC`             | GEC category                                | multi  | —                        |
+| `Debunklang`      | Debunk language                             | single | **Language** (primary)   |
+| `platform`        | Primary platform                            | single | —                        |
+| `content_type`    | Content Type                                | single | article-type pages       |
+| `Debunk`          | Verdict                                     | single | verdict                  |
 
 `swp_article_metadata.language` is a separate scalar column (ISO `en`/`fr`/`so`/
 `am`/`om`/`sw`) — the desk/routing language, distinct from `Debunklang`.
@@ -31,10 +31,12 @@ on staging and their Superdesk labels:
 ## Filter dimensions
 
 ### Region → `countrymention1`
+
 "First country mentioned" (single, ISO3 codes like `NGA`). Labels come from the
 subject `name`.
 
 ### Topic → `Harm_type`
+
 "Claim Topic" (multi; codes like `elections`, `employment`, `finance`, `gender`).
 
 This is also what a **content desk** collects: `/fact-checks/<slug>` lists the
@@ -42,17 +44,19 @@ fact-checks carrying the desk's Claim Topics. Which desks exist is editorial,
 not a fold of the topics in use. See "Content desks" below.
 
 ### Language → `Debunklang`, falling back to the article language
+
 The Language filter is keyed on the Debunk language, and falls back to the
 article language for any article that has none. The two use different code
 systems and are reconciled at the presentation layer:
 
-| | `Debunklang` (Debunk language) | `swp_article_metadata.language` (article) |
-| --- | --- | --- |
-| code form | vocabulary qcodes (`debunkeng`, `debunkful`, …) — non-ISO | ISO (`en`, `fr`, …) |
-| storage | `subject` scheme | scalar column |
-| values | English, Fulani, Oromo, … | the 6 desk languages |
+|           | `Debunklang` (Debunk language)                            | `swp_article_metadata.language` (article) |
+| --------- | --------------------------------------------------------- | ----------------------------------------- |
+| code form | vocabulary qcodes (`debunkeng`, `debunkful`, …) — non-ISO | ISO (`en`, `fr`, …)                       |
+| storage   | `subject` scheme                                          | scalar column                             |
+| values    | English, Fulani, Oromo, …                                 | the 6 desk languages                      |
 
 Contract:
+
 - **One list, deduped by language identity (display name), not code.**
   A debunk language whose label already appears as a desk language (e.g.
   "English") is dropped in favour of the ISO option, so its option keeps the
@@ -75,6 +79,7 @@ name. So the option lists describe the taxonomy actually applied to content, and
 grow as more content is tagged.
 
 Sizing and caching are env-tunable:
+
 - `TAXONOMY_SAMPLE_SIZE` — how many fact-checks are read to build the lists.
 - `FILTER_OPTIONS_TTL_SECONDS` — how long a derived set is cached.
 

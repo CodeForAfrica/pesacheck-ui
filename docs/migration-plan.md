@@ -34,13 +34,13 @@ The reference implementation for everything in Track A is the sibling repo
 
 ### Endpoints (staging)
 
-| Service | URL | Auth | Use |
-| --- | --- | --- | --- |
-| **Hasura GraphQL** | `https://pesacheckstaging-hasura.superdesk.org/v1/graphql` | **none — anonymous, read-only** | All content reads. This is the primary data source. |
+| Service            | URL                                                        | Auth                                 | Use                                                                                  |
+| ------------------ | ---------------------------------------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------ |
+| **Hasura GraphQL** | `https://pesacheckstaging-hasura.superdesk.org/v1/graphql` | **none — anonymous, read-only**      | All content reads. This is the primary data source.                                  |
 | Publisher REST API | `https://pesacheck-staging-publisher.superdesk.pro/api/v2` | JWT (`POST /api/v2/auth/` for token) | Search, auth/login, content push. Protected routes return `401 JWT Token not found`. |
-| Publisher media | `https://pesacheck-staging-publisher.superdesk.pro/media/` | none (public GET) | Image/asset bytes. |
-| Superdesk core | `https://pesacheck-staging.superdesk.pro` | session | Editorial app (authoring). Not read by the frontend. |
-| SD auth check | `https://pesacheck-staging.superdesk.pro/api/macros` | token | Preview-auth check only (returns 401 unauth). |
+| Publisher media    | `https://pesacheck-staging-publisher.superdesk.pro/media/` | none (public GET)                    | Image/asset bytes.                                                                   |
+| Superdesk core     | `https://pesacheck-staging.superdesk.pro`                  | session                              | Editorial app (authoring). Not read by the frontend.                                 |
+| SD auth check      | `https://pesacheck-staging.superdesk.pro/api/macros`       | token                                | Preview-auth check only (returns 401 unauth).                                        |
 
 - **Tenant:** every query MUST filter by `tenant_code = "e6lkum"` (the staging
   PesaCheck tenant). Without it you get other tenants' data or nothing.
@@ -143,7 +143,7 @@ When the local stack is up, the same map applies with local hosts:
 
 Today: pages `import { SPOTLIGHT_FEATURE } from "@/lib/home-content"` — static
 constants. We keep the **types** (`Story`, `Article`, `ContentDesk`, …) as the
-contract and swap the *source* behind them, one page at a time.
+contract and swap the _source_ behind them, one page at a time.
 
 Introduce a data-access layer that returns those same types:
 
@@ -184,32 +184,34 @@ Source of truth for queries/mappers: `pesacheck-pwa-app-router/services/`
 (`collectionService.queries.js`, `articleService.ts`, `routeService.ts`,
 `menuService.ts`, `helpers.ts`, `articleBodyService.js`).
 
-| Figma field (`Story` / `Article`) | Superdesk source | Notes |
-| --- | --- | --- |
-| `image` | `swp_article.swp_image_renditions` → `${MEDIA_URL}${asset_id}.webp` | Reuse `helpers.ts:findRendition`; pick a rendition by name |
-| `title` | `swp_article.title` (or SEO/subtitle) | |
-| `excerpt` | `swp_article.lead` / description | |
-| `verdict` ("False", "Altered", …) | **`swp_article.metadata` jsonb** → `subject[]` where `scheme === "Debunk"` → `.name` | **Verified** on staging. Parse `metadata` (Hasura returns it as a string). Title prefix (FAKE/SATIRE/…) is a separate editor convention and does **not** always match the `Debunk` code — use the structured tag, not the title. Null-safe: some articles have an empty `subject[]`. |
-| `topic` / harm | `swp_article.metadata` `subject[]` where `scheme === "01harm"` or `"Harm_type"` (also `swp_route.name`) | Same array as verdict. Desks are still routes (see below). |
-| `region` | `swp_article.metadata` `subject[]` where `scheme === "countries"` / `"countrymention1"` | **Verified** — same array as verdict. |
-| `language` | article language field / language route | English/Français/Kiswahili exist as routes |
-| `date` | `swp_article.published_at` | Format client-side |
-| `readTime` | **computed** from body word count | No native field |
-| `href` | route slug + article slug | cf. `swp_article_previous_relative_url` |
-| `tags` (Article) | `swp_article_keywords` → `swp_keyword` | |
-| `author` (Article) | `swp_article_authors` → `swp_author` | |
-| body paragraphs / inline image | `swp_article.body` | Convert via `articleBodyService.js:convertBodyImages` (rewrites img src to MEDIA_URL — already the non-S3 branch) |
-| `relatedStories` | `swp_article_related` | |
-| `ContentDesk{name,slug,topics}` | **curated** (`lib/content-desks.ts`), keyed to `metadata.subject[]` codes where `scheme: "Harm_type"` (Claim Topic) | The five desks PesaCheck runs, each gathering one or more Claim Topics. A desk is not a route: `swp_route` collections mix language desks, `team`, page routes, and carry no topic. See `docs/fact-check-filters.md`. |
-| `ContentDesk.image` | **curated** (`lib/content-desks.ts`) | No vocabulary table is exposed, so a term carries no artwork; keyed by topic code with a default |
+| Figma field (`Story` / `Article`) | Superdesk source                                                                                                    | Notes                                                                                                                                                                                                                                                                                |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `image`                           | `swp_article.swp_image_renditions` → `${MEDIA_URL}${asset_id}.webp`                                                 | Reuse `helpers.ts:findRendition`; pick a rendition by name                                                                                                                                                                                                                           |
+| `title`                           | `swp_article.title` (or SEO/subtitle)                                                                               |                                                                                                                                                                                                                                                                                      |
+| `excerpt`                         | `swp_article.lead` / description                                                                                    |                                                                                                                                                                                                                                                                                      |
+| `verdict` ("False", "Altered", …) | **`swp_article.metadata` jsonb** → `subject[]` where `scheme === "Debunk"` → `.name`                                | **Verified** on staging. Parse `metadata` (Hasura returns it as a string). Title prefix (FAKE/SATIRE/…) is a separate editor convention and does **not** always match the `Debunk` code — use the structured tag, not the title. Null-safe: some articles have an empty `subject[]`. |
+| `topic` / harm                    | `swp_article.metadata` `subject[]` where `scheme === "01harm"` or `"Harm_type"` (also `swp_route.name`)             | Same array as verdict. Desks are still routes (see below).                                                                                                                                                                                                                           |
+| `region`                          | `swp_article.metadata` `subject[]` where `scheme === "countries"` / `"countrymention1"`                             | **Verified** — same array as verdict.                                                                                                                                                                                                                                                |
+| `language`                        | article language field / language route                                                                             | English/Français/Kiswahili exist as routes                                                                                                                                                                                                                                           |
+| `date`                            | `swp_article.published_at`                                                                                          | Format client-side                                                                                                                                                                                                                                                                   |
+| `readTime`                        | **computed** from body word count                                                                                   | No native field                                                                                                                                                                                                                                                                      |
+| `href`                            | route slug + article slug                                                                                           | cf. `swp_article_previous_relative_url`                                                                                                                                                                                                                                              |
+| `tags` (Article)                  | `swp_article_keywords` → `swp_keyword`                                                                              |                                                                                                                                                                                                                                                                                      |
+| `author` (Article)                | `swp_article_authors` → `swp_author`                                                                                |                                                                                                                                                                                                                                                                                      |
+| body paragraphs / inline image    | `swp_article.body`                                                                                                  | Convert via `articleBodyService.js:convertBodyImages` (rewrites img src to MEDIA_URL — already the non-S3 branch)                                                                                                                                                                    |
+| `relatedStories`                  | `swp_article_related`                                                                                               |                                                                                                                                                                                                                                                                                      |
+| `ContentDesk{name,slug,topics}`   | **curated** (`lib/content-desks.ts`), keyed to `metadata.subject[]` codes where `scheme: "Harm_type"` (Claim Topic) | The five desks PesaCheck runs, each gathering one or more Claim Topics. A desk is not a route: `swp_route` collections mix language desks, `team`, page routes, and carry no topic. See `docs/fact-check-filters.md`.                                                                |
+| `ContentDesk.image`               | **curated** (`lib/content-desks.ts`)                                                                                | No vocabulary table is exposed, so a term carries no artwork; keyed by topic code with a default                                                                                                                                                                                     |
 
 ### Already verified on staging (`tenant_code = e6lkum`)
+
 - Routes match the Figma content desks almost exactly (Climate Change, Gender,
   Elections, Public Finances, Health) plus language collections.
 - Marketing pages exist as `type: "content"` routes (About, Methodology,
   Principles & Funding, Contact) → can become CMS-driven later, not just static.
 
 ### Phase 1 discovery items
+
 1. ~~**Verdict**~~ — ✅ **RESOLVED.** Lives in `swp_article.metadata` (jsonb) →
    `subject[]` → element where `scheme === "Debunk"`; `.name` is the verdict
    ("False", "Altered", "Hoax", …). **Not** in `swp_article_extra` (the original
@@ -245,8 +247,10 @@ Each phase keeps the static fallback; flip sections as they're proven.
 - **Phase 6 (optional) — Marketing pages** from `type: "content"` routes.
 
 ### Config changes to this repo (Phase 1)
+
 - `package.json`: add `graphql-request` (+ `graphql`).
 - `.env.local`:
+
   ```
   NEXT_PUBLIC_API_URL=https://pesacheckstaging-hasura.superdesk.org/v1/graphql
   NEXT_PUBLIC_TENANT_CODE=e6lkum
@@ -262,10 +266,12 @@ Each phase keeps the static fallback; flip sections as they're proven.
 
 We build from the open-source projects (no staging access beyond public APIs).
 Components: **Superdesk core** (editorial: Angular client + Python server + Mongo
-+ Elasticsearch + Redis), **Superdesk Publisher** (Symfony/PHP + PostgreSQL),
-**Hasura** (GraphQL over the Publisher Postgres). Budget ~8GB RAM.
+
+- Elasticsearch + Redis), **Superdesk Publisher** (Symfony/PHP + PostgreSQL),
+  **Hasura** (GraphQL over the Publisher Postgres). Budget ~8GB RAM.
 
 ### Why seed core (not push to Publisher directly)
+
 Content is seeded by **authoring + publishing in core**, then letting Superdesk's
 own pipeline transmit it to Publisher — the same path real editors use. The
 payoff: core generates **image renditions** (the card/hero crops the frontend
@@ -274,11 +280,12 @@ Pushing straight to Publisher's API is lighter but means hand-crafting that
 payload and renditions yourself. The cost of the core path is the wiring in
 steps 4–5 below.
 
-> **Publishing is the trigger.** Only *published* items flow to Publisher.
+> **Publishing is the trigger.** Only _published_ items flow to Publisher.
 > Inserting rows straight into Mongo does **not** reach Publisher — there's no
 > publish event. All seeding must go through the publish action.
 
 ### Setup
+
 1. **Prereqs.** Docker + Docker Compose. Clone `superdesk/superdesk` and
    `superdesk/web-publisher`.
 2. **Superdesk core.** Bring up via its bundled docker-compose; create an admin
@@ -313,6 +320,7 @@ steps 4–5 below.
    `NEXT_PUBLIC_MEDIA_URL=http://localhost:<publisher-port>/media/`.
 
 ### Seed script sketch (core REST API)
+
 Automates "create → publish" so the pipeline carries items to Publisher. Pseudo:
 
 ```
@@ -334,6 +342,7 @@ PATCH /api/archive/<id>/publish  (If-Match: <_etag>) { state: "published" }
 ```
 
 Notes:
+
 - Send `If-Match: <_etag>` on every PATCH (Superdesk uses optimistic concurrency).
 - `associations.featuremedia` is what makes core generate the renditions.
 - Map sample articles' `subject`/desk to the taxonomy the frontend filters on
@@ -341,6 +350,7 @@ Notes:
 - Keep the script idempotent (skip if slug already published) so reruns are safe.
 
 ### Lighter fallback
+
 If the core→Publisher wiring (step 4) blocks you, fall back to **Publisher +
 Hasura only**, seeded via Publisher's content-push API directly or its demo
 fixtures — same `swp_*` contract, no editorial core. You lose payload/rendition
@@ -349,6 +359,7 @@ fidelity but unblock frontend work.
 ---
 
 ## Risks & open questions
+
 - ~~**Verdict & taxonomy modeling**~~ — ✅ located in `swp_article.metadata`
   jsonb (`subject[]`, `scheme:"Debunk"` for verdict; `countries`/`01harm` for
   region/topic). Residual risks: (a) the **full `Debunk` vocabulary** is
@@ -370,6 +381,7 @@ fidelity but unblock frontend work.
   versions you clone.
 
 ## Suggested first concrete steps
+
 1. ✅ Done — verdict/taxonomy located in `swp_article.metadata` (`subject[]`:
    `Debunk` = verdict, `countries`/`01harm` = region/topic). Remaining: confirm
    the full `Debunk` vocabulary (item #1 above) and write the parse-`metadata` +

@@ -1,9 +1,11 @@
 # Detailed procedure notes
 
 ## Asset extraction subagent (for large pages)
+
 The per-section `get_design_context` dumps are large. To keep the main context
 clean, delegate extraction to a `general-purpose` subagent. Give it the list of
 section node ids + slugs and instruct it to, for each node:
+
 1. Call `get_design_context(nodeId)` (clientFrameworks="react",
    clientLanguages="typescript,css").
 2. Save the full reference code to `/tmp/figma-ref/<slug>.txt`.
@@ -16,6 +18,7 @@ once per run, so dedup happens automatically within a section. Across sections,
 identical assets land under each section folder — acceptable, or post-process.
 
 ## Identifying sections in an absolutely-positioned frame
+
 Most Figma frames are NOT auto-layout: the root frame has dozens of absolutely
 positioned children. Use `parse-metadata.mjs` to list direct children sorted by
 `y`. Group them into visual sections by y-position bands and by group names
@@ -28,6 +31,7 @@ every overlapping layer — interpret the intended single layout and build it as
 clean responsive grid. The screenshot is the source of truth for what's visible.
 
 ## Translating layout
+
 - Map the 1440px frame to `Container` (1240px content, 100px gutters).
 - Convert `left/top` absolute coords into flex/grid order; convert fixed widths
   (e.g. `w-[295px]`) into responsive grid tracks.
@@ -37,6 +41,7 @@ clean responsive grid. The screenshot is the source of truth for what's visible.
   copy is supplied; centralize it in `lib/<page>-content.ts`.
 
 ## Gotchas observed
+
 - `get_metadata` frequently exceeds the token limit and is written to a file —
   parse the file, don't try to read it all into context.
 - The Figma asset host is `http://localhost:3845`; it only works while the Figma

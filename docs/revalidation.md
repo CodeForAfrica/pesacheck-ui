@@ -18,10 +18,10 @@ is the authority:
 pnpm build   # the Revalidate column says which pages cache, and for how long
 ```
 
-| | What triggers it | How fast | Covers |
-| --- | --- | --- | --- |
-| **Tag revalidation** | a Publisher webhook POSTs `/api/revalidate` | seconds | articles, content desks, menus |
-| **Time (ISR)** | nothing — every page carries `revalidate = 300` | ≤ 5 min | everything, including what the webhook can't see |
+|                      | What triggers it                                | How fast | Covers                                           |
+| -------------------- | ----------------------------------------------- | -------- | ------------------------------------------------ |
+| **Tag revalidation** | a Publisher webhook POSTs `/api/revalidate`     | seconds  | articles, content desks, menus                   |
+| **Time (ISR)**       | nothing — every page carries `revalidate = 300` | ≤ 5 min  | everything, including what the webhook can't see |
 
 Before this, those pages carried Next's default for a static route — **one
 hour** — so a correction could sit behind an hour of cached HTML. Not frozen
@@ -41,18 +41,22 @@ Every read declares what it belongs to. `lib/data/cache.ts` holds the
 vocabulary; `gql()` takes them as its third argument:
 
 ```ts
-await gql<Shape>(QUERY, { tenant: TENANT_CODE, slug }, { tags: [TAGS.article(slug)] });
+await gql<Shape>(
+  QUERY,
+  { tenant: TENANT_CODE, slug },
+  { tags: [TAGS.article(slug)] },
+);
 ```
 
-| Tag | Set by | Busted by |
-| --- | --- | --- |
-| `article:<slug>` | `getRawArticle` | that article changing |
-| `articles` | the fact-check listings | any article changing |
-| `content-list:<name>` | `getContentListArticles`, `getPage` | that list changing |
-| `content-lists` | the same calls, collectively | any article or list changing |
-| `routes` | `getRoutes` | a route changing |
-| `navigation` | `getSiteMenus` | a menu changing |
-| `filter-options` | `getFilterOptions` | nothing automatic — hourly TTL |
+| Tag                   | Set by                              | Busted by                      |
+| --------------------- | ----------------------------------- | ------------------------------ |
+| `article:<slug>`      | `getRawArticle`                     | that article changing          |
+| `articles`            | the fact-check listings             | any article changing           |
+| `content-list:<name>` | `getContentListArticles`, `getPage` | that list changing             |
+| `content-lists`       | the same calls, collectively        | any article or list changing   |
+| `routes`              | `getRoutes`                         | a route changing               |
+| `navigation`          | `getSiteMenus`                      | a menu changing                |
+| `filter-options`      | `getFilterOptions`                  | nothing automatic — hourly TTL |
 
 Next records a read's tags on the cached response **and** on every page
 prerendered from it, so `revalidateTag("article:x")` drops both. You can see
@@ -144,7 +148,7 @@ on TTLs alone.
 
 **The secret travels in the URL** — `?secret=…`. Publisher's webhook form has
 three fields (events, URL, enabled) and no way to add a header, so there is
-nowhere else to put it. Use a value that is *only* this secret's: it will show
+nowhere else to put it. Use a value that is _only_ this secret's: it will show
 up in access logs and proxy traces, and while the worst an attacker can do with
 it is force re-renders, that is not a secret to share with anything else. The
 route also accepts `x-revalidate-secret` or `Authorization: Bearer` for callers
@@ -182,13 +186,13 @@ read from the body. A **direct** shape also works, for a manual poke:
 Answers are deliberately explicit about doing nothing, so a misconfigured
 webhook cannot look like a working one:
 
-| Response | Meaning |
-| --- | --- |
-| `{"revalidated": true, "tags": [...]}` | those tags were dropped |
-| `{"revalidated": false, "reason": "other tenant"}` | `X-WEBHOOK-TENANT` isn't ours — a webhook pointed at the wrong site |
-| `{"revalidated": false, "reason": "no tags mapped for X"}` | subscribed to an event no page depends on |
-| `401` | wrong or missing secret |
-| `503` | `REVALIDATE_SECRET` is not set |
+| Response                                                   | Meaning                                                             |
+| ---------------------------------------------------------- | ------------------------------------------------------------------- |
+| `{"revalidated": true, "tags": [...]}`                     | those tags were dropped                                             |
+| `{"revalidated": false, "reason": "other tenant"}`         | `X-WEBHOOK-TENANT` isn't ours — a webhook pointed at the wrong site |
+| `{"revalidated": false, "reason": "no tags mapped for X"}` | subscribed to an event no page depends on                           |
+| `401`                                                      | wrong or missing secret                                             |
+| `503`                                                      | `REVALIDATE_SECRET` is not set                                      |
 
 Revalidation uses the `"max"` profile — stale-while-revalidate. The reader who
 arrives first gets the old page and the fresh one renders behind them, rather
@@ -196,13 +200,13 @@ than waiting on Hasura.
 
 ### Which events map to what
 
-| Publisher event | Tags | Why |
-| --- | --- | --- |
-| `article[created\|updated\|published\|unpublished\|canceled]` | `article:<slug>`, `articles`, `content-lists` | the article's page, and everything that lists it |
-| `article[preview]` | none | renders an unpublished draft; must never reach the live cache |
-| `route[created\|updated\|deleted]` | `routes`, `articles` | which desks exist, and which desk a listing sits under |
-| `menu[created\|updated\|deleted]` | `navigation` | header and footer link rows |
-| `package[*]` | none | the incoming Superdesk item, before Publisher has made an article of it — the `article[*]` event that follows is the one carrying a slug |
+| Publisher event                                               | Tags                                          | Why                                                                                                                                      |
+| ------------------------------------------------------------- | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `article[created\|updated\|published\|unpublished\|canceled]` | `article:<slug>`, `articles`, `content-lists` | the article's page, and everything that lists it                                                                                         |
+| `article[preview]`                                            | none                                          | renders an unpublished draft; must never reach the live cache                                                                            |
+| `route[created\|updated\|deleted]`                            | `routes`, `articles`                          | which desks exist, and which desk a listing sits under                                                                                   |
+| `menu[created\|updated\|deleted]`                             | `navigation`                                  | header and footer link rows                                                                                                              |
+| `package[*]`                                                  | none                                          | the incoming Superdesk item, before Publisher has made an article of it — the `article[*]` event that follows is the one carrying a slug |
 
 An article event with no slug in the body still busts the listings. A listing
 refresh beats nothing.
@@ -226,7 +230,7 @@ Two properties of Publisher's webhooks make time-based revalidation
 load-bearing rather than ceremonial:
 
 - **No content-list event.** Reordering a curated list fires nothing, so
-  curation changes land on the TTL. An *article* edit does bust
+  curation changes land on the TTL. An _article_ edit does bust
   `content-lists`, so the common case — a title or image changing everywhere it
   appears — is still immediate.
 - **Single-attempt delivery.** `WebhookHandler` sends one request through
@@ -254,7 +258,7 @@ five minutes late — so check them before concluding the code is broken.
 
 Cloudflare's bot protection challenges traffic that does not look like a
 browser. This is not hypothetical here: `EDGE_PRESHARED_AUTH` exists because
-Bot Fight Mode was challenging the site's *outbound* calls to the GraphQL host
+Bot Fight Mode was challenging the site's _outbound_ calls to the GraphQL host
 (see `lib/data/client.ts`). Publisher's webhook is the same shape inbound — a
 Guzzle POST from a datacentre IP, no cookies, no browser fingerprint.
 
@@ -279,7 +283,7 @@ never arrive.
 ### 2. Cloudflare must not out-cache the origin
 
 Next serves prerendered pages with `Cache-Control: s-maxage=300,
-stale-while-revalidate=…`, and on-demand revalidation refreshes *Next's* copy.
+stale-while-revalidate=…`, and on-demand revalidation refreshes _Next's_ copy.
 If Cloudflare is caching the HTML on its own longer TTL, readers keep getting
 the edge copy and the revalidation is invisible to them.
 
@@ -293,7 +297,7 @@ age: 8464
 ```
 
 Four hours at the edge — and `max-age` (rather than `s-maxage`) means the
-*browser* holds it that long too, which no purge can reach. Those headers come
+_browser_ holds it that long too, which no purge can reach. Those headers come
 from the current production site rather than this app, so treat it as "confirm
 the zone's rules for this hostname", not as a diagnosis.
 
@@ -339,7 +343,7 @@ no bug here":
 - **The first visit to an article never shows it.** `generateStaticParams`
   emits only the sample slugs, so a real article URL is rendered on demand the
   first time it is asked for — and that render is fresh. Staleness begins with
-  the *second* edit, once a copy is cached.
+  the _second_ edit, once a copy is cached.
 
 So the sequence that does show it:
 
@@ -361,11 +365,11 @@ In order of likelihood:
 
 1. **More than five minutes have passed and it's still stale.** Then it isn't
    caching — the TTL would have caught it. Check the query, or whether the page
-   is silently falling back to `lib/*-content.ts` (see *Fallback behaviour* in
+   is silently falling back to `lib/*-content.ts` (see _Fallback behaviour_ in
    `superdesk-setup.md`; a broken query looks exactly like unfinished
    curation).
 2. **It showed design copy for a few minutes, then fixed itself.** A Hasura
-   error was cached for the TTL — see *A cached read caches failures too*
+   error was cached for the TTL — see _A cached read caches failures too_
    above. Nothing to fix on the site; look at Hasura for the original error.
 3. **It was a curation change.** Content lists have no Publisher event; the
    TTL is the only thing that refreshes them. Expected, not a fault.

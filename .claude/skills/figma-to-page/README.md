@@ -11,7 +11,7 @@ In Claude Code, with the Figma desktop app open (Dev Mode MCP running):
 /figma-to-page https://www.figma.com/design/<key>/<name>?node-id=2866-1070
 ```
 
-Or just ask: *"build this Figma node as a page: <url>"*. The skill reads the
+Or just ask: _"build this Figma node as a page: <url>"_. The skill reads the
 node, extracts real assets, scaffolds tokens/primitives/sections against the
 existing `components/ui` library, composes the page, and runs a
 lint/build/preview-screenshot verification gate.

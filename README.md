@@ -21,12 +21,12 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ### Scripts
 
-| Command | Description |
-| --- | --- |
-| `pnpm dev` | Start the development server |
-| `pnpm build` | Production build |
-| `pnpm start` | Serve the production build |
-| `pnpm lint` | Run ESLint |
+| Command      | Description                  |
+| ------------ | ---------------------------- |
+| `pnpm dev`   | Start the development server |
+| `pnpm build` | Production build             |
+| `pnpm start` | Serve the production build   |
+| `pnpm lint`  | Run ESLint                   |
 
 ## Project structure
 
@@ -114,7 +114,7 @@ URL:
 /figma-to-page https://www.figma.com/design/<file-key>/<name>?node-id=2866-1070
 ```
 
-You can also just ask in plain language — *"build this Figma node as a page: <url>"*.
+You can also just ask in plain language — _"build this Figma node as a page: <url>"_.
 The skill reads the node, downloads its real assets, scaffolds the page sections
 against `components/ui`, composes the route under `app/`, and finishes with a
 lint/build/screenshot check comparing the result to the design.

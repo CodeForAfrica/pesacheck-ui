@@ -17,10 +17,10 @@ articles.
 Three hops, and which one a value takes is decided by how its **vocabulary** is
 configured — not by the content profile:
 
-| Vocabulary setting | Appears in Superdesk as | Arrives in Publisher as | Read in code with |
-| --- | --- | --- | --- |
-| `field_type: "text"` | its own field on the profile | `swp_article_extra` row (`field_name` / `value`) | `extraValue(article, name)` |
-| `selection_type: "single selection"`, no `field_type` | a facet of the **Subject** field | `metadata.subject[]` entry with `scheme` | `findSubject(meta, scheme)?.name` |
+| Vocabulary setting                                    | Appears in Superdesk as          | Arrives in Publisher as                          | Read in code with                 |
+| ----------------------------------------------------- | -------------------------------- | ------------------------------------------------ | --------------------------------- |
+| `field_type: "text"`                                  | its own field on the profile     | `swp_article_extra` row (`field_name` / `value`) | `extraValue(article, name)`       |
+| `selection_type: "single selection"`, no `field_type` | a facet of the **Subject** field | `metadata.subject[]` entry with `scheme`         | `findSubject(meta, scheme)?.name` |
 
 This is the single most confusing part of the setup. A "subject" vocabulary
 does not appear as a field of its own in the content profile editor — it feeds
@@ -37,10 +37,10 @@ Two consequences worth knowing before authoring:
   Two different rules apply, and getting them wrong leaves fields on a form
   that nobody put there:
 
-  | Kind of field | Renders when |
-  | --- | --- |
-  | regular (`place`, `authors`, `body_html`, …) | its **`schema` entry is non-null**. `enabled: false` does **not** suppress it. |
-  | vocabulary (`faq_group`, `media_centre_label`, …) | it is merely **present in `editor`**, even disabled with a null schema. |
+  | Kind of field                                     | Renders when                                                                   |
+  | ------------------------------------------------- | ------------------------------------------------------------------------------ |
+  | regular (`place`, `authors`, `body_html`, …)      | its **`schema` entry is non-null**. `enabled: false` does **not** suppress it. |
+  | vocabulary (`faq_group`, `media_centre_label`, …) | it is merely **present in `editor`**, even disabled with a null schema.        |
 
   So to keep a field off a profile: null its `schema` entry, and for a
   vocabulary remove it from `editor` altogether. `editor` otherwise governs
@@ -60,17 +60,17 @@ clipping, the tag on an announcement, the document kind on a research strand,
 and the pill on an upcoming event.
 
 Deliberately **not** the `01harm` taxonomy the fact-checks filter on: what an
-entry *is* on this page is a different question from what harm a fact-check
+entry _is_ on this page is a different question from what harm a fact-check
 addresses, and overloading `01harm` would have polluted the fact-check filters.
 
 Items, grouped by the section that uses them:
 
-| Section | Labels |
-| --- | --- |
-| Event spotlight | Workshop, Webinar, Lab, Summit, Clinic |
-| Announcements | Network, Methodology, Partnership, Data |
-| In research | Journal article, Working paper, Conference paper, Policy report |
-| In the news | International newsrooms, Platform reporting, Sector review, Broadcast |
+| Section         | Labels                                                                |
+| --------------- | --------------------------------------------------------------------- |
+| Event spotlight | Workshop, Webinar, Lab, Summit, Clinic                                |
+| Announcements   | Network, Methodology, Partnership, Data                               |
+| In research     | Journal article, Working paper, Conference paper, Policy report       |
+| In the news     | International newsrooms, Platform reporting, Sector review, Broadcast |
 
 Untagged entries omit the label rather than printing a placeholder, so every
 section renders correctly before the vocabulary is populated.
@@ -127,9 +127,9 @@ fact-check shows the approved illustration for its Debunk rating
 instead of its own feature image. This vocabulary is how an editor opts out for
 one post:
 
-| qcode | Name | Shows |
-| --- | --- | --- |
-| `default` | Default | the rating's illustration |
+| qcode      | Name               | Shows                        |
+| ---------- | ------------------ | ---------------------------- |
+| `default`  | Default            | the rating's illustration    |
 | `uploaded` | Use uploaded image | the post's own feature image |
 
 **The qcodes are the contract**, read by `VERDICT_IMAGE_UPLOADED`; the names
@@ -153,12 +153,12 @@ the next `superdesk-bootstrap`, so the field also belongs in the tracked
 All `field_type: "text"`, so each is its own field and lands in
 `swp_article_extra`.
 
-| Field id | Label | Used by |
-| --- | --- | --- |
-| `team_role` | Role | the job title under a staff member's name |
-| `linkedin_url` | LinkedIn | turns the card's badge into a link; absent hides it |
-| `partner_role` | Partner role | the pill on an ecosystem card ("Verified signatory") |
-| `partner_url` | Partner website | where an entry's "Learn More" goes |
+| Field id       | Label           | Used by                                              |
+| -------------- | --------------- | ---------------------------------------------------- |
+| `team_role`    | Role            | the job title under a staff member's name            |
+| `linkedin_url` | LinkedIn        | turns the card's badge into a link; absent hides it  |
+| `partner_role` | Partner role    | the pill on an ecosystem card ("Verified signatory") |
+| `partner_url`  | Partner website | where an entry's "Learn More" goes                   |
 
 `partner_url` matters more than it looks: an entry without one falls back to
 linking to its own article under `/fact-checks/`, which renders an organisation
@@ -170,14 +170,14 @@ All `field_type: "text"`, so each is its own field and lands in
 `swp_article_extra`. Names are the contract — `EVENT_FIELDS` in
 `lib/data/map.ts` looks them up by exactly these ids.
 
-| Field id | Label | Example | Used by |
-| --- | --- | --- | --- |
-| `event_venue` | Event venue | `Nairobi` / `Online` | line above the headline |
-| `event_dates` | Event dates | `12–13 September 2026` | line above the headline |
-| `event_format` | Event format | `In person & streamed` | spotlight detail row |
-| `event_languages` | Event languages | `English, French, Kiswahili` | spotlight detail row |
-| `event_cost` | Event cost | `Free for partner newsrooms` | spotlight detail row |
-| `event_meta` | Event meta | `Nairobi · 12–13 September 2026` | **superseded**; read as a fallback |
+| Field id          | Label           | Example                          | Used by                            |
+| ----------------- | --------------- | -------------------------------- | ---------------------------------- |
+| `event_venue`     | Event venue     | `Nairobi` / `Online`             | line above the headline            |
+| `event_dates`     | Event dates     | `12–13 September 2026`           | line above the headline            |
+| `event_format`    | Event format    | `In person & streamed`           | spotlight detail row               |
+| `event_languages` | Event languages | `English, French, Kiswahili`     | spotlight detail row               |
+| `event_cost`      | Event cost      | `Free for partner newsrooms`     | spotlight detail row               |
+| `event_meta`      | Event meta      | `Nairobi · 12–13 September 2026` | **superseded**; read as a fallback |
 
 `event_venue` and `event_dates` replaced the single pre-composed `event_meta`
 line. Either half stands alone, joined with `·` when both are present. Events
@@ -195,10 +195,10 @@ the fact-check vocabularies it does not.
 
 ### Announcement
 
-| Pane | Fields |
-| --- | --- |
-| Header | slugline, genre, place, priority, urgency, anpa_category, subject, ednote, authors, **Entry Type** |
-| Content | headline, abstract, byline, dateline, body_html, sign_off |
+| Pane    | Fields                                                                                             |
+| ------- | -------------------------------------------------------------------------------------------------- |
+| Header  | slugline, genre, place, priority, urgency, anpa_category, subject, ednote, authors, **Entry Type** |
+| Content | headline, abstract, byline, dateline, body_html, sign_off                                          |
 
 The card renders five things: publish date, label, headline, **abstract**, and a
 link to the article. The abstract is the entire visible body — one sentence that
@@ -207,10 +207,10 @@ image, whatever is attached.
 
 ### Research Citations
 
-| Pane | Fields |
-| --- | --- |
-| Header | slugline, place, authors, **Entry Type** |
-| Content | headline, abstract, body_html, sign_off |
+| Pane    | Fields                                   |
+| ------- | ---------------------------------------- |
+| Header  | slugline, place, authors, **Entry Type** |
+| Content | headline, abstract, body_html, sign_off  |
 
 The strand's headline becomes the label, the abstract becomes the copy, and the
 CTA opens the article itself. The accent colour comes from the strand's
@@ -219,10 +219,10 @@ the schema carries a colour, so reordering the list reshuffles them.
 
 ### Event
 
-| Pane | Fields |
-| --- | --- |
-| Header | slugline, **Entry Type**, event fields (see above) |
-| Content | headline, abstract, body_html, feature media |
+| Pane    | Fields                                             |
+| ------- | -------------------------------------------------- |
+| Header  | slugline, **Entry Type**, event fields (see above) |
+| Content | headline, abstract, body_html, feature media       |
 
 Headline is required (80 chars), abstract is required (400 — wider than the
 other profiles because the spotlight body is a full paragraph), and feature
@@ -231,12 +231,12 @@ show no image, so only the featured event's media is ever used.
 
 ### FAQ
 
-| Pane | Field | Labelled | Holds |
-| --- | --- | --- | --- |
-| Header | slugline | — | the URL-safe id, unused by the page |
-| Header | `ecosystem_group`-style CV | **FAQ Group** | the group heading |
-| Content | `headline` | **Question** | the question |
-| Content | `abstract` | **Answer** | the answer, and the only copy rendered |
+| Pane    | Field                      | Labelled      | Holds                                  |
+| ------- | -------------------------- | ------------- | -------------------------------------- |
+| Header  | slugline                   | —             | the URL-safe id, unused by the page    |
+| Header  | `ecosystem_group`-style CV | **FAQ Group** | the group heading                      |
+| Content | `headline`                 | **Question**  | the question                           |
+| Content | `abstract`                 | **Answer**    | the answer, and the only copy rendered |
 
 Headline allows 120 characters rather than the 64 the other profiles use,
 because questions are sentences rather than headlines; the answer is capped at
@@ -253,7 +253,7 @@ entries authored before this profile existed rather than a supported path.
 **The field ids cannot be renamed.** `headline` and `abstract` are Superdesk
 built-ins, not custom fields, so `question` and `answer` are not available as
 ids — an item with no `headline` has no title anywhere in Superdesk's own lists
-and search. What *is* settable is the label an author sees, through
+and search. What _is_ settable is the label an author sees, through
 `editor.<field>.field_name` in the profile, which is why the table above lists
 both.
 
@@ -264,13 +264,13 @@ vocabularies out of it.
 
 ### Team Member
 
-| Pane | Field | Labelled |
-| --- | --- | --- |
-| Header | slugline, `team_role`, `linkedin_url` | — / **Role** / **LinkedIn** |
-| Content | `headline` | **Name** |
-| Content | `abstract` (card bio, 200 chars) | **Short bio** |
-| Content | `body_html` | **Biography** |
-| Content | feature media (portrait) | — |
+| Pane    | Field                                 | Labelled                    |
+| ------- | ------------------------------------- | --------------------------- |
+| Header  | slugline, `team_role`, `linkedin_url` | — / **Role** / **LinkedIn** |
+| Content | `headline`                            | **Name**                    |
+| Content | `abstract` (card bio, 200 chars)      | **Short bio**               |
+| Content | `body_html`                           | **Biography**               |
+| Content | feature media (portrait)              | —                           |
 
 Staff have their own pages at `/about/team/<slug>`, rendered from the body —
 the card's "See more" links there. The fact-check route declines this profile,
@@ -281,9 +281,9 @@ No portrait falls back to the design's grey circle rather than a stock photo.
 
 ### Ecosystem Partner
 
-| Pane | Fields |
-| --- | --- |
-| Header | slugline, **Ecosystem Group**, **Partner role**, **Partner website** |
+| Pane    | Fields                                                                              |
+| ------- | ----------------------------------------------------------------------------------- |
+| Header  | slugline, **Ecosystem Group**, **Partner role**, **Partner website**                |
 | Content | headline (the name, 60 chars), abstract (the description), feature media (the logo) |
 
 No body, sign-off, place or authors: an ecosystem card is a logo, a name, one
@@ -304,25 +304,25 @@ Publisher content lists are the curation layer. Names are matched **exactly** �
 look them up by string, so renaming a list in Publisher silently drops the
 section back to its static fallback.
 
-| List | Feeds |
-| --- | --- |
-| `Homepage — Hero` | homepage hero |
-| `Homepage — Spotlight` | homepage spotlight |
-| `Homepage — Latest` | latest stories |
-| `Homepage — Trending` | trending |
-| `Media Centre — In Research` | research strand grid |
-| `Media Centre — In the News` | press clippings |
-| `Media Centre — Announcements` | announcements list |
-| `Media Centre — Spotlight` | event spotlight **and** "Also coming up" |
-| `Page — FAQs` | the FAQs hero and its call-out bar |
-| `Page — FAQs — Questions` | every question on the FAQs page |
-| `Page — Knowledge` | the Knowledge page |
-| `Page — Principles` | the Principles page |
-| `Page — Methodology` | the Methodology page |
-| `Page — Funding` | the Funding page |
-| `About — Team` | the "Our team" grid on the About page |
-| `About — Ecosystem` | the partner cards on Our Ecosystem |
-| `About — Ecosystem Roles` | the "How we build the ecosystem" cards |
+| List                           | Feeds                                    |
+| ------------------------------ | ---------------------------------------- |
+| `Homepage — Hero`              | homepage hero                            |
+| `Homepage — Spotlight`         | homepage spotlight                       |
+| `Homepage — Latest`            | latest stories                           |
+| `Homepage — Trending`          | trending                                 |
+| `Media Centre — In Research`   | research strand grid                     |
+| `Media Centre — In the News`   | press clippings                          |
+| `Media Centre — Announcements` | announcements list                       |
+| `Media Centre — Spotlight`     | event spotlight **and** "Also coming up" |
+| `Page — FAQs`                  | the FAQs hero and its call-out bar       |
+| `Page — FAQs — Questions`      | every question on the FAQs page          |
+| `Page — Knowledge`             | the Knowledge page                       |
+| `Page — Principles`            | the Principles page                      |
+| `Page — Methodology`           | the Methodology page                     |
+| `Page — Funding`               | the Funding page                         |
+| `About — Team`                 | the "Our team" grid on the About page    |
+| `About — Ecosystem`            | the partner cards on Our Ecosystem       |
+| `About — Ecosystem Roles`      | the "How we build the ecosystem" cards   |
 
 Four things about how lists behave:
 
@@ -359,14 +359,14 @@ Configure it **once per tenant**, in the Publisher app inside Superdesk:
 3. **Webhooks** → **Add Webhook**.
 4. **Events** — pick from the autocomplete; free text is disabled:
 
-   | Event | Add it to refresh |
-   | --- | --- |
-   | `article[published]` | a new fact-check, everywhere it appears |
-   | `article[updated]` | a correction to a live article |
-   | `article[unpublished]`, `article[canceled]` | a takedown |
-   | `article[created]` | harmless; fires before the article is public |
-   | `route[created\|updated\|deleted]` | which content desks exist |
-   | `menu[created\|updated\|deleted]` | header and footer links |
+   | Event                                       | Add it to refresh                            |
+   | ------------------------------------------- | -------------------------------------------- |
+   | `article[published]`                        | a new fact-check, everywhere it appears      |
+   | `article[updated]`                          | a correction to a live article               |
+   | `article[unpublished]`, `article[canceled]` | a takedown                                   |
+   | `article[created]`                          | harmless; fires before the article is public |
+   | `route[created\|updated\|deleted]`          | which content desks exist                    |
+   | `menu[created\|updated\|deleted]`           | header and footer links                      |
 
    Leave `article[preview]` off — it carries an unpublished draft, and the site
    refuses it.
@@ -391,7 +391,7 @@ covered in [`revalidation.md`](./revalidation.md).
 
 **Content lists have no event.** Reordering `Homepage — Hero`, adding a person
 to `About — Team`, or changing the sections of a page — all content lists —
-fires nothing. Those changes appear on the 5-minute TTL. Editing an *article* does refresh every list it appears in, so the common
+fires nothing. Those changes appear on the 5-minute TTL. Editing an _article_ does refresh every list it appears in, so the common
 case is still immediate. Nothing is broken if a curation change takes a few
 minutes; it is the designed behaviour.
 
@@ -431,7 +431,7 @@ state. This means **a broken query looks exactly like unfinished curation**. If
 a section shows copy you recognise from the design, check the list before
 suspecting the code.
 
-An edit that is correct in Superdesk but shows the *previous* live content is a
+An edit that is correct in Superdesk but shows the _previous_ live content is a
 different problem — the site is prerendered, and the page has not been
 revalidated yet. See [`revalidation.md`](./revalidation.md).
 
@@ -443,12 +443,12 @@ than code:
 - **Content profiles cannot be edited through the API.** Every write shape was
   tried against `content_types/<id>`:
 
-  | Request | Result |
-  | --- | --- |
-  | `PATCH` | 400, "the browser (or proxy) sent a request that this server could not understand" — Flask failing to parse a body that never arrived |
-  | `POST` + `X-HTTP-Method-Override: PATCH` | 405, POST is not allowed on the item endpoint |
-  | `PATCH` + `X-HTTP-Method-Override: PATCH` | reaches etag validation with a one-key body; 400 with a full profile document |
-  | `PUT` | 403 for the admin user |
+  | Request                                   | Result                                                                                                                                |
+  | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+  | `PATCH`                                   | 400, "the browser (or proxy) sent a request that this server could not understand" — Flask failing to parse a body that never arrived |
+  | `POST` + `X-HTTP-Method-Override: PATCH`  | 405, POST is not allowed on the item endpoint                                                                                         |
+  | `PATCH` + `X-HTTP-Method-Override: PATCH` | reaches etag validation with a one-key body; 400 with a full profile document                                                         |
+  | `PUT`                                     | 403 for the admin user                                                                                                                |
 
   The size-dependent behaviour of the last two points at a request-size limit on
   `PATCH` somewhere in front of the app rather than the method being blocked.

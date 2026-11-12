@@ -26,6 +26,7 @@ affected this build:
 
 When in doubt about a framework API, grep the local docs for deprecation
 markers first:
+
 ```bash
 grep -rniE "deprecat|no longer|removed in|unstable_|must now" \
   node_modules/next/dist/docs/01-app/01-getting-started/

@@ -1,13 +1,14 @@
 ---
+
 name: figma-to-page
 description: >-
-  Convert a Figma design node into a Next.js App Router page that matches this
-  project's structure and conventions. Use when the user provides a Figma
-  design URL (figma.com/design/...?node-id=...) and wants it built as a page,
-  section, or component — e.g. "build this Figma page", "convert this node to a
-  page", "turn this frame into Next.js". Covers reading the node via the Figma
-  MCP, extracting real assets, scaffolding tokens/primitives/sections, composing
-  the page, and verifying fidelity with a lint/build/preview-screenshot gate.
+Convert a Figma design node into a Next.js App Router page that matches this
+project's structure and conventions. Use when the user provides a Figma
+design URL (figma.com/design/...?node-id=...) and wants it built as a page,
+section, or component — e.g. "build this Figma page", "convert this node to a
+page", "turn this frame into Next.js". Covers reading the node via the Figma
+MCP, extracting real assets, scaffolding tokens/primitives/sections, composing
+the page, and verifying fidelity with a lint/build/preview-screenshot gate.
 ---
 
 # Figma → Next.js page
@@ -40,8 +41,10 @@ Work one section at a time; do not try to one-shot a whole page. Use the
 TaskCreate tool to track the phases below.
 
 ### 0. Confirm scope (ask before building)
+
 These four choices materially change the output, so confirm them up front with
 `AskUserQuestion` (skip any the user already specified):
+
 1. **Responsiveness** — pixel-match desktop only, or responsive with
    mobile/tablet breakpoints? (Figma frames are desktop-only.)
 2. **Assets** — export real photos/logos/illustrations, or placeholders + real
@@ -52,6 +55,7 @@ These four choices materially change the output, so confirm them up front with
    Home node → `app/page.tsx`.)
 
 ### 1. Understand the node
+
 1. `get_screenshot(nodeId)` — the visual source of truth for the gate.
 2. `get_metadata(nodeId)` — the structure. It is often large; if it exceeds the
    token limit it is saved to a file. Parse it for the **direct children** (the
@@ -63,6 +67,7 @@ These four choices materially change the output, so confirm them up front with
    `reference/conventions.md`).
 
 ### 2. Extract assets (deterministic)
+
 For each section node, call `get_design_context(nodeId)` and save the returned
 reference code to `/tmp/figma-ref/<slug>.txt`. If the response comes back as
 metadata only (the node is too large), call it again with `forceCode: true`, or
@@ -84,6 +89,7 @@ the bulky design-context dumps stay out of context — have it return only the
 manifest.
 
 ### 3. Scaffold tokens, primitives, sections
+
 - **Tokens & font**: ensure `app/globals.css` `@theme` and `app/layout.tsx`
   (Inter via `next/font/google`) match the design. Already done for this repo —
   reuse them.
@@ -113,11 +119,13 @@ scroll on mobile). Keep components Server Components; add `'use client'` only to
 interactive leaves (carousels, tabs, search, menus, back-to-top).
 
 ### 4. Compose the page
+
 Create `app/<route>/page.tsx` (or `app/page.tsx` for the home node) that imports
 the section components in order. The "Home" node maps to `app/page.tsx`; confirm
 the route for other nodes.
 
 ### 5. Verify (the gate — required)
+
 1. `preview_start` (uses `.claude/launch.json`; create it if missing — see
    `reference/conventions.md`).
 2. `preview_resize` to 1440 wide, `preview_screenshot`, and compare against the

@@ -14,7 +14,7 @@ A page is three things. Once you can see these, every page works the same way.
 
 1. **A route** decides the URL. The route named `Principles` serves
    `/about/principles`. Routes are made once and rarely touched.
-2. **A content list** named after the route — `Page — Principles` — *is* the
+2. **A content list** named after the route — `Page — Principles` — _is_ the
    page. What is in that list, in the order you drag it, is what appears.
 3. **Sections** are the items in that list: one article each, on the
    `Page Section` profile. The headline is the section heading, the body is the
@@ -27,10 +27,10 @@ content from a second list, which is why some pages have several lists.
 
 Two tags control this, both set in the article's **Subject** field:
 
-| Tag | Values | What it does |
-| --- | --- | --- |
-| `page_section_role` | `hero`, `section`, `cta` | `hero` makes the section the banner — its headline becomes the page title, its summary the standfirst, its image the backdrop. `cta` lifts it out into the call-out bar at the foot. Everything else is `section`. |
-| `page_section_template` | see each page below | Names which built-in block to draw in place of the body. Leave unset for a prose section. |
+| Tag                     | Values                   | What it does                                                                                                                                                                                                       |
+| ----------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `page_section_role`     | `hero`, `section`, `cta` | `hero` makes the section the banner — its headline becomes the page title, its summary the standfirst, its image the backdrop. `cta` lifts it out into the call-out bar at the foot. Everything else is `section`. |
+| `page_section_template` | see each page below      | Names which built-in block to draw in place of the body. Leave unset for a prose section.                                                                                                                          |
 
 Only one section per page should be tagged `hero`. Tag none and the first item
 in the list is used instead.
@@ -67,13 +67,13 @@ in the last column.
 
 List: `Page — About`
 
-| Slugline | Role | Renders | Content from |
-| --- | --- | --- | --- |
-| `about-hero` | hero | prose | — |
-| `about-intro` | section | `about-intro` | `Page — About — Intro Images` |
-| `about-impact` | section | `impact-stats` | `Page — About — Impact` |
-| `about-team` | section | `team-grid` | `Page — About — Team` |
-| `about-ally-strip` | section | `ally-partner-strip` | `Page — Partners — Allies` |
+| Slugline           | Role    | Renders              | Content from                  |
+| ------------------ | ------- | -------------------- | ----------------------------- |
+| `about-hero`       | hero    | prose                | —                             |
+| `about-intro`      | section | `about-intro`        | `Page — About — Intro Images` |
+| `about-impact`     | section | `impact-stats`       | `Page — About — Impact`       |
+| `about-team`       | section | `team-grid`          | `Page — About — Team`         |
+| `about-ally-strip` | section | `ally-partner-strip` | `Page — Partners — Allies`    |
 
 The intro section's standfirst comes from its **body**, not its summary — it
 runs longer than a headline allows.
@@ -82,15 +82,15 @@ runs longer than a headline allows.
 
 List: `Page — Contact Us`
 
-| Slugline | Role | Renders | Content from |
-| --- | --- | --- | --- |
-| `contact-hero` | hero | prose | — |
-| `contact-hq` | section | `contact-form` | its own `contact_address`, `contact_email`, `contact_phone` |
-| `contact-locations` | section | `contact-locations` | `Page — Contact Us — Locations` |
-| `contact-whatsapp` | section | `contact-whatsapp` | `Page — Contact Us — WhatsApp` |
-| `contact-licensing` | section | prose | — |
-| `contact-imprint` | section | `legal-sections` | `Page — Imprint — Sections` |
-| `contact-fact-check` | section | `contact-fact-check` | its own body, links included |
+| Slugline             | Role    | Renders              | Content from                                                |
+| -------------------- | ------- | -------------------- | ----------------------------------------------------------- |
+| `contact-hero`       | hero    | prose                | —                                                           |
+| `contact-hq`         | section | `contact-form`       | its own `contact_address`, `contact_email`, `contact_phone` |
+| `contact-locations`  | section | `contact-locations`  | `Page — Contact Us — Locations`                             |
+| `contact-whatsapp`   | section | `contact-whatsapp`   | `Page — Contact Us — WhatsApp`                              |
+| `contact-licensing`  | section | prose                | —                                                           |
+| `contact-imprint`    | section | `legal-sections`     | `Page — Imprint — Sections`                                 |
+| `contact-fact-check` | section | `contact-fact-check` | its own body, links included                                |
 
 The message form is built into the site and is not editable — only the heading
 above it and the contact details beneath. The large WhatsApp number lives in
@@ -100,11 +100,11 @@ above it and the contact details beneath. The large WhatsApp number lives in
 
 List: `Page — FAQs`
 
-| Slugline | Role | Renders | Content from |
-| --- | --- | --- | --- |
-| `faqs-hero` | hero | prose | — |
-| `faqs-questions` | section | `faq-questions` | `Page — FAQs — Questions` |
-| `faqs-cta` | cta | prose | its `cta_url` and `cta_label` |
+| Slugline         | Role    | Renders         | Content from                  |
+| ---------------- | ------- | --------------- | ----------------------------- |
+| `faqs-hero`      | hero    | prose           | —                             |
+| `faqs-questions` | section | `faq-questions` | `Page — FAQs — Questions`     |
+| `faqs-cta`       | cta     | prose           | its `cta_url` and `cta_label` |
 
 A section tagged `cta` with no `cta_url` quietly stays an ordinary section
 rather than becoming the call-out bar.
@@ -113,13 +113,13 @@ rather than becoming the call-out bar.
 
 List: `Page — Media Centre`
 
-| Slugline | Role | Renders | Content from |
-| --- | --- | --- | --- |
-| `media-centre-hero` | hero | prose | — |
-| `media-centre-research` | section | `media-research` | `Page — Media Centre — In Research` |
-| `media-centre-news` | section | `media-news` | `Page — Media Centre — In the News` |
+| Slugline                     | Role    | Renders               | Content from                          |
+| ---------------------------- | ------- | --------------------- | ------------------------------------- |
+| `media-centre-hero`          | hero    | prose                 | —                                     |
+| `media-centre-research`      | section | `media-research`      | `Page — Media Centre — In Research`   |
+| `media-centre-news`          | section | `media-news`          | `Page — Media Centre — In the News`   |
 | `media-centre-announcements` | section | `media-announcements` | `Page — Media Centre — Announcements` |
-| `media-centre-events` | section | `media-events` | `Page — Media Centre — Spotlight` |
+| `media-centre-events`        | section | `media-events`        | `Page — Media Centre — Spotlight`     |
 
 Each section's heading comes from its own headline, so renaming "In the news"
 is an edit to `media-centre-news`.
@@ -128,21 +128,21 @@ is an edit to `media-centre-news`.
 
 List: `Page — Our Ecosystem`
 
-| Slugline | Role | Renders | Content from |
-| --- | --- | --- | --- |
-| `ecosystem-hero-y5vv3jai` | hero | prose | — |
-| `ecosystem-groups` | section | `ecosystem-groups` | `Page — Our Ecosystem — Partners` |
-| `ecosystem-roles` | section | `ecosystem-roles` | `Page — Our Ecosystem — Roles` |
+| Slugline                  | Role    | Renders            | Content from                      |
+| ------------------------- | ------- | ------------------ | --------------------------------- |
+| `ecosystem-hero-y5vv3jai` | hero    | prose              | —                                 |
+| `ecosystem-groups`        | section | `ecosystem-groups` | `Page — Our Ecosystem — Partners` |
+| `ecosystem-roles`         | section | `ecosystem-roles`  | `Page — Our Ecosystem — Roles`    |
 
 ### Partners — `/about/partners`
 
 List: `Page — Partners`
 
-| Slugline | Role | Renders | Content from |
-| --- | --- | --- | --- |
-| `partners-hero` | hero | prose | — |
-| `partners-wall` | section | `partners-logos` | `Page — Partners — Partners` |
-| `partners-allies` | section | `allies-logos` | `Page — Partners — Allies` |
+| Slugline          | Role    | Renders          | Content from                 |
+| ----------------- | ------- | ---------------- | ---------------------------- |
+| `partners-hero`   | hero    | prose            | —                            |
+| `partners-wall`   | section | `partners-logos` | `Page — Partners — Partners` |
+| `partners-allies` | section | `allies-logos`   | `Page — Partners — Allies`   |
 
 The blurb above each wall is the section's **body**. The Allies list also feeds
 the strip on the About page — edit it once, both change.
@@ -151,18 +151,18 @@ the strip on the About page — edit it once, both change.
 
 List: `Page — Tools`
 
-| Slugline | Role | Renders | Content from |
-| --- | --- | --- | --- |
-| `tools-hero` | hero | prose | — |
+| Slugline         | Role    | Renders          | Content from           |
+| ---------------- | ------- | ---------------- | ---------------------- |
+| `tools-hero`     | hero    | prose            | —                      |
 | `tools-showcase` | section | `tools-showcase` | `Page — Tools — Tools` |
 
 ### Privacy Policy — `/privacy-policy`
 
 List: `Page — Privacy Policy`
 
-| Slugline | Role | Renders | Content from |
-| --- | --- | --- | --- |
-| `privacy-hero` | hero | prose | — |
+| Slugline           | Role    | Renders          | Content from                       |
+| ------------------ | ------- | ---------------- | ---------------------------------- |
+| `privacy-hero`     | hero    | prose            | —                                  |
 | `privacy-sections` | section | `legal-sections` | `Page — Privacy Policy — Sections` |
 
 Clauses are numbered by their position in the list, so reordering renumbers the
@@ -170,12 +170,12 @@ document. The closing paragraph after the last clause is the section's **body**.
 
 ### Principles, Methodology, Funding, Knowledge
 
-| Page | List | Sections |
-| --- | --- | --- |
-| Principles — `/about/principles` | `Page — Principles` | hero + 7 prose |
+| Page                               | List                 | Sections        |
+| ---------------------------------- | -------------------- | --------------- |
+| Principles — `/about/principles`   | `Page — Principles`  | hero + 7 prose  |
 | Methodology — `/about/methodology` | `Page — Methodology` | hero + 12 prose |
-| Funding — `/about/funding` | `Page — Funding` | hero + 3 prose |
-| Knowledge — `/knowledge` | `Page — Knowledge` | hero + 3 prose |
+| Funding — `/about/funding`         | `Page — Funding`     | hero + 3 prose  |
+| Knowledge — `/knowledge`           | `Page — Knowledge`   | hero + 3 prose  |
 
 The simplest pages: no templates, no second list. Add a section by publishing
 another `Page Section` article and dropping it into the list. Once a page has
@@ -187,29 +187,29 @@ headlines automatically.
 These feed the templates. Each row is one article; the columns say which part
 of that article becomes what on screen. Order in the list is order on the page.
 
-| List | Headline | Summary | Body | Image | Extra fields |
-| --- | --- | --- | --- | --- | --- |
-| `Page — About — Team` | name | bio | — | portrait | `team_role`, `linkedin_url` |
-| `Page — About — Impact` | the figure | the line beneath | — | — | `impact_icon` |
-| `Page — About — Intro Images` | unused | — | — | the two portraits | — |
-| `Page — FAQs — Questions` | the question | the answer | answer, if no summary | — | `faq_group` |
-| `Page — Tools — Tools` | tool name | tagline | description | screenshot | `cta_url`, `cta_label` |
-| `Page — Partners — Partners` | organisation | — | — | logo | — |
-| `Page — Partners — Allies` | organisation | — | — | logo | — |
-| `Page — Our Ecosystem — Partners` | organisation | — | — | logo | `ecosystem_group`, `partner_role`, `partner_url` |
-| `Page — Our Ecosystem — Roles` | role name | — | description | — | `ecosystem_role_icon` |
-| `Page — Media Centre — In Research` | the label | the copy | — | — | `media_centre_label` |
-| `Page — Media Centre — In the News` | headline | — | sets read time | clipping image | `media_centre_label` |
-| `Page — Media Centre — Announcements` | headline | excerpt | — | — | `media_centre_label` |
-| `Page — Media Centre — Spotlight` | event name | description | — | event image | `event_venue`, `event_dates`, `event_format`, `event_languages`, `event_cost` |
-| `Page — Contact Us — Locations` | country | city | person | — | `contact_email`, `contact_phone` |
-| `Page — Contact Us — WhatsApp` | column heading | — | column text | — | — |
-| `Page — Privacy Policy — Sections` | clause title | — | clause text | — | — |
-| `Page — Imprint — Sections` | clause title | — | clause text | — | — |
+| List                                  | Headline       | Summary          | Body                  | Image             | Extra fields                                                                  |
+| ------------------------------------- | -------------- | ---------------- | --------------------- | ----------------- | ----------------------------------------------------------------------------- |
+| `Page — About — Team`                 | name           | bio              | —                     | portrait          | `team_role`, `linkedin_url`                                                   |
+| `Page — About — Impact`               | the figure     | the line beneath | —                     | —                 | `impact_icon`                                                                 |
+| `Page — About — Intro Images`         | unused         | —                | —                     | the two portraits | —                                                                             |
+| `Page — FAQs — Questions`             | the question   | the answer       | answer, if no summary | —                 | `faq_group`                                                                   |
+| `Page — Tools — Tools`                | tool name      | tagline          | description           | screenshot        | `cta_url`, `cta_label`                                                        |
+| `Page — Partners — Partners`          | organisation   | —                | —                     | logo              | —                                                                             |
+| `Page — Partners — Allies`            | organisation   | —                | —                     | logo              | —                                                                             |
+| `Page — Our Ecosystem — Partners`     | organisation   | —                | —                     | logo              | `ecosystem_group`, `partner_role`, `partner_url`                              |
+| `Page — Our Ecosystem — Roles`        | role name      | —                | description           | —                 | `ecosystem_role_icon`                                                         |
+| `Page — Media Centre — In Research`   | the label      | the copy         | —                     | —                 | `media_centre_label`                                                          |
+| `Page — Media Centre — In the News`   | headline       | —                | sets read time        | clipping image    | `media_centre_label`                                                          |
+| `Page — Media Centre — Announcements` | headline       | excerpt          | —                     | —                 | `media_centre_label`                                                          |
+| `Page — Media Centre — Spotlight`     | event name     | description      | —                     | event image       | `event_venue`, `event_dates`, `event_format`, `event_languages`, `event_cost` |
+| `Page — Contact Us — Locations`       | country        | city             | person                | —                 | `contact_email`, `contact_phone`                                              |
+| `Page — Contact Us — WhatsApp`        | column heading | —                | column text           | —                 | —                                                                             |
+| `Page — Privacy Policy — Sections`    | clause title   | —                | clause text           | —                 | —                                                                             |
+| `Page — Imprint — Sections`           | clause title   | —                | clause text           | —                 | —                                                                             |
 
 Three lists carry rules that are not obvious from the table:
 
-- **Spotlight** — the *first* event is the large featured one; the rest become
+- **Spotlight** — the _first_ event is the large featured one; the rest become
   the "Also coming up" cards. Promote an event by dragging it to the top.
 - **WhatsApp** — exactly two columns. The first gets the channel link, the
   second the QR code. Reordering swaps them.
@@ -223,38 +223,38 @@ Three lists carry rules that are not obvious from the table:
 Set under **Subject**, chosen from a list. Three have values the site knows by
 name — picking anything else falls back to a default rather than failing loudly.
 
-| Vocabulary | Used on | Notes |
-| --- | --- | --- |
-| `page_section_role` | page sections | `hero`, `section`, `cta` |
-| `page_section_template` | page sections | Fixed set — each value is a block the site knows how to draw. Adding one needs a developer. |
-| `faq_group` | FAQ questions | Free to name. The group heading is the value you pick. |
-| `media_centre_label` | Media Centre entries | The kind of document, the outlet name, or the announcement tag, depending on the list. |
-| `ecosystem_group` | ecosystem partners | Free to name. Becomes the band heading. |
-| `ecosystem_role_icon` | ecosystem roles | **Fixed:** `announce`, `hand`, `server`. |
-| `impact_icon` | impact stats | **Fixed** — the same icon set the site navigation uses. |
+| Vocabulary              | Used on              | Notes                                                                                       |
+| ----------------------- | -------------------- | ------------------------------------------------------------------------------------------- |
+| `page_section_role`     | page sections        | `hero`, `section`, `cta`                                                                    |
+| `page_section_template` | page sections        | Fixed set — each value is a block the site knows how to draw. Adding one needs a developer. |
+| `faq_group`             | FAQ questions        | Free to name. The group heading is the value you pick.                                      |
+| `media_centre_label`    | Media Centre entries | The kind of document, the outlet name, or the announcement tag, depending on the list.      |
+| `ecosystem_group`       | ecosystem partners   | Free to name. Becomes the band heading.                                                     |
+| `ecosystem_role_icon`   | ecosystem roles      | **Fixed:** `announce`, `hand`, `server`.                                                    |
+| `impact_icon`           | impact stats         | **Fixed** — the same icon set the site navigation uses.                                     |
 
 ## Custom fields
 
 Typed in directly. They only appear on profiles that carry them, which is why a
 field you expect can be missing from an article.
 
-| Field | On | What it does |
-| --- | --- | --- |
-| `content_list` | page sections | Points a template at a different list than its usual one. This is how the imprint clauses appear on Contact Us. |
-| `cta_url` | page sections, tools | Where the button or card goes. |
-| `cta_label` | page sections, tools | The button's words. Tools default to "Visit website". |
-| `team_role` | team members | Job title under the name. |
-| `linkedin_url` | team members | Turns the card's badge into a link. Empty hides it. |
-| `partner_role` | ecosystem partners | The pill on the card — "Verified signatory". |
-| `partner_url` | ecosystem partners | Where "Learn More" goes. **Fill this in** — without it the card links to its own article, which reads as though the organisation were a fact-check. |
-| `event_venue` | events | "Nairobi", "Online". Shown above the headline. |
-| `event_dates` | events | Written as you want it read: "12–13 September 2026". |
-| `event_format` | events | "In person & streamed". A detail row on the featured event. |
-| `event_languages` | events | "English, French, Kiswahili". |
-| `event_cost` | events | "Free for partner newsrooms". |
-| `contact_address` | contact sections | The postal address beside the map pin. |
-| `contact_email` | contact sections, offices | An office card without one is dropped. |
-| `contact_phone` | contact sections, offices | Also the large WhatsApp number. |
+| Field             | On                        | What it does                                                                                                                                        |
+| ----------------- | ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `content_list`    | page sections             | Points a template at a different list than its usual one. This is how the imprint clauses appear on Contact Us.                                     |
+| `cta_url`         | page sections, tools      | Where the button or card goes.                                                                                                                      |
+| `cta_label`       | page sections, tools      | The button's words. Tools default to "Visit website".                                                                                               |
+| `team_role`       | team members              | Job title under the name.                                                                                                                           |
+| `linkedin_url`    | team members              | Turns the card's badge into a link. Empty hides it.                                                                                                 |
+| `partner_role`    | ecosystem partners        | The pill on the card — "Verified signatory".                                                                                                        |
+| `partner_url`     | ecosystem partners        | Where "Learn More" goes. **Fill this in** — without it the card links to its own article, which reads as though the organisation were a fact-check. |
+| `event_venue`     | events                    | "Nairobi", "Online". Shown above the headline.                                                                                                      |
+| `event_dates`     | events                    | Written as you want it read: "12–13 September 2026".                                                                                                |
+| `event_format`    | events                    | "In person & streamed". A detail row on the featured event.                                                                                         |
+| `event_languages` | events                    | "English, French, Kiswahili".                                                                                                                       |
+| `event_cost`      | events                    | "Free for partner newsrooms".                                                                                                                       |
+| `contact_address` | contact sections          | The postal address beside the map pin.                                                                                                              |
+| `contact_email`   | contact sections, offices | An office card without one is dropped.                                                                                                              |
+| `contact_phone`   | contact sections, offices | Also the large WhatsApp number.                                                                                                                     |
 
 Every event detail field is optional on its own: an unset one drops its row
 rather than printing a blank.
