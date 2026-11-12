@@ -1,7 +1,7 @@
 # figma-to-page
 
-Convert a Figma design node into a Next.js App Router page that matches this
-project's structure (Next.js 16, Tailwind v4, Inter), at high fidelity.
+Convert a Figma design node into a Next.js App Router page that matches this project's structure (Next.js 16, Tailwind
+v4, Inter), at high fidelity.
 
 ## Usage
 
@@ -11,17 +11,15 @@ In Claude Code, with the Figma desktop app open (Dev Mode MCP running):
 /figma-to-page https://www.figma.com/design/<key>/<name>?node-id=2866-1070
 ```
 
-Or just ask: _"build this Figma node as a page: <url>"_. The skill reads the
-node, extracts real assets, scaffolds tokens/primitives/sections against the
-existing `components/ui` library, composes the page, and runs a
+Or just ask: _"build this Figma node as a page: <url>"_. The skill reads the node, extracts real assets, scaffolds
+tokens/primitives/sections against the existing `components/ui` library, composes the page, and runs a
 lint/build/preview-screenshot verification gate.
 
 ## What's deterministic vs guided
 
-- **Deterministic (scripts):** asset download + naming, metadata parsing,
-  section scaffolding, and the verify gate.
-- **Guided (LLM + gate):** translating absolute-positioned Figma layers into
-  clean responsive layout. The screenshot comparison gate is the quality check.
+- **Deterministic (scripts):** asset download + naming, metadata parsing, section scaffolding, and the verify gate.
+- **Guided (LLM + gate):** translating absolute-positioned Figma layers into clean responsive layout. The screenshot
+  comparison gate is the quality check.
 
 ## Layout
 

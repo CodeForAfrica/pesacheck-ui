@@ -49,6 +49,19 @@
       "quoteStyle": "double"
     }
   },
+  "markdown": {
+    "parser": {
+      "frontmatter": true
+    },
+    "formatter": {
+      "enabled": true,
+      "formatEmbeds": true,
+      "proseWrap": "always",
+      "indentStyle": "space",
+      "indentWidth": 2,
+      "lineWidth": 120
+    }
+  },
   "assist": {
     "enabled": true,
     "actions": {
