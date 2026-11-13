@@ -97,9 +97,7 @@ derived and ordered exactly like the FAQ groups.
 `ecosystem_role_icon` chooses the icon on a "How we build the ecosystem" card. **Its qcodes are not free text** — they
 must match `ECOSYSTEM_ROLE_ICONS` in `lib/ecosystem-content.ts`, currently `announce`, `hand` and `server`. An icon is a
 React component and cannot come from Superdesk, so an editor picks from the set this build ships; a role tagged with
-anything else falls back to the default rather than rendering an empty badge.
-**Adding a fourth icon is a code
-change**,
+anything else falls back to the default rather than rendering an empty badge. **Adding a fourth icon is a code change**,
 and that is the one part of these pages an editor cannot do alone.
 
 ### `verdict_image` — labelled **Verdict Image**
@@ -292,9 +290,7 @@ Four things about how lists behave:
 - **Items are filtered to the six language routes** (`english`, `french`, `kiswahili`, `afaan-oromo`, `somali`,
   `amharic` — see `LANGUAGE_ROUTE_SLUGS` in `lib/data/stories.ts`). Curated lists get polluted with non-article entries
   such as team-member profiles, and there is no structural marker separating a language route from another collection,
-  so the set is editorial.
-  **An article
-  published to any other route will not appear on the site even when correctly
+  so the set is editorial. **An article published to any other route will not appear on the site even when correctly
   curated.**
 
 ## Webhooks — telling the site an edit happened
@@ -366,9 +362,8 @@ reordering one — has no webhook event and lands on the 5-minute TTL. Nothing n
 
 Every section falls back independently to the design copy in `lib/media-centre-content.ts`. An unreachable Hasura, a
 missing list, an empty list and a list whose items are all on non-language routes all arrive the same way — as nothing
-to show — and none of these sections has a designed empty state. This means
-**a broken query looks exactly like unfinished curation**. If a section shows copy you recognise from the design, check
-the list before suspecting the code.
+to show — and none of these sections has a designed empty state. This means **a broken query looks exactly like
+unfinished curation**. If a section shows copy you recognise from the design, check the list before suspecting the code.
 
 An edit that is correct in Superdesk but shows the _previous_ live content is a different problem — the site is
 prerendered, and the page has not been revalidated yet. See [`revalidation.md`](./revalidation.md).
@@ -388,9 +383,7 @@ Recorded because they cost time to diagnose, and they are infrastructure rather 
 
   The size-dependent behaviour of the last two points at a request-size limit on `PATCH` somewhere in front of the app
   rather than the method being blocked. Either way there is no way through: Eve replaces the whole `editor` object, so a
-  profile edit is always a large body.
-  **Editing a profile through the API
-  means deleting it and POSTing a replacement**
+  profile edit is always a large body. **Editing a profile through the API means deleting it and POSTing a replacement**
   — `DELETE` needs an `If-Match` header (without it, 428) and the create frequently answers `409` having succeeded
   anyway, so verify the result rather than trusting the status code. Vocabularies are unaffected:
   `PATCH /vocabularies/<id>` works normally.
