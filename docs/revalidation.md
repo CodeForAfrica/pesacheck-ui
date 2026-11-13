@@ -20,11 +20,8 @@ pnpm build   # the Revalidate column says which pages cache, and for how long
 | **Tag revalidation** | a Publisher webhook POSTs `/api/revalidate`     | seconds  | articles, content desks, menus                   |
 | **Time (ISR)**       | nothing — every page carries `revalidate = 300` | ≤ 5 min  | everything, including what the webhook can't see |
 
-Before this, those pages carried Next's default for a static route —
-**one
-hour**
-— so a correction could sit behind an hour of cached HTML. Not frozen until a redeploy, but far too slow for a
-fact-check correction.
+Before this, those pages carried Next's default for a static route — **one hour** — so a correction could sit behind an
+hour of cached HTML. Not frozen until a redeploy, but far too slow for a fact-check correction.
 
 The TTL is the backstop, and it is load-bearing rather than ceremonial. Publisher delivers a webhook once, with no retry
 and no delivery log, and it has **no event for content lists** — so a curation change (reordering the homepage hero,
@@ -89,9 +86,9 @@ needs the same treatment.
 
 ### What `next dev` caches
 
-Development is not simply "uncached". `next dev` keeps no route cache, so every request re-renders — but the
-**data cache is live in development too**, which means a page can visibly re-render and still show data minutes old.
-That is a convincing illusion of a broken query.
+Development is not simply "uncached". `next dev` keeps no route cache, so every request re-renders — but the **data
+cache is live in development too**, which means a page can visibly re-render and still show data minutes old. That is a
+convincing illusion of a broken query.
 
 So `gql()` skips the data cache when `NODE_ENV === "development"`: local reads always hit Hasura, and an edit in
 Superdesk shows up on the next reload. The cost is a slower dev server: every render of a page makes its Hasura round
@@ -105,10 +102,9 @@ can look frozen while you are editing files. It clears on a full reload.
 
 ### A cached read caches failures too
 
-Next declines to cache a non-200 response, so a 5xx from Hasura or Cloudflare is retried on the next render.
-**A GraphQL error is not a non-200**: Hasura answers a statement timeout or a validation error with HTTP 200 and an
-`errors` body, `graphql-request` throws on it, and Next — seeing a 200 — stores it under that read's tags for the full
-TTL.
+Next declines to cache a non-200 response, so a 5xx from Hasura or Cloudflare is retried on the next render. **A GraphQL
+error is not a non-200**: Hasura answers a statement timeout or a validation error with HTTP 200 and an `errors` body,
+`graphql-request` throws on it, and Next — seeing a 200 — stores it under that read's tags for the full TTL.
 
 The visible effect is a page stuck on its static fallback for up to five minutes after Hasura has recovered, which reads
 exactly like unfinished curation. It clears in one of two ways: the TTL expires, or a webhook revalidates the tag, which
@@ -316,8 +312,8 @@ In order of likelihood:
 1. **More than five minutes have passed and it's still stale.** Then it isn't caching — the TTL would have caught it.
    Check the query, or whether the page is silently falling back to `lib/*-content.ts` (see _Fallback behaviour_ in
    `superdesk-setup.md`; a broken query looks exactly like unfinished curation).
-2. **It showed design copy for a few minutes, then fixed itself.** A Hasura error was cached for the TTL — see
-   _A cached read caches failures too_ above. Nothing to fix on the site; look at Hasura for the original error.
+2. **It showed design copy for a few minutes, then fixed itself.** A Hasura error was cached for the TTL — see _A cached
+   read caches failures too_ above. Nothing to fix on the site; look at Hasura for the original error.
 3. **It was a curation change.** Content lists have no Publisher event; the TTL is the only thing that refreshes them.
    Expected, not a fault.
 4. **The webhook didn't fire, or fired and failed.** Publisher keeps no delivery log, so this is diagnosed from the

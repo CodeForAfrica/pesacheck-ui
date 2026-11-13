@@ -21,14 +21,12 @@ Header, Footer, back-to-top, the nav, and social/footer content are **site-wide*
 they will drift. This is already wired up:
 
 - **`Header`, `Footer`, `BackToTop` live in `components/layout/`** and are rendered from the root **`app/layout.tsx`**,
-  which also provides the `<main className="flex-1">` wrapper. Each `page.tsx` returns
-  **only its unique
-  sections**
-  (a fragment), never the chrome.
+  which also provides the `<main className="flex-1">` wrapper. Each `page.tsx` returns **only its unique sections** (a
+  fragment), never the chrome.
 - **Site-wide content lives in `lib/site.ts`** (`NAV_LINKS`, `FOOTER_NAV`, `LEGAL`, `ALLIES`, `PARTNERS`,
   `SOCIAL_ICONS`, `ABOUT_BLURB`, `FOOTER_ABOUT`). Reserve `lib/<page>-content.ts` for page-specific data only.
-- When adding a new page: create `app/<route>/page.tsx` returning its sections — the chrome comes for free.
-  **Wire navigation to real routes** by updating `NAV_LINKS` hrefs from `#anchors` to `/route` paths as pages land.
+- When adding a new page: create `app/<route>/page.tsx` returning its sections — the chrome comes for free. **Wire
+  navigation to real routes** by updating `NAV_LINKS` hrefs from `#anchors` to `/route` paths as pages land.
 - If a non-chrome section repeats across pages (e.g. a CTA band), promote it to `components/shared/` and drive it from
   `lib/site.ts`.
 

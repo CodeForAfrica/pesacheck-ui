@@ -82,10 +82,8 @@ one-time setup is needed.
 1. Install and open the **Figma desktop app** (the browser version does not expose the MCP server), then open the
    PesaCheck file.
 2. Make sure your Figma plan/seat has **Dev Mode** access.
-3. From the Figma menu, enable the local MCP server
-   (**Preferences → Enable Dev
-   Mode MCP Server**,
-   or the equivalent toggle in your Figma version). When it's running it serves `http://localhost:3845`.
+3. From the Figma menu, enable the local MCP server (**Preferences → Enable Dev Mode MCP Server**, or the equivalent
+   toggle in your Figma version). When it's running it serves `http://localhost:3845`.
 4. Keep the desktop app open with the file loaded for the whole session — the skill reads the node live; nothing works
    if Figma is closed.
 

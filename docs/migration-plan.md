@@ -8,8 +8,8 @@ Hasura) built from the open-source projects.
 
 The local stack is the long pole (heavy to stand up, and we have no staging DB dump — content must be authored locally).
 The frontend data layer does **not** need to wait for it: the remote staging Hasura
-(`https://pesacheckstaging-hasura.superdesk.org/v1/graphql`) is anonymous, read-only, and speaks the
-**same `swp_*` schema** the local stack will. So:
+(`https://pesacheckstaging-hasura.superdesk.org/v1/graphql`) is anonymous, read-only, and speaks the **same `swp_*`
+schema** the local stack will. So:
 
 - **Track A — Frontend data layer.** Build against the remote staging Hasura now. Prove the data contract page by page.
   Start immediately.
@@ -261,18 +261,16 @@ lighter but means hand-crafting that payload and renditions yourself. The cost o
    `tenant_code` (local analogue of `e6lkum`). Note the organization **API key**. Media is served from Publisher's
    `/media/`.
 4. **Wire core → Publisher (the publish pipeline).**
-   - In **core**, register a **subscriber** with a **destination** whose transmitter targets Publisher's
-     **content-push API** (`<publisher>/api/v2/content/push`), authenticated with the org API key / shared secret (this
-     is what `WEBHOOK_TOP_SECRET_TOKEN` in the reference repo is for).
+   - In **core**, register a **subscriber** with a **destination** whose transmitter targets Publisher's **content-push
+     API** (`<publisher>/api/v2/content/push`), authenticated with the org API key / shared secret (this is what
+     `WEBHOOK_TOP_SECRET_TOKEN` in the reference repo is for).
    - In **Publisher**, define **routing rules** so pushed articles are assigned to the routes/collections matching the
      Figma desk slugs (`climate-change`, `gender`, `elections`, …). ⚠️ **Most common failure:** articles push in
      successfully but appear nowhere because no routing rule placed them on a route the frontend reads. Verify a pushed
      article gets a `route_id` in Publisher.
-5. **Hasura.** Run a Hasura container against the Publisher Postgres.
-   **Import
-   `pesacheck-pwa-app-router/hasura_metadata.json`**
-   to expose the `swp_*` tables and grant the **anonymous role** read access (so the browser can query, same as
-   staging).
+5. **Hasura.** Run a Hasura container against the Publisher Postgres. **Import
+   `pesacheck-pwa-app-router/hasura_metadata.json`** to expose the `swp_*` tables and grant the **anonymous role** read
+   access (so the browser can query, same as staging).
 6. **Seed content.** Either author + publish a few fact-checks by hand in the core UI, or script it against the core
    REST API (sketch below). Each item must reach the **published** state. Then verify they appear via a Hasura query
    filtered by the local `tenant_code`.
@@ -311,11 +309,9 @@ Notes:
 
 ### Lighter fallback
 
-If the core→Publisher wiring (step 4) blocks you, fall back to
-**Publisher +
-Hasura only**,
-seeded via Publisher's content-push API directly or its demo fixtures — same `swp_*` contract, no editorial core. You
-lose payload/rendition fidelity but unblock frontend work.
+If the core→Publisher wiring (step 4) blocks you, fall back to **Publisher + Hasura only**, seeded via Publisher's
+content-push API directly or its demo fixtures — same `swp_*` contract, no editorial core. You lose payload/rendition
+fidelity but unblock frontend work.
 
 ---
 

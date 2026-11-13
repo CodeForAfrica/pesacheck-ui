@@ -15,17 +15,13 @@ the page, and verifying fidelity with a lint/build/preview-screenshot gate.
 
 Turn a Figma node URL into a high-fidelity, responsive Next.js page that matches this repo's conventions. The procedure
 below is deterministic where it can be (scripts do the mechanical work) and LLM-guided where it must be (translating
-absolute-positioned Figma layers into responsive layout). The
-**verification
-gate**
-— not the prompt — is what makes the visual result reliable; never skip it.
+absolute-positioned Figma layers into responsive layout). The **verification gate** — not the prompt — is what makes the
+visual result reliable; never skip it.
 
 ## Prerequisites
 
-- The **Figma desktop app** must be open with the file, and its
-  **Dev Mode MCP
-  server**
-  running (assets are served from `http://localhost:3845/assets/...`).
+- The **Figma desktop app** must be open with the file, and its **Dev Mode MCP server** running (assets are served from
+  `http://localhost:3845/assets/...`).
 - Figma MCP tools (load via ToolSearch if deferred): `mcp__figma-desktop__get_metadata`, `get_screenshot`,
   `get_design_context`, `get_variable_defs`.
 - Preview MCP tools for the gate: `mcp__Claude_Preview__preview_start`, `preview_screenshot`, `preview_resize`,

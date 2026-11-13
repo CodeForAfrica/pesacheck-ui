@@ -17,10 +17,8 @@ Mostly yes — **one PR per phase, with two exceptions** found by inspecting the
    (fetch in the async server page, pass data down), not a one-line import swap. The `?? fallback` pattern in the plan
    applies at the **page** level — pages must be refactored to own the data and feed components.
 2. **`FactChecksExplorer` is a `"use client"` component** (filters use `useState`/ `useMemo`). Client components can't
-   fetch server-side, so its data **must** be fetched in a server parent and threaded in as props. This makes
-   **Phase 2
-   bigger than one PR**
-   → split into 2a (home listings) and 2b (fact-checks grid).
+   fetch server-side, so its data **must** be fetched in a server parent and threaded in as props. This makes **Phase 2
+   bigger than one PR** → split into 2a (home listings) and 2b (fact-checks grid).
 
 Everything else is a clean single PR. Routing has one quirk to handle (below).
 
@@ -85,8 +83,8 @@ Lowest-risk vertical slice: stand up the data layer and convert the one 1:1 row.
   `metadata` (verdict) and `body` (readTime). One generic list query covers Spotlight/Trending/Top news.
 - [x] `lib/data/stories.ts` — `getSpotlight()`, `getTrending()`, `getLatest()` returning `Story[]` via `mapStory`.
   List→section mapping (verified staging lists): Spotlight→`Homepage — Spotlight`, Trending→`Homepage —       Trending`,
-  Latest→`Top news` (no "Latest" curated list exists; "Top news" is the listed source).
-  **Names use an EM DASH (—) — must match exactly.**
+  Latest→`Top news` (no "Latest" curated list exists; "Top news" is the listed source). **Names use an EM DASH (—) —
+  must match exactly.**
 - [x] `lib/data/map.ts` — `mapStory` (+ `formatStoryDate`, `computeReadTime`, rendition picker). Maps
   `verdict`/`image`/`date`; computes `readTime` from body word count. Null-safe; `topic`/`region`/`language` left to
   PR4.
@@ -118,22 +116,19 @@ Heavier: client-component data lifting.
   `swp_article_metadata.swp_article_metadata_subjects` relation, with `$limit`/`$offset`. Selects the same fields as
   `GET_CONTENT_LIST_ITEMS` so `mapStory` consumes the rows unchanged.
 - [x] `lib/data/stories.ts` — `getFactChecks(page): FactCheckListing` (`{ stories,       page, totalPages }`),
-  `FACT_CHECKS_PAGE_SIZE = 10`.
-  **A fact-check is
-      defined by carrying a `Debunk` verdict**,
-  enforced in the query (the only signal separating fact-checks from homepage content-blocks + editorial test stubs that
-  share `route`/`profile`). Route-agnostic, so it keeps working once fact-checks land on topic desks (staging desks are
-  empty; everything sits on `english`).
+  `FACT_CHECKS_PAGE_SIZE = 10`. **A fact-check is defined by carrying a `Debunk` verdict**, enforced in the query (the
+  only signal separating fact-checks from homepage content-blocks + editorial test stubs that share `route`/`profile`).
+  Route-agnostic, so it keeps working once fact-checks land on topic desks (staging desks are empty; everything sits on
+  `english`).
 - [x] `app/fact-checks/page.tsx` made async; reads `?page=`, fetches that DB page with the `?? fallback` pattern (static
   pool, paged identically).
 - [x] `FactChecksExplorer` (client) takes `stories` + `page`/`totalPages`; pagination navigates by `?page=N` (server
   re-fetch) — never loads the corpus client-side.
 - [x] `app/fact-checks/[desk]/page.tsx` (PR5 placeholder) passes the static pool on a single page so it compiles + hides
   pagination.
-- [x] Verify against staging: grid renders live fact-checks (verdict badges, dates, readTime, real media).
-  **Server pagination proven** end-to-end by temporarily setting page size to 2 (5 items → 3 pages): each page is a
-  distinct DB slice, `?page=N` drives the fetch, boundary disables "Next". Restored to 10. tsc + biome clean; 27 Vitest
-  tests pass.
+- [x] Verify against staging: grid renders live fact-checks (verdict badges, dates, readTime, real media). **Server
+  pagination proven** end-to-end by temporarily setting page size to 2 (5 items → 3 pages): each page is a distinct DB
+  slice, `?page=N` drives the fetch, boundary disables "Next". Restored to 10. tsc + biome clean; 27 Vitest tests pass.
 
 **Notes:**
 
@@ -145,10 +140,10 @@ Heavier: client-component data lifting.
   though the jsonb carries the verdict — a staging integrity gap). All relation-matched articles still carry the jsonb
   verdict _name_, so `mapStory`'s badge is unaffected. The French "FAUX" article (no structured `Debunk` tag) is also
   absent. Both are staging artifacts; production data is consistently pipelined.
-- Filters remain **static** (region/language/topic from `fact-checks-content`) and now operate
-  **client-side on the current page only**: staged chips show but `applied` starts empty, so the full server page is
-  visible on load. Live `Story`s carry no taxonomy yet, so "Apply Filters" narrows to empty — expected. PR4 makes
-  filtering server-side, layering filter params onto the same `?page=` URL the pagination already uses.
+- Filters remain **static** (region/language/topic from `fact-checks-content`) and now operate **client-side on the
+  current page only**: staged chips show but `applied` starts empty, so the full server page is visible on load. Live
+  `Story`s carry no taxonomy yet, so "Apply Filters" narrows to empty — expected. PR4 makes filtering server-side,
+  layering filter params onto the same `?page=` URL the pagination already uses.
 
 ## PR 3 — Single article — Phase 3 ✅
 
@@ -156,9 +151,9 @@ Heavier: client-component data lifting.
   body, metadata, route, `swp_article_metadata{byline}`, feature-media renditions, authors, keywords, related (selecting
   the same fields `mapStory` consumes).
 - [x] `lib/data/article.ts` — `getArticle(slug): Article` (throws when absent so the page's `?? fallback` fires).
-- [x] Port `convertBodyImages` into `lib/data/body.ts:renderBody` — rewrites `<img>` src → `MEDIA_URL`
-  **inside a `sanitize-html` `transformTags` pass** (no `jsdom`), then sanitizes. Hardened vs the reference:
-  **drops `<script>`**. New deps: `sanitize-html` + `@types/sanitize-html`.
+- [x] Port `convertBodyImages` into `lib/data/body.ts:renderBody` — rewrites `<img>` src → `MEDIA_URL` **inside a
+  `sanitize-html` `transformTags` pass** (no `jsdom`), then sanitizes. Hardened vs the reference: **drops `<script>`**.
+  New deps: `sanitize-html` + `@types/sanitize-html`.
 - [x] `lib/data/map.ts` — `mapArticle`: authors→`author` (join names, fallback jsonb/relation byline, then "PesaCheck"),
   keywords→`tags`, related→`Story[]` (reuses `mapStory`), verdict via `getVerdict`, `readTime`/`date` reuse PR2a
   helpers. Live articles are `format:"short"` with structured paragraph fields empty and the rendered HTML in the new
@@ -184,11 +179,10 @@ Heavier: client-component data lifting.
   JWT-gated and isn't the frontend's data source). The footer boilerplate is **appended into `body`** on publish, always
   opening with "This post is part of an ongoing series of PesaCheck…". `lib/data/body.ts:   renderArticleBody` splits
   the body at that marker → `bodyHtml` (main) + `footnotes[]` (boilerplate paragraphs, rendered in the grey band).
-  **English
-  marker only**;
-  translated/markerless bodies keep the footer inline (graceful fallback). Footnotes carry **sanitized inline HTML**
-  (production footers hyperlink "report"/"methodology"), rendered via `dangerouslySetInnerHTML` in `ArticleFootnotes` —
-  the same path as the body; static footnotes are plain text (valid HTML).
+  **English marker only**; translated/markerless bodies keep the footer inline (graceful fallback). Footnotes carry
+  **sanitized inline HTML** (production footers hyperlink "report"/"methodology"), rendered via
+  `dangerouslySetInnerHTML` in `ArticleFootnotes` — the same path as the body; static footnotes are plain text (valid
+  HTML).
 - **Staging sparsity:** no real staging fact-check carries feature media, authors, or keywords — only the rich HTML body +
   verdict. So live articles render with no hero image (short layout shows none anyway), author "PesaCheck", no tags, no
   related. Mapper + pages are fully null-safe; PR 5/data backfill will populate these.
@@ -222,11 +216,10 @@ Heavier: client-component data lifting.
 
 **Notes:**
 
-- **Why editorial options (not live-derived, contra the original plan item)** —
-  _superseded by PR 7, which derives them from article `metadata`:_ the normalized subject relation exposes only
-  `scheme`/`code` — no display `name` (jsonb-only), no reverse relation to article, no tenant scope — so a scoped,
-  labeled option list can't be queried. Codes/labels are curated like `LANGUAGE_ROUTE_SLUGS`. Filtering itself is fully
-  server-side & scalable.
+- **Why editorial options (not live-derived, contra the original plan item)** — _superseded by PR 7, which derives them
+  from article `metadata`:_ the normalized subject relation exposes only `scheme`/`code` — no display `name`
+  (jsonb-only), no reverse relation to article, no tenant scope — so a scoped, labeled option list can't be queried.
+  Codes/labels are curated like `LANGUAGE_ROUTE_SLUGS`. Filtering itself is fully server-side & scalable.
 - **`_and` semantics:** AND across dimensions = separate `swp_article_metadata` clauses in `_and`; OR within a dimension
   = `code: { _in }`. Never emit an empty `_in: []` (Hasura matches nothing) → inactive dimensions are omitted.
 - **`TaxonomyRow` (`components/ui/MetaRow.tsx`)** made null-safe: it now renders only the dimensions present (live
@@ -337,9 +330,9 @@ PR 4 made filtering server-side but kept the **option lists** editorial, and lef
 
 - **Not verified against staging (AC 7):** the sandbox this was written in can't reach
   `*.pesacheck.org`/`*.superdesk.org`, so the queries are typed against the schema the existing queries already exercise
-  (`metadata`, `swp_article_metadata.language`, `title`/`lead`/`body`) but ran only against a stub.
-  **Smoke-test on staging before go-live**: dropdown contents, a term that only appears in an article body, and
-  multi-dimension filtering.
+  (`metadata`, `swp_article_metadata.language`, `title`/`lead`/`body`) but ran only against a stub. **Smoke-test on
+  staging before go-live**: dropdown contents, a term that only appears in an article body, and multi-dimension
+  filtering.
 - **`_ilike '%term%'` can't use a btree index.** Fine at staging size and fine early in production, but the search
   clause is the one thing here that scales with corpus size — add a `pg_trgm` GIN index on `title`/`lead` (and consider
   dropping `body` from the OR) if search latency shows up.

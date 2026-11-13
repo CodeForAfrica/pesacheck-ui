@@ -19,10 +19,8 @@ data, served as GraphQL by Hasura. Plan: `docs/migration-plan.md`. Progress trac
 side (vocabularies, content profiles, content lists, and how a field reaches the site): `docs/superdesk-setup.md`.
 
 - **Data-access layer:** `lib/data/` (graphql-request client + queries + mappers). Server Components fetch by
-  `await`-ing these functions — there is
-  **no
-  client-side query library**.
-  Client components receive data as props from a server parent.
+  `await`-ing these functions — there is **no client-side query library**. Client components receive data as props from
+  a server parent.
 - **The seam (follow this when adding content):** pages own fetching and pass data down as props; `lib/*-content.ts`
   stays as the typed fallback. Pattern: `const x = (await getX().catch(() => null)) ?? fallback`. Map raw `swp_*` shapes
   to the existing UI types (`Story`, `Article`, `ContentDesk`) in `lib/data/map.ts` — keep components on those types,

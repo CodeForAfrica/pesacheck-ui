@@ -1,10 +1,7 @@
 # Next.js 16 specifics
 
-AGENTS.md warns this is a modified Next.js with breaking changes.
-**Before
-writing framework code, read the relevant guide in
-`node_modules/next/dist/docs/`**
-and heed deprecation notices. Notes that affected this build:
+AGENTS.md warns this is a modified Next.js with breaking changes. **Before writing framework code, read the relevant
+guide in `node_modules/next/dist/docs/`** and heed deprecation notices. Notes that affected this build:
 
 - **`next build` no longer runs the linter** (Next 16). Run `npm run lint` separately as part of the verification gate.
 - **Instant navigation**: the docs repeatedly hint to `export const   unstable_instant` from a route for instant

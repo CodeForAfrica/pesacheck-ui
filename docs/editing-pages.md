@@ -35,11 +35,9 @@ Only one section per page should be tagged `hero`. Tag none and the first item i
 This order matters. A section that skips step 5 exists in Superdesk and is nowhere on the site.
 
 1. **Create the article** on the `Page Section` profile. Any other profile will not show the template and role fields.
-2. **Write the slugline.** It becomes the section's anchor link and
-   **cannot be
-   changed after publishing**.
-   Prefix it with the page name when the plain word is taken elsewhere — `methodology-who-we-are` rather than
-   `who-we-are`. The page prefix is stripped from the anchor automatically.
+2. **Write the slugline.** It becomes the section's anchor link and **cannot be changed after publishing**. Prefix it
+   with the page name when the plain word is taken elsewhere — `methodology-who-we-are` rather than `who-we-are`. The
+   page prefix is stripped from the anchor automatically.
 3. **Fill the fields.** Headline is the section heading, body is the text. Add the role and template tags under Subject
    if the section needs them.
 4. **Publish it.** A draft never reaches the site. Publish to the page's own route where one exists — it makes the item
